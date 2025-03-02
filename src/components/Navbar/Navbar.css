@@ -1,0 +1,85 @@
+/* navbar.css */
+
+/* Navbar container */
+.navbar {
+    background-color: white;
+    padding: 0.75rem 1.5rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 50;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Container to align the content */
+  .navbar-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1280px; /* This controls the max width of the navbar */
+    margin: 0 auto; /* Center the content horizontally */
+    width: 100%;
+  }
+  
+  /* Logo and name */
+  .navbar-logo {
+    display: flex;
+    align-items: center;
+    font-size: 1.125rem;
+    font-weight: bold;
+    color: #3b82f6; /* Tailwind's blue-500 color */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  /* Main navigation links */
+  .navbar-links {
+    display: flex;
+    gap: 2rem;
+  }
+  
+  .navbar-links a {
+    font-size: 0.875rem;
+    color: #4b5563; /* Tailwind's gray-600 color */
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+  
+  .navbar-links a:hover {
+    color: #3b82f6; /* Tailwind's blue-500 color */
+  }
+  
+  /* Account buttons */
+  .navbar-buttons {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .navbar-buttons a {
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .navbar-buttons .signup {
+    color: #3b82f6; /* Tailwind's blue-500 color */
+    border: 1px solid #3b82f6;
+  }
+  
+  .navbar-buttons .signup:hover {
+    background-color: #3b82f6;
+    color: white;
+  }
+  
+  .navbar-buttons .login {
+    background-color: #3b82f6;
+    color: white;
+  }
+  
+  .navbar-buttons .login:hover {
+    background-color: #2563eb; /* Tailwind's blue-600 color */
+  }
+  
