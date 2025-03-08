@@ -1,64 +1,108 @@
 /* SimpleSearch container */
 .simple-search-wrapper {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    padding: 20px 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px 0;
+}
+
+/* Search box */
+.simple-search-box {
+  width: 100%;
+  max-width: 950px;
+  background-color: white;
+  padding: 20px 25px;
+  border-radius: 12px;
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px; /* Added gap for better spacing */
+}
+
+/* Form group: label + select */
+.simple-search-group {
+  display: flex;
+  flex-direction: column;
+  width: 30%;
+  position: relative;
+}
+
+/* Label styling */
+.simple-search-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 5px; /* Increased margin for better spacing */
+}
+
+/* Select field */
+.simple-search-group select {
+  font-size: 14px;
+  color: #777;
+  border: 1px solid #ddd; /* Added border for better visibility */
+  outline: none;
+  background: #f9f9f9; /* Light background for better contrast */
+  padding: 8px 10px; /* Increased padding for better click area */
+  border-radius: 5px; /* Rounded corners */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.simple-search-group select:focus {
+  border-color: #007BE5; /* Blue border on focus */
+  box-shadow: 0 0 5px rgba(0, 123, 229, 0.5); /* Subtle shadow on focus */
+}
+
+/* Thin vertical dividers between fields */
+.simple-search-group:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: -15px; /* Adjusted position for better alignment */
+  top: 10px;
+  height: 80%;
+  width: 1px;
+  background-color: #ddd;
+}
+
+/* Search button */
+.simple-search-button {
+  padding: 12px 24px;
+  background-color: #007BE5;
+  color: white;
+  cursor: pointer;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Slight shadow for button */
+}
+
+.simple-search-button:hover {
+  background-color: #005BB5;
+  transform: translateY(-2px); /* Slight lift effect on hover */
+}
+
+.simple-search-button:active {
+  background-color: #004494; /* Even darker blue on click */
+  transform: translateY(0); /* Remove lift effect on click */
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .simple-search-box {
+      flex-direction: column;
+      gap: 20px; /* Increased gap for better spacing */
+      padding: 25px;
   }
-  
-  /* SimpleSearch form */
-  .simple-search-form {
-    display: flex;
-    justify-content: space-between; /* Keep space between the fields */
-    gap: 20px; /* Reduce the space between form groups */
-    align-items: center; /* Center-align items vertically */
-    width: 100%;
-    max-width: 1000px; /* Make the form a little narrower */
-    background-color: white; /* White background */
-    padding: 20px;
-    border-radius: 8px; /* Rounded corners */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+
+  .simple-search-group {
+      width: 100%;
   }
-  
-  /* Each form group: label + select + search button */
-  .simple-search-form div {
-    display: flex;
-    flex-direction: column; /* Stack label, select, and button vertically */
-    align-items: center;
-    gap: 10px; /* Add a bit more gap between items */
-    width: 200px; /* Control width of each form group */
+
+  .simple-search-button {
+      width: 100%;
+      margin-left: 0;
   }
-  
-  /* Label styling */
-  .simple-search-form label {
-    font-size: 16px;
-    font-weight: bold;
-    text-align: center;
-  }
-  
-  /* Input fields styling */
-  .simple-search-form select {
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    width: 100%;
-    background-color: #f9f9f9; /* Light grey background for select fields */
-  }
-  
-  /* Search button styling */
-  .simple-search-form button {
-    padding: 10px 20px;
-    background-color: #007BE5; /* Same blue as before */
-    color: white;
-    cursor: pointer;
-    border: none;
-    font-size: 16px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-  }
-  
-  .simple-search-form button:hover {
-    background-color: #005BB5; /* Darker blue on hover */
-  }
-  
+}

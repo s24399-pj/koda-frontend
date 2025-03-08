@@ -3,6 +3,7 @@ import carImage from "../../assets/images/skoda_fabia.png";
 import "./HomePage.css";
 import SimpleSearch from "../../components/SimpleSearch/SimpleSearch";
 import useTitle from "../../hooks/useTitle"; // Ensure you are importing the hook
+import WhyChooseUs from "../../components/WhyChooseUs/WhyChooseUs";
 
 const HomePage = () => {
   useTitle("Home"); // This sets the title of the page
@@ -28,6 +29,7 @@ const HomePage = () => {
 
       {/* SimpleSearch below text and car image */}
       <SimpleSearch />
+      <WhyChooseUs />
     </div>
   );
 };
