@@ -1,12 +1,12 @@
-import React from "react";
 import carImage from "../../assets/images/skoda_fabia.png";
 import "./HomePage.css";
 import SimpleSearch from "../../components/SimpleSearch/SimpleSearch";
-import useTitle from "../../hooks/useTitle"; // Ensure you are importing the hook
+import useTitle from "../../hooks/useTitle";
 import WhyChooseUs from "../../components/WhyChooseUs/WhyChooseUs";
+import MostViewedCars from "../../components/MostViewed/MostViewed";
 
 const HomePage = () => {
-  useTitle("Home"); // This sets the title of the page
+  useTitle("Home");
 
   return (
     <div className="homepage-container">
@@ -23,13 +23,14 @@ const HomePage = () => {
 
         {/* Right side car image */}
         <div className="car-image-container">
-          <img className="car-image" src={carImage} alt="Fabia" />
+          <img className="car-image-home" src={carImage} alt="Fabia" />
         </div>
       </div>
 
       {/* SimpleSearch below text and car image */}
       <SimpleSearch />
       <WhyChooseUs />
+      <MostViewedCars />
     </div>
   );
 };

@@ -54,17 +54,6 @@
   box-shadow: 0 0 5px rgba(0, 123, 229, 0.5); /* Subtle shadow on focus */
 }
 
-/* Thin vertical dividers between fields */
-.simple-search-group:not(:last-child)::after {
-  content: "";
-  position: absolute;
-  right: -15px; /* Adjusted position for better alignment */
-  top: 10px;
-  height: 80%;
-  width: 1px;
-  background-color: #ddd;
-}
-
 /* Search button */
 .simple-search-button {
   padding: 12px 24px;
