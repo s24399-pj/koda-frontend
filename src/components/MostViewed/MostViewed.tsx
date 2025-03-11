@@ -1,4 +1,4 @@
-import "./MostViewed.css";
+import "./MostViewed.scss";
 import audi from "../../assets/images/audi_home.png";
 import ferrari from "../../assets/images/ferrari_home.png";
 import bmw from "../../assets/images/bmw_home.png";
@@ -12,7 +12,7 @@ const cars = [
     passengers: "4 Osobowy",
     transmission: "Automat",
     airConditioning: "Klimatyzacja",
-    doors: "4 Drzwi",
+    doors: "2 Drzwi",
     price: "50,000 PLN",
   },
   {

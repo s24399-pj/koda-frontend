@@ -1,5 +1,5 @@
 import React from "react";
-import "./WhyChooseUs.css";
+import "./WhyChooseUs.scss";
 import { FaLock, FaUserCheck, FaClock, FaInfoCircle } from "react-icons/fa";
 
 const WhyChooseUs: React.FC = () => {

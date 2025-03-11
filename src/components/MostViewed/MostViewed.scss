@@ -1,0 +1,95 @@
+.most-viewed-container {
+  text-align: center;
+  padding: 40px 20px;
+
+  .section-tag {
+    display: inline-block;
+    background: #e7f0ff;
+    color: #4a90e2;
+    padding: 5px 15px;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 14px;
+  }
+
+  .section-title {
+    font-size: 28px;
+    margin: 15px 0;
+  }
+
+  .cars-list {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+
+  .car-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    width: 250px;
+
+    .car-image {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .car-name {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    .car-details {
+      font-size: 14px;
+      color: #666;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .car-price {
+      font-size: 16px;
+      font-weight: bold;
+      margin: 15px 0;
+      color: black;
+    }
+
+    .buy-button {
+      width: 100%;
+      background: #007be5;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+
+      &:hover {
+        background: #005bb5;
+      }
+    }
+  }
+
+  .view-all-button {
+    background: white;
+    color: #007be5;
+    border: 1px solid #007be5;
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin-top: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &:hover {
+      background: #007be5;
+      color: white;
+    }
+  }
+}

@@ -1,5 +1,5 @@
 import carImage from "../../assets/images/skoda_fabia.png";
-import "./HomePage.css";
+import "./HomePage.scss";
 import SimpleSearch from "../../components/SimpleSearch/SimpleSearch";
 import useTitle from "../../hooks/useTitle";
 import WhyChooseUs from "../../components/WhyChooseUs/WhyChooseUs";
@@ -27,7 +27,6 @@ const HomePage = () => {
         </div>
       </div>
 
-      {/* SimpleSearch below text and car image */}
       <SimpleSearch />
       <WhyChooseUs />
       <MostViewedCars />

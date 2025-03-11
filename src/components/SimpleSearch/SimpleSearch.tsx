@@ -1,5 +1,4 @@
-import React from "react";
-import "./SimpleSearch.css";
+import "./SimpleSearch.scss";
 
 const SimpleSearch = () => {
   return (
