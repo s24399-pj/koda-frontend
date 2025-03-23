@@ -3,7 +3,7 @@ import "./HomePage.scss";
 import SimpleSearch from "../../components/SimpleSearch/SimpleSearch";
 import useTitle from "../../hooks/useTitle";
 import WhyChooseUs from "../../components/WhyChooseUs/WhyChooseUs";
-import MostViewedCars from "../../components/MostViewed/MostViewed";
+import OfferSlider from "../../components/OfferSlider/OfferSlider";
 
 const HomePage = () => {
   useTitle("Home");
@@ -29,7 +29,7 @@ const HomePage = () => {
 
       <SimpleSearch />
       <WhyChooseUs />
-      <MostViewedCars />
+      <OfferSlider />
     </div>
   );
 };
