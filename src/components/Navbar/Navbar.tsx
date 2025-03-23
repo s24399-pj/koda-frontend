@@ -1,16 +1,15 @@
 import React from 'react';
+import { Link } from "react-router-dom";
 import './navbar.scss';
 
 const Navbar: React.FC = () => {
   return (
     <nav className="navbar">
       <div className="navbar-content">
-        {/* Logo and name */}
         <div className="navbar-logo">
-          <span>KODA</span>
+          <Link to="/">KODA</Link>
         </div>
         
-        {/* Main navigation */}
         <div className="navbar-links">
           <a href="#">Sprzedaj</a>
           <a href="#">Kup</a>
@@ -18,7 +17,6 @@ const Navbar: React.FC = () => {
           <a href="#">Dlaczego warto wybrać nas</a>
         </div>
         
-        {/* Account buttons */}
         <div className="navbar-buttons">
           <a href="#" className="signup">Zarejestruj się</a>
           <a href="#" className="login">Zaloguj się</a>
