@@ -3,7 +3,10 @@ import { useParams } from "react-router-dom";
 import useTitle from "../../hooks/useTitle";
 import axios from "axios";
 import L from "leaflet";
+import Slider from "react-slick";
 import "leaflet/dist/leaflet.css";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import "./Offer.scss";
 
 interface CarDetails {
@@ -45,6 +48,7 @@ const Offer: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [mapLat, setMapLat] = useState<number | null>(null);
   const [mapLng, setMapLng] = useState<number | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string>("");
   const mapRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -52,20 +56,33 @@ const Offer: React.FC = () => {
       try {
         const response = await axios.get<OfferData>(`http://localhost:8137/api/v1/offers/${id}`);
         setOffer(response.data);
-
+  
         if (response.data.location) {
-          const geocodeResponse = await axios.get(`https://nominatim.openstreetmap.org/search`, {
+          const geocodeResponse = await axios.get("https://nominatim.openstreetmap.org/search", {
             params: {
-              q: response.data.location,
+              q: `${response.data.location}, Poland`,
               format: "json",
-              limit: 1,
+              limit: 5,
+              addressdetails: 1,
             },
           });
 
           if (geocodeResponse.data.length > 0) {
-            const { lat, lon } = geocodeResponse.data[0];
-            setMapLat(parseFloat(lat));
-            setMapLng(parseFloat(lon));
+            const validLocation = geocodeResponse.data.find((result) =>
+              result.address.city || result.address.town || result.address.village
+            );
+  
+            if (validLocation) {
+              const { lat, lon } = validLocation;
+              setMapLat(parseFloat(lat));
+              setMapLng(parseFloat(lon));
+            } else {
+              console.error("Nie znaleziono dokładnej miejscowości");
+              setError("Nie udało się znaleźć dokładnej lokalizacji.");
+            }
+          } else {
+            console.error("Brak wyników dla tej lokalizacji");
+            setError("Nie udało się znaleźć lokalizacji.");
           }
         }
       } catch (error) {
@@ -75,31 +92,66 @@ const Offer: React.FC = () => {
         setLoading(false);
       }
     };
-
+  
     fetchOffer();
-  }, [id]);
+  }, [id]);  
 
   useEffect(() => {
     if (mapLat && mapLng && mapRef.current) {
-      const map = L.map(mapRef.current).setView([mapLat, mapLng], 13);
+        const map = L.map(mapRef.current).setView([mapLat, mapLng], 13);
 
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      }).addTo(map);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        }).addTo(map);
 
-      L.marker([mapLat, mapLng]).addTo(map).openPopup();
+        L.circle([mapLat, mapLng], {
+            radius: 4000,
+            color: "#007be5",
+            fillColor: "#007be5",
+            fillOpacity: 0.3,
+            weight: 2,
+        }).addTo(map).bindPopup("Lokalizacja oferty");
 
-      return () => {
-        map.remove();
-      };
+        return () => {
+            map.remove();
+        };
     }
-  }, [mapLat, mapLng]);
+}, [mapLat, mapLng]);
+
+  const handleImageClick = (image: string) => {
+    setSelectedImage(image);
+  };
 
   if (loading) return <p>Ładowanie...</p>;
   if (error) return <p className="error">{error}</p>;
   if (!offer || !offer.CarDetailsDto) return <p>Brak danych o ofercie.</p>;
 
-  const mainImageUrl = offer.imageUrls && offer.imageUrls.length > 0 ? offer.imageUrls[0] : offer.mainImage;
+  const mainImageUrl = selectedImage || (offer.imageUrls && offer.imageUrls.length > 0 ? offer.imageUrls[0] : offer.mainImage);
+
+  const sliderSettings = {
+    infinite: true,
+    speed: 500,
+    slidesToShow: 3,
+    slidesToScroll: 1,
+    focusOnSelect: true,
+    centerMode: true,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 2,
+          centerMode: true,
+        },
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 1,
+          centerMode: true,
+        },
+      },
+    ],
+  };
 
   return (
     <div className="offer-container">
@@ -127,13 +179,18 @@ const Offer: React.FC = () => {
 
       {offer.imageUrls && offer.imageUrls.length > 0 && (
         <div className="offer-gallery">
-          {offer.imageUrls.map((image, index) => (
-            <img
-              key={index}
-              src={`http://localhost:8137/images/${image}`}
-              alt={`Car view ${index + 1}`}
-            />
-          ))}
+          <Slider {...sliderSettings}>
+            {offer.imageUrls.map((image, index) => (
+              <div key={index}>
+                <img
+                  src={`http://localhost:8137/images/${image}`}
+                  alt={`Car view ${index + 1}`}
+                  className="slider-image"
+                  onClick={() => handleImageClick(image)}
+                />
+              </div>
+            ))}
+          </Slider>
         </div>
       )}
 
@@ -157,8 +214,8 @@ const Offer: React.FC = () => {
 
       {mapLat && mapLng && (
         <div className="offer-map">
-          <h2>Mapa lokalizacji</h2>
-          <div ref={mapRef} style={{ height: "400px", width: "100%" }}></div>
+          <h2>Lokalizacja</h2>
+          <div ref={mapRef} style={{ height: "300px", width: "60%" }}></div>
         </div>
       )}
     </div>

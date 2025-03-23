@@ -1,121 +1,157 @@
 .offer-container {
-    max-width: 1200px;
-    margin: 40px auto;
-    padding: 20px;
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 20px;
   
-    .offer-header {
-      display: flex;
-      gap: 20px;
-      align-items: center;
-  
-      .main-image {
-        width: 100%;
-        max-width: 600px; /* Ensure the main image doesn't get too large */
-        height: 350px; /* Adjust this to the desired consistent height */
-        object-fit: cover; /* Maintain the aspect ratio */
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Optional: Add some shadow for depth */
-      }
-  
-      .offer-info {
-        flex: 1;
-  
-        h1 {
-          font-size: 28px;
-          color: #333;
-        }
-  
-        .price {
-          font-size: 24px;
-          font-weight: bold;
-          color: #007be5;
-        }
-  
-        .location {
-          font-size: 16px;
-          color: #777;
-        }
-  
-        .contact-button {
-          background: #007be5;
-          color: white;
-          padding: 10px 20px;
-          border: none;
-          border-radius: 5px;
-          cursor: pointer;
-          transition: background 0.3s;
-  
-          &:hover {
-            background: #005bb5;
-          }
-        }
-      }
+  .offer-header {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    
+    .main-image {
+      width: 100%;
+      max-width: 600px;
+      height: 350px;
+      object-fit: cover;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
-  
-    .offer-gallery {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-  
-      img {
-        width: 150px;
-        height: 100px;
-        object-fit: cover;
+    
+    .offer-info {
+      flex: 1;
+      h1 {
+        font-size: 28px;
+        color: #333;
+      }
+      .price {
+        font-size: 24px;
+        font-weight: bold;
+        color: #007be5;
+      }
+      .location {
+        font-size: 16px;
+        color: #777;
+      }
+      .contact-button {
+        background: #007be5;
+        color: white;
+        padding: 10px 20px;
+        border: none;
         border-radius: 5px;
         cursor: pointer;
-        transition: transform 0.3s;
-  
+        transition: background 0.3s;
         &:hover {
-          transform: scale(1.05);
+          background: #005bb5;
         }
       }
     }
+  }
   
-    .offer-details {
-      margin-top: 30px;
-  
-      h2 {
-        font-size: 22px;
-        margin-bottom: 10px;
+  .offer-gallery {
+    margin-top: 20px;
+    max-width: 600px;
+    margin-left: 0;
+    margin-right: auto;
+    
+    .slick-slider {
+      .slick-list {
+        margin: 0;
       }
-  
-      p {
-        font-size: 16px;
-        line-height: 1.6;
-      }
-  
-      ul {
-        list-style: none;
-        padding: 0;
-  
-        li {
-          font-size: 16px;
-          padding: 5px 0;
-          display: flex;
-          align-items: center;
-          gap: 5px;
-        }
+      .slick-track {
+        display: flex;
       }
     }
-  
-    .error {
-      color: red;
-      text-align: center;
+    .slick-slide {
+      display: flex;
+      justify-content: center;
+      max-width: 150px;
+      margin-right: 6px;
+    }
+    img {
+      width: 150px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.3s;
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+  }
+
+  .offer-details {
+    margin-top: 30px;
+
+    h2 {
+      font-size: 22px;
+      margin-bottom: 10px;
     }
 
-    .offer-map {
-        margin-top: 30px;
-      
-        h2 {
-          font-size: 22px;
-          margin-bottom: 10px;
-        }
-      
-        #offer-map {
-          height: 400px;  // Adjust the height to your needs
-          width: 100%;    // Ensure it's responsive
-          border-radius: 10px;  // Optional: Add a radius for smooth corners if desired
-        }
+    p {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+
+      li {
+        font-size: 16px;
+        padding: 5px 0;
+        display: flex;
+        align-items: center;
+        gap: 5px;
       }
-      
-  }  
+    }
+  }
+
+  .error {
+    color: red;
+    text-align: center;
+  }
+
+  .offer-map {
+    margin-top: 30px;
+
+    h2 {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    #offer-map {
+      height: 400px;
+      width: 100%;
+      border-radius: 10px;
+    }
+  }
+
+  .slick-prev, .slick-next {
+    background-color: transparent;
+    border: none;
+    outline: none;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .slick-prev:before, .slick-next:before {
+    font-size: 30px;
+    color: #007be5;
+  }
+
+  .slick-prev:hover:before, .slick-next:hover:before {
+    color: #005bb5;
+  }
+
+  .slick-prev {
+    left: -35px;
+  }
+
+  .slick-next {
+    right: -35px;
+  }
+}
