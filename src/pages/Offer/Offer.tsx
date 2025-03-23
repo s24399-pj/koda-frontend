@@ -4,40 +4,11 @@ import useTitle from "../../hooks/useTitle";
 import axios from "axios";
 import L from "leaflet";
 import Slider from "react-slick";
+import { OfferData } from "../../types/offerTypes";
 import "leaflet/dist/leaflet.css";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "./Offer.scss";
-
-interface CarDetails {
-  brand: string;
-  model: string;
-  year: number;
-  color: string;
-  displacement: string;
-  mileage: number;
-  fuelType: string;
-  transmission: string;
-  bodyType: string;
-  driveType: string;
-  enginePower: number;
-  doors: number;
-  seats: number;
-}
-
-interface OfferData {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  currency: string;
-  location: string;
-  contactPhone: string;
-  contactEmail: string;
-  mainImage: string;
-  imageUrls?: string[];
-  CarDetailsDto: CarDetails;
-}
 
 const Offer: React.FC = () => {
   useTitle("Offer");
@@ -54,7 +25,7 @@ const Offer: React.FC = () => {
   useEffect(() => {
     const fetchOffer = async () => {
       try {
-        const response = await axios.get<OfferData>(`http://localhost:8137/api/v1/offers/${id}`);
+        const response = await axios.get<OfferData>(`${import.meta.env.VITE_API_URL}/api/v1/offers/${id}`);
         setOffer(response.data);
   
         if (response.data.location) {
@@ -157,7 +128,7 @@ const Offer: React.FC = () => {
     <div className="offer-container">
       <div className="offer-header">
         <img
-          src={`http://localhost:8137/images/${mainImageUrl}`}
+          src={`${import.meta.env.VITE_API_URL}/images/${mainImageUrl}`}
           alt={offer.title}
           className="main-image"
         />
@@ -183,7 +154,7 @@ const Offer: React.FC = () => {
             {offer.imageUrls.map((image, index) => (
               <div key={index}>
                 <img
-                  src={`http://localhost:8137/images/${image}`}
+                  src={`${import.meta.env.VITE_API_URL}/images/${image}`}
                   alt={`Car view ${index + 1}`}
                   className="slider-image"
                   onClick={() => handleImageClick(image)}
