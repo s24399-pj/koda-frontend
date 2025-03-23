@@ -1,0 +1,73 @@
+.offer-slider {
+  width: 80%;
+  margin: 0 auto;
+  position: relative;
+}
+
+.vehicle-card {
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-right: 10px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+.vehicle-card-wrapper {
+  padding: 0 10px;
+}
+
+.vehicle-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.vehicle-details {
+  margin-top: 10px;
+
+  h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+
+  p {
+    margin: 5px 0;
+    font-size: 14px;
+  }
+}
+
+.slick-prev, .slick-next {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slick-prev:before, .slick-next:before {
+  font-size: 30px;
+  color: #007be5;
+}
+
+.slick-prev:hover:before, .slick-next:hover:before {
+  color: #005bb5;
+}
+
+.slick-prev {
+  left: -35px;
+}
+
+.slick-next {
+  right: -35px;
+}
