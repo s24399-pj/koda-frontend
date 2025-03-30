@@ -60,7 +60,7 @@ const OfferList: React.FC = () => {
                     <p>Przebieg: {offer.mileage.toLocaleString()} km</p>
                     <p>Typ paliwa: {offer.fuelType}</p>
                     <p>Moc silnika: {offer.enginePower} KM</p>
-                    <p>Pojemność silnika: {offer.displacement} cm³</p>
+                    <p>Pojemność silnika: {offer.displacement}</p>
                 </div>
                 </div>
             </div>
