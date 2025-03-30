@@ -46,13 +46,13 @@
 
     // Right side car image styling
     .car-image-container {
-      max-width: 900px;
+      max-height: 600px;
       width: 100%;
       display: flex;
       justify-content: flex-end;
 
       .car-image-home {
-        width: 800px;
+        width: 600px;
         height: auto;
         object-fit: contain;
       }

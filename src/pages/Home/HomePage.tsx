@@ -1,9 +1,9 @@
-import carImage from "../../assets/images/skoda_fabia.png";
-import "./HomePage.scss";
 import SimpleSearch from "../../components/SimpleSearch/SimpleSearch";
 import useTitle from "../../hooks/useTitle";
 import WhyChooseUs from "../../components/WhyChooseUs/WhyChooseUs";
 import OfferSlider from "../../components/OfferSlider/OfferSlider";
+import carImage from "../../assets/images/car_home.png";
+import "./HomePage.scss";
 
 const HomePage = () => {
   useTitle("Home");
@@ -23,7 +23,7 @@ const HomePage = () => {
 
         {/* Right side car image */}
         <div className="car-image-container">
-          <img className="car-image-home" src={carImage} alt="Fabia" />
+          <img className="car-image-home" src={carImage} alt="Car" />
         </div>
       </div>
 
