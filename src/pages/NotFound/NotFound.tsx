@@ -8,7 +8,7 @@ const NotFound: React.FC = () => {
     <div className="not-found-container">
       <img src={carNotFound} alt="Car Not Found" className="not-found-image" />
       <h1>404 - Strona nie znaleziona</h1>
-      <p>Ups! Wygląda na to, że zabłądziłeś. Wracamy do głównej?</p>
+      <p>Ups! Wygląda na to, że zabłądziłeś. Wracamy do strony głównej?</p>
       <Link to="/" className="back-home-button">Powrót do strony głównej</Link>
     </div>
   );
