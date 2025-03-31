@@ -12,9 +12,9 @@ export interface CarDetails {
     enginePower: number;
     doors: number;
     seats: number;
-  }
-  
-  export interface OfferData {
+}
+
+export interface OfferData {
     id: string;
     title: string;
     description: string;
@@ -26,4 +26,4 @@ export interface CarDetails {
     mainImage: string;
     imageUrls?: string[];
     CarDetailsDto: CarDetails;
-  }
+}
