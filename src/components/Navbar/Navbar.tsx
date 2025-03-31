@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from "react-router-dom";
+import logo from "../../assets/images/koda_logo.svg";
 import './navbar.scss';
 
 const Navbar: React.FC = () => {
@@ -7,9 +8,12 @@ const Navbar: React.FC = () => {
     <nav className="navbar">
       <div className="navbar-content">
         <div className="navbar-logo">
-          <Link to="/">KODA</Link>
+          <Link to="/">
+            <img src={logo} alt="Koda Logo" className="logo-img" />
+            <span className="logo-text">KODA</span>
+          </Link>
         </div>
-        
+
         <div className="navbar-links">
           <a href="#">Sprzedaj</a>
           <a href="#">Kup</a>

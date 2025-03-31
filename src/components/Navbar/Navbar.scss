@@ -20,32 +20,35 @@
   .navbar-logo {
     display: flex;
     align-items: center;
-    font-size: 1.6rem;
-    font-weight: bold;
-    color: #3b82f6;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    font-family: 'Poppins', sans-serif;
-    position: relative;
+    gap: 16px;
     transition: transform 0.3s ease-in-out;
 
     a {
-      text-decoration: none;
-      color: inherit;
       display: flex;
       align-items: center;
-      gap: 10px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .logo-img {
+      height: 40px;
+      width: auto;
+      margin-right: 16px;
+    }
+
+    .logo-text {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: #3b82f6;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-family: 'Poppins', sans-serif;
     }
 
     &:hover {
       transform: scale(1.05);
-      color: #2563eb;
     }
-
-    &:hover::after {
-      width: 110%;
-    }
-}
+  }
 
   .navbar-links {
     display: flex;
