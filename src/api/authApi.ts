@@ -1,21 +1,8 @@
 import axios from "axios";
 import axiosAuthClient, {setLogoutFunction} from "./axiosAuthClient";
-
-export interface RegisterCredentials {
-    email: string;
-    password: string;
-    firstName?: string;
-    lastName?: string;
-}
-
-export interface LoginCredentials {
-    email: string;
-    password: string;
-}
-
-export interface AuthResponse {
-    accessToken: string;
-}
+import {RegisterCredentials} from "../types/auth/RegisterCredentials.ts";
+import {LoginCredentials} from "../types/auth/LoginCredentials.ts";
+import {AuthResponse} from "../types/auth/AuthResponse.ts";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -53,7 +40,7 @@ export const login = (credentials: LoginCredentials): Promise<AuthResponse> => {
 
 export const logout = (): Promise<void> => {
     return axiosAuthClient
-        .post("/api/v1/auth/logout")
+        .get("/api/v1/auth/logout")
         .then(() => {})
         .catch((error) => {
             console.error("Logout error:", error);

@@ -1,11 +1,5 @@
 import axiosAuthClient from "./axiosAuthClient";
-
-export interface UserProfile {
-    id?: string;
-    email?: string;
-    firstName?: string;
-    lastName?: string;
-}
+import {UserProfile} from "../types/user/UserProfile.ts";
 
 export const getUserProfile = (): Promise<UserProfile> => {
     return axiosAuthClient

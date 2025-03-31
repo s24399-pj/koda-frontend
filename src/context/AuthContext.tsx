@@ -1,47 +1,44 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode } from "react";
+import {AuthContextType} from "../types/auth/AuthContextType.ts";
 
-// Interfejs kontekstu autoryzacji
-interface AuthContextType {
-    isAuthenticated: boolean;
-    setIsAuthenticated: (value: boolean) => void;
-    checkIsAuthenticated: () => boolean;
-}
-
-// Utworzenie kontekstu z domyślnymi wartościami
 const AuthContext = createContext<AuthContextType>({
     isAuthenticated: false,
     setIsAuthenticated: () => {},
     checkIsAuthenticated: () => false,
+    logout: () => {},
 });
 
-// Hook do korzystania z kontekstu
 export const useAuth = () => useContext(AuthContext);
 
-// Props dla dostawcy kontekstu
 interface AuthProviderProps {
     children: ReactNode;
 }
 
-// Dostawca kontekstu autoryzacji
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-    // Funkcja sprawdzająca czy użytkownik jest zalogowany
     const checkIsAuthenticated = (): boolean => {
         const token = localStorage.getItem("accessToken");
         return !!token;
     };
 
-    const [isAuthenticatedState, setIsAuthenticated] = useState<boolean>(checkIsAuthenticated());
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(checkIsAuthenticated());
 
-    // Inicjalizacja stanu autoryzacji
+    const logout = async (): Promise<void> => {
+        try {
+            await logout();
+            setIsAuthenticated(false);
+        } catch (error) {
+            console.error("Logout error:", error);
+            setIsAuthenticated(false);
+        }
+    };
+
     useEffect(() => {
         const checkAuth = () => {
             setIsAuthenticated(checkIsAuthenticated());
         };
 
-        // Sprawdź przy montowaniu komponentu
         checkAuth();
 
-        // Nasłuchiwanie na zmiany w localStorage
         const handleStorageChange = (e: StorageEvent) => {
             if (e.key === "accessToken") {
                 checkAuth();
@@ -55,14 +52,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         };
     }, []);
 
+    const value = {
+        isAuthenticated,
+        setIsAuthenticated,
+        checkIsAuthenticated,
+        logout
+    };
+
     return (
-        <AuthContext.Provider
-            value={{
-                isAuthenticated: isAuthenticatedState,
-                setIsAuthenticated,
-                checkIsAuthenticated,
-            }}
-        >
+        <AuthContext.Provider value={value}>
             {children}
         </AuthContext.Provider>
     );
