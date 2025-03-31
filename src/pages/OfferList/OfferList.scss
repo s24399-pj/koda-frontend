@@ -1,0 +1,102 @@
+.offer-list-container {
+    text-align: center;
+    padding: 20px;
+    margin-top: 80px;
+  
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 40px;
+    }
+  
+    .offer-card {
+      display: flex;
+      align-items: center;
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+      min-height: 140px;
+  
+      .offer-image {
+        width: 160px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-right: 20px;
+      }
+  
+      .offer-details {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+  
+        .offer-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 10px;
+        }
+  
+        h2 {
+          margin: 0;
+          font-size: 18px;
+          font-weight: 600;
+          color: #333;
+        }
+  
+        .offer-price {
+          font-weight: bold;
+          color: #007bff;
+          font-size: 16px;
+          text-align: right;
+        }
+  
+        .offer-info {
+          text-align: left;
+          margin-top: 10px;
+          p {
+            color: #666;
+            margin: 4px 0;
+            font-size: 14px;
+            opacity: 0.8;
+          }
+        }
+      }
+    }
+  
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 25px;
+  
+      button {
+        padding: 10px 14px;
+        border: none;
+        background: #ddd;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 14px;
+  
+        &:hover {
+          background: #bbb;
+        }
+  
+        &.active {
+          background: #007bff;
+          color: white;
+        }
+  
+        &:disabled {
+          background: #eee;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }  

@@ -2,8 +2,11 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./NotFound.scss";
 import carNotFound from "../../assets/images/car_not_found.png";
+import useTitle from "../../hooks/useTitle";
 
 const NotFound: React.FC = () => {
+  useTitle("Not Found");
+  
   return (
     <div className="not-found-container">
       <img src={carNotFound} alt="Car Not Found" className="not-found-image" />
