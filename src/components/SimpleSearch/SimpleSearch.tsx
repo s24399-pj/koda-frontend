@@ -12,6 +12,14 @@ const SimpleSearch = () => {
   const [maxPrice, setMaxPrice] = useState<string>("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
 
+  const formatNumber = (value: string) => {
+    return value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  };
+
+  const cleanNumber = (value: string) => {
+    return value.replace(/\s/g, "");
+  };
+
   useEffect(() => {
     if (phrase.length >= 2) {
       axios
@@ -31,7 +39,9 @@ const SimpleSearch = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (phrase.trim() !== "") {
-      navigate(`/offers?phrase=${encodeURIComponent(phrase)}&minPrice=${minPrice}&maxPrice=${maxPrice}`);
+      const finalMinPrice = cleanNumber(minPrice);
+      const finalMaxPrice = cleanNumber(maxPrice);
+      navigate(`/offers?phrase=${encodeURIComponent(phrase)}&minPrice=${finalMinPrice}&maxPrice=${finalMaxPrice}`);
     }
   };
 
@@ -62,22 +72,22 @@ const SimpleSearch = () => {
         <div className="simple-search-group">
           <label htmlFor="minPrice">Minimalna cena</label>
           <input
-            type="number"
+            type="text"
             id="minPrice"
             name="minPrice"
             value={minPrice}
-            onChange={(e) => setMinPrice(e.target.value)}
+            onChange={(e) => setMinPrice(formatNumber(e.target.value))}
             placeholder="Wpisz minimalną cenę"
           />
         </div>
         <div className="simple-search-group">
           <label htmlFor="maxPrice">Maksymalna cena</label>
           <input
-            type="number"
+            type="text"
             id="maxPrice"
             name="maxPrice"
             value={maxPrice}
-            onChange={(e) => setMaxPrice(e.target.value)}
+            onChange={(e) => setMaxPrice(formatNumber(e.target.value))}
             placeholder="Wpisz maksymalną cenę"
           />
         </div>
