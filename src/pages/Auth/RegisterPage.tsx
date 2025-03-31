@@ -68,8 +68,7 @@ const RegisterPage: React.FC = () => {
                 lastName: values.lastName,
             });
 
-            // Redirect to login page after successful registration
-            navigate("/login", {
+            navigate("/user/login", {
                 state: {
                     successMessage: "Konto zostało utworzone pomyślnie. Możesz się teraz zalogować."
                 }
