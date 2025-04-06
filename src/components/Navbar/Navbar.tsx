@@ -28,10 +28,10 @@ const Navbar: React.FC = () => {
                 </div>
 
                 <div className="navbar-links">
-                    <a href="#">Sprzedaj</a>
                     <a href="#">Kup</a>
-                    <a href="#">O nas</a>
-                    <a href="#">Dlaczego warto wybrać nas</a>
+                    <a href="#">Sprzedaj</a>
+                    <Link to="/comparison">Porównaj</Link>
+                    <a href="#">Dlaczego My</a>
                 </div>
 
                 <div className="navbar-buttons">
