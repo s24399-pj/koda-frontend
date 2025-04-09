@@ -37,7 +37,7 @@ const Navbar: React.FC = () => {
                 <div className="navbar-buttons">
                     {isAuthenticated ? (
                         <>
-                            <Link to="/user/profile" className="profile">Mój profil</Link>
+                            <Link to="/user/panel" className="profile">Mój profil</Link>
                             <button onClick={handleLogout} className="logout">Wyloguj się</button>
                         </>
                     ) : (
