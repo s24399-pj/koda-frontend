@@ -65,7 +65,7 @@ class AuthAxiosClient {
 
     private handleDefaultLogout = (): void => {
         localStorage.removeItem("accessToken");
-        window.location.href = "/login";
+        window.location.href = "/user/login";
     };
 
     public get client(): AxiosInstance {

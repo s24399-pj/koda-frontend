@@ -14,12 +14,21 @@ export interface CarDetails {
     seats: number;
 }
 
+export interface SellerData {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    profilePictureBase64?: string;
+}
+
 export interface OfferData {
     id: string;
     title: string;
     description: string;
     price: number;
     currency: string;
+    seller: SellerData;
     location: string;
     contactPhone: string;
     contactEmail: string;
