@@ -31,7 +31,6 @@ Thumbs.db
 ehthumbs.db
 
 # ENV files
-.env
 .env.*.local
 
 # ESLint cache
