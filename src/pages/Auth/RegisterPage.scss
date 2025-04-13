@@ -87,9 +87,9 @@
           transition: all 0.3s;
           background-color: #ffffff;
           box-sizing: border-box;
-          color: #333333; /* Ustawienie koloru tekstu */
-          color-scheme: light; /* Zapobieganie stosowania schematu kolorów przeglądarki */
-          -webkit-text-fill-color: #333333; /* Dla starszych wersji Safari */
+          color: #333333;
+          color-scheme: light;
+          -webkit-text-fill-color: #333333;
 
           &:focus {
             border-color: #007be5;
