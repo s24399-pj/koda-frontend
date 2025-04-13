@@ -2,13 +2,13 @@
   max-width: 1200px;
   margin: 100px auto;
   padding: 20px;
-  
+
   .offer-header {
     display: flex;
     gap: 20px;
     align-items: flex-start;
     margin-bottom: 20px;
-    
+
     .main-image {
       width: 100%;
       max-width: 600px;
@@ -17,7 +17,7 @@
       border-radius: 10px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
-    
+
     .offer-info {
       flex: 1;
       h1 {
@@ -33,6 +33,24 @@
         font-size: 16px;
         color: #777;
       }
+
+      .contact-details {
+        margin-top: 10px;
+
+        p {
+          margin-bottom: 5px;
+        }
+
+        a {
+          color: #007be5;
+          text-decoration: none;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+
       .contact-button {
         background: #007be5;
         color: white;
@@ -40,6 +58,7 @@
         border: none;
         border-radius: 5px;
         cursor: pointer;
+        margin-top: 15px;
         transition: background 0.3s;
         &:hover {
           background: #005bb5;
@@ -47,13 +66,13 @@
       }
     }
   }
-  
+
   .offer-gallery {
     margin-top: 20px;
     max-width: 600px;
     margin-left: 0;
     margin-right: auto;
-    
+
     .slick-slider {
       .slick-list {
         margin: 0;
@@ -108,6 +127,91 @@
     }
   }
 
+  .seller-info-section {
+    margin-top: 30px;
+    margin-bottom: 30px;
+
+    h2 {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .seller-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: white;
+      border-radius: 10px;
+      padding: 15px 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      border-left: 3px solid #007be5;
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .seller-profile {
+        display: flex;
+        align-items: center;
+
+        .profile-image-container {
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          overflow: hidden; /* Ograniczenie zdjęcia do kontenera */
+          border: 2px solid #e0e0e0;
+          background-color: #f0f0f0;
+
+          .profile-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+        }
+
+        .seller-details {
+          margin-left: 15px;
+
+          h3 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+          }
+
+          .seller-email {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+          }
+        }
+      }
+
+      .view-seller-offers {
+        background-color: #f0f7ff;
+        border: 1px solid #007be5;
+        color: #007be5;
+        padding: 8px 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+
+        @media (max-width: 768px) {
+          margin-top: 15px;
+          align-self: flex-start;
+        }
+
+        &:hover {
+          background-color: #007be5;
+          color: white;
+        }
+      }
+    }
+  }
+
   .error {
     color: red;
     text-align: center;
@@ -125,6 +229,12 @@
       height: 400px;
       width: 100%;
       border-radius: 10px;
+    }
+
+    /* Style dla div z mapą (zachowujemy kompatybilność z oboma podejściami) */
+    div[ref] {
+      border-radius: 10px;
+      /* Pozostałe style są ustawiane inline w komponencie */
     }
   }
 

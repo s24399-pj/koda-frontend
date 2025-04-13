@@ -89,6 +89,9 @@
           transition: all 0.3s;
           background-color: #ffffff;
           box-sizing: border-box;
+          color: #333333;
+          color-scheme: light;
+          -webkit-text-fill-color: #333333;
 
           &:focus {
             border-color: #007be5;
@@ -130,10 +133,9 @@
         }
 
         input {
-          padding-left: 45px; // Miejsce na ikonę
+          padding-left: 45px;
         }
 
-        // Przycisk do pokazywania/ukrywania hasła
         .toggle-password {
           position: absolute;
           right: 16px;
