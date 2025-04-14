@@ -5,7 +5,6 @@
   justify-content: center;
   align-items: center;
   padding: 20px;
-  margin-top: 60px;
 
   .login-form-wrapper {
     background-color: #ffffff;
@@ -33,7 +32,7 @@
       margin-bottom: 30px;
 
       h1 {
-        font-size: 32px;
+        font-size: 28px;
         color: #333333;
         margin-bottom: 10px;
         font-weight: 600;
@@ -53,6 +52,7 @@
       margin-bottom: 20px;
       font-size: 14px;
       border-left: 3px solid #d32f2f;
+      word-break: break-word;
     }
 
     .success-message {
@@ -63,6 +63,7 @@
       margin-bottom: 20px;
       font-size: 14px;
       border-left: 3px solid #2e7d32;
+      word-break: break-word;
     }
 
     .login-form {
@@ -164,6 +165,8 @@
         align-items: center;
         margin-bottom: 24px;
         width: 100%;
+        flex-wrap: wrap;
+        gap: 10px;
 
         .remember-me {
           display: flex;
@@ -253,13 +256,49 @@
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .login-container {
     padding: 15px;
 
     .login-form-wrapper {
-      padding: 30px 20px;
+      padding: 30px 25px;
       border-radius: 12px;
+      max-width: 100%;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 10px;
+
+    .login-form-wrapper {
+      padding: 25px 15px;
+
+      .login-header {
+        h1 {
+          font-size: 24px;
+        }
+
+        p {
+          font-size: 14px;
+        }
+      }
+
+      .form-options {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+
+        .remember-me, .forgot-password {
+          width: 100%;
+        }
+      }
+
+      .login-button {
+        padding: 12px;
+        font-size: 15px;
+      }
     }
   }
 }
