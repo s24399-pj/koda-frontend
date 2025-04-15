@@ -177,8 +177,6 @@ const Offer: React.FC = () => {
         const response = await axios.get<OfferData>(`${import.meta.env.VITE_API_URL}/api/v1/offers/${id}`);
         setOffer(response.data);
 
-<<<<<<< HEAD
-=======
         const images: string[] = [];
         if (response.data.mainImage) {
           images.push(response.data.mainImage);
@@ -196,7 +194,6 @@ const Offer: React.FC = () => {
           setSelectedImage(images[0]);
         }
 
->>>>>>> eabb89251de0f7aa9f14b5233b34ffb71cae315e
         if (response.data.seller?.profilePictureBase64) {
           setProfileImage(response.data.seller.profilePictureBase64);
         }
