@@ -31,7 +31,7 @@ const Navbar: React.FC = () => {
                     <a href="#">Kup</a>
                     <a href="#">Sprzedaj</a>
                     <Link to="/comparison">Porównaj</Link>
-                    <a href="#">Dlaczego My</a>
+                    <Link to="/whyus">Dlaczego My</Link>
                 </div>
 
                 <div className="navbar-buttons">

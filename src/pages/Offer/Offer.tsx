@@ -32,7 +32,6 @@ const Offer: React.FC = () => {
         const response = await axios.get<OfferData>(`${import.meta.env.VITE_API_URL}/api/v1/offers/${id}`);
         setOffer(response.data);
 
-        // Ustaw zdjęcie profilowe, jeśli jest dostępne
         if (response.data.seller?.profilePictureBase64) {
           setProfileImage(response.data.seller.profilePictureBase64);
         }
