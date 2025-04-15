@@ -7,6 +7,7 @@ import OfferList from "../pages/OfferList/OfferList";
 import NotFound from "../pages/NotFound/NotFound";
 import UserPanel from "../pages/UserPanel/UserPanel.tsx";
 import OfferComparison from "../pages/OfferComparison/OfferComparison.tsx";
+import WhyUs from "../pages/WhyUs/WhyUs.tsx";
 
 const AppRouter = () => {
     return (
@@ -16,6 +17,7 @@ const AppRouter = () => {
             <Route path="/offers" element={<OfferList />} />
             <Route path="/offer/:id" element={<Offer />} />
             <Route path="comparison" element={<OfferComparison />} />
+            <Route path="/whyus" element={<WhyUs />} />
             <Route path="/user/login" element={<LoginPage />} />
             <Route path="/user/register" element={<RegisterPage />} />
 
