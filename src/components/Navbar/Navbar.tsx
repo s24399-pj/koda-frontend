@@ -29,7 +29,7 @@ const Navbar: React.FC = () => {
 
                 <div className="navbar-links">
                     <a href="#">Kup</a>
-                    <a href="#">Sprzedaj</a>
+                    <Link to="/offer/create">Sprzedaj</Link>
                     <Link to="/comparison">Porównaj</Link>
                     <Link to="/whyus">Dlaczego My</Link>
                 </div>

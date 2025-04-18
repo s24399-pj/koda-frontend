@@ -8,6 +8,7 @@ import NotFound from "../pages/NotFound/NotFound";
 import UserPanel from "../pages/UserPanel/UserPanel.tsx";
 import OfferComparison from "../pages/OfferComparison/OfferComparison.tsx";
 import WhyUs from "../pages/WhyUs/WhyUs.tsx";
+import OfferCreation from "../pages/OfferCreation/OfferCreation.tsx";
 
 const AppRouter = () => {
     return (
@@ -23,6 +24,7 @@ const AppRouter = () => {
 
             {/* Private routes - we need to validate on the FE if user is authenticated before launching this component*/}
             <Route path="/user/panel" element={<UserPanel />} />
+            <Route path="/offer/create" element={<OfferCreation />} />
         </Routes>
     );
 };
