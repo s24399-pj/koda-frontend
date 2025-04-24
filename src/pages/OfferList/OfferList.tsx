@@ -4,6 +4,7 @@ import axios from "axios";
 import "./OfferList.scss";
 import useTitle from "../../hooks/useTitle";
 import { MiniOffer } from "../../types/miniOfferTypes";
+import LikeButton from "../../components/LikeButton/LikeButton";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const PAGE_SIZE = 5;
@@ -119,10 +120,13 @@ const OfferList: React.FC = () => {
                             loading="lazy"
                         />
                         <div className="offer-details">
-                          <div className="offer-header">
-                            <h2>{truncateText(offer.title, 50)}</h2>
+                        <div className="offer-header">
+                          <h2>{truncateText(offer.title, 50)}</h2>
+                          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                             <span className="offer-price">{offer.price.toLocaleString()} PLN</span>
+                            <LikeButton />
                           </div>
+                        </div>
                           <div className="offer-info">
                             <p><strong>Rok:</strong> {offer.year}</p>
                             <p><strong>Przebieg:</strong> {offer.mileage.toLocaleString()} km</p>
