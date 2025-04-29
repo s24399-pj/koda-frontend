@@ -9,6 +9,7 @@ import UserPanel from "../pages/UserPanel/UserPanel.tsx";
 import OfferComparison from "../pages/OfferComparison/OfferComparison.tsx";
 import WhyUs from "../pages/WhyUs/WhyUs.tsx";
 import OfferCreation from "../pages/OfferCreation/OfferCreation.tsx";
+import LikedOffers from "../pages/LikedOffers/likedOffers.tsx";
 
 const AppRouter = () => {
     return (
@@ -19,6 +20,7 @@ const AppRouter = () => {
             <Route path="/offer/:id" element={<Offer />} />
             <Route path="comparison" element={<OfferComparison />} />
             <Route path="/whyus" element={<WhyUs />} />
+            <Route path="/liked" element={<LikedOffers />} />
             <Route path="/user/login" element={<LoginPage />} />
             <Route path="/user/register" element={<RegisterPage />} />
 
