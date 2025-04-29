@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './UserOffers.scss';
 import { getUserOffers, deleteOffer } from '../../api/offerApi';
+import {ApiOffer, OfferData} from "../../types/offerTypes.ts";
 
 const DEFAULT_CAR_IMAGE = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYgMjU2Ij48cmVjdCB3aWR0aD0iMjU2IiBoZWlnaHQ9IjI1NiIgZmlsbD0iI2U5ZWNlZiIvPjxwYXRoIGQ9Ik0xNzUuMTIsMTI4LjVINzQuODhhMTIsMTIsMCwwLDAtMTIsOUw1NywxNzFhNiw2LDAsMCwwLDYsNmgxMzBhNiw2LDAsMCwwLDYtNmwtNS44OC0zMy41QTEyLDEyLDAsMCwwLDE3NS4xMiwxMjguNVoiIGZpbGw9IiM2Yzc1N2QiLz48Y2lyY2xlIGN4PSI4NCIgY3k9IjE2MSIgcj0iMTIiIGZpbGw9IiNlOWVjZWYiLz48Y2lyY2xlIGN4PSIxNzIiIGN5PSIxNjEiIHI9IjEyIiBmaWxsPSIjZTllY2VmIi8+PHBhdGggZD0iTTE5MywxMjIuMjRsLTI1LjI0LTI1LjI0QTIwLDIwLDAsMCwwLDE1My40LDkwaC01MC44YTIwLDIwLDAsMCwwLTE0LjE0LDUuODZMNjMuMjIsMTIwLjg2YTIwLDIwLDAsMCwwLTYsMTZsMS40OSwxMy4wN0EyMCwyMCwwLDAsMCw3OC4xOCwxNjhoOTkuNjVBMjAsMjAsMCwwLDAsMTk3LjM4LDE1MGwxLjQ5LTEzLjA3QTIwLDIwLDAsMCwwLDE5MywxMjIuMjRaIiBmaWxsPSIjNmM3NTdkIi8+PC9zdmc+";
 
@@ -21,71 +22,6 @@ const fuelTypeTranslations: Record<string, string> = {
     'HYDROGEN': 'Wodór',
     'OTHER': 'Inny'
 };
-
-interface CarDetails {
-    brand: string;
-    model: string;
-    year: number;
-    color: string;
-    displacement: string;
-    mileage: number;
-    fuelType: string;
-    transmission: string;
-    bodyType: string;
-    driveType: string;
-    enginePower: number;
-    doors: number;
-    seats: number;
-}
-
-interface SellerData {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    profilePictureBase64?: string;
-}
-
-interface OfferData {
-    id: string;
-    title: string;
-    description: string;
-    price: number;
-    currency: string;
-    seller: SellerData;
-    location: string;
-    contactPhone: string;
-    contactEmail: string;
-    mainImage: string;
-    imageUrls?: string[];
-    CarDetailsDto: CarDetails;
-}
-
-interface ApiOffer {
-    id: string;
-    title: string;
-    price: number;
-    mainImage: string | null;
-    mileage: number;
-    fuelType: string;
-    year: number;
-    enginePower: number;
-    displacement: string;
-    brand?: string;
-    model?: string;
-    description?: string;
-    currency?: string;
-    seller?: SellerData;
-    location?: string;
-    contactPhone?: string;
-    contactEmail?: string;
-    color?: string;
-    transmission?: string;
-    bodyType?: string;
-    driveType?: string;
-    doors?: number;
-    seats?: number;
-}
 
 const mapApiResponseToComponentFormat = (apiOffers: ApiOffer[]): OfferData[] => {
     if (!apiOffers || !Array.isArray(apiOffers)) {
@@ -133,6 +69,7 @@ const UserOffers: React.FC = () => {
     const [offers, setOffers] = useState<OfferData[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [noUserIdError, setNoUserIdError] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchUserOffers = async () => {
@@ -141,39 +78,24 @@ const UserOffers: React.FC = () => {
 
                 const userId = localStorage.getItem('userId');
 
-                console.log("Pobieranie ofert dla użytkownika ID:", userId);
-
                 if (!userId) {
-                    console.warn('Nie znaleziono ID użytkownika w localStorage. Spróbuj załadować stronę profilu przed wejściem na stronę ogłoszeń.');
+                    console.warn('Nie znaleziono ID użytkownika w localStorage.');
+                    setNoUserIdError(true);
+                    setLoading(false);
+                    return;
+                }
 
-                    const hardcodedId = 'b01f81d6-6f6f-4713-a583-86dcfd62aba8';
-                    console.log('Używanie hardcodowanego ID:', hardcodedId);
+                console.log("Pobieranie ofert dla użytkownika ID:", userId);
+                const data = await getUserOffers(userId);
 
-                    const data = await getUserOffers(hardcodedId);
-                    if (data && data.content) {
-                        console.log('Otrzymane dane:', data.content);
-
-                        const mappedOffers = mapApiResponseToComponentFormat(data.content);
-                        console.log('Zmapowane dane:', mappedOffers);
-
-                        setOffers(mappedOffers);
-                    } else {
-                        console.warn('Otrzymano puste dane odpowiedzi');
-                        setOffers([]);
-                    }
+                if (data && data.content) {
+                    console.log('Otrzymane dane:', data.content);
+                    const mappedOffers = mapApiResponseToComponentFormat(data.content);
+                    console.log('Zmapowane dane:', mappedOffers);
+                    setOffers(mappedOffers);
                 } else {
-                    const data = await getUserOffers(userId);
-                    if (data && data.content) {
-                        console.log('Otrzymane dane:', data.content);
-
-                        const mappedOffers = mapApiResponseToComponentFormat(data.content);
-                        console.log('Zmapowane dane:', mappedOffers);
-
-                        setOffers(mappedOffers);
-                    } else {
-                        console.warn('Otrzymano puste dane odpowiedzi');
-                        setOffers([]);
-                    }
+                    console.warn('Otrzymano puste dane odpowiedzi');
+                    setOffers([]);
                 }
             } catch (err) {
                 console.error('Błąd podczas pobierania ogłoszeń:', err);
@@ -209,6 +131,10 @@ const UserOffers: React.FC = () => {
                 alert('Nie udało się usunąć ogłoszenia. Spróbuj ponownie później.');
             }
         }
+    };
+
+    const redirectToProfile = () => {
+        window.location.href = '/user/panel';
     };
 
     const OfferCard: React.FC<{ offer: OfferData }> = ({ offer }) => {
@@ -263,6 +189,18 @@ const UserOffers: React.FC = () => {
     const renderOffers = () => {
         if (loading) {
             return <div className="offers-loading">Ładowanie ogłoszeń...</div>;
+        }
+
+        if (noUserIdError) {
+            return (
+                <div className="offers-error">
+                    <p>Nie można pobrać ogłoszeń. Brak ID użytkownika.</p>
+                    <p>Przejdź najpierw do profilu, aby załadować swoje dane.</p>
+                    <button className="primary-btn" onClick={redirectToProfile}>
+                        Przejdź do profilu
+                    </button>
+                </div>
+            );
         }
 
         if (error) {

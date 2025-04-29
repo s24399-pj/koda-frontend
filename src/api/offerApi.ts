@@ -1,6 +1,8 @@
 import axiosAuthClient from './axiosAuthClient';
 import { CreateOfferCommand, OfferResponse } from '../types/offer/OfferTypes';
 
+const OFFERS_ENDPOINT = '/api/v1/offers';
+
 export interface OffersResponse {
     content: any[];
     pageable: {
@@ -21,8 +23,6 @@ export interface OffersResponse {
     numberOfElements?: number;
     size?: number;
 }
-
-const OFFERS_ENDPOINT = '/api/v1/offers';
 
 export const createOffer = async (offerData: CreateOfferCommand): Promise<OfferResponse> => {
     try {
