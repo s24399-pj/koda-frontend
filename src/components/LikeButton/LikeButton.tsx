@@ -5,7 +5,7 @@ const LikeButton: React.FC = () => {
   const [liked, setLiked] = useState(false);
 
   const toggleLike = (e: React.MouseEvent) => {
-    e.stopPropagation(); // żeby nie kliknęło karty
+    e.stopPropagation();
     setLiked((prev) => !prev);
   };
 
