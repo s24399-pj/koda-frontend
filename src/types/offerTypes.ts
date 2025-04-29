@@ -36,3 +36,29 @@ export interface OfferData {
     imageUrls?: string[];
     CarDetailsDto: CarDetails;
 }
+
+export interface ApiOffer {
+    id: string;
+    title: string;
+    price: number;
+    mainImage: string | null;
+    mileage: number;
+    fuelType: string;
+    year: number;
+    enginePower: number;
+    displacement: string;
+    brand?: string;
+    model?: string;
+    description?: string;
+    currency?: string;
+    seller?: SellerData;
+    location?: string;
+    contactPhone?: string;
+    contactEmail?: string;
+    color?: string;
+    transmission?: string;
+    bodyType?: string;
+    driveType?: string;
+    doors?: number;
+    seats?: number;
+}

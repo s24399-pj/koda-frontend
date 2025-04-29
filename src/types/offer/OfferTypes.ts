@@ -1,4 +1,6 @@
 // Enumeracje
+import {OfferData} from "../offerTypes.ts";
+
 export enum FuelType {
     PETROL = 'PETROL',
     DIESEL = 'DIESEL',
@@ -144,4 +146,26 @@ export interface OfferResponse {
     currency: string;
     createdAt: string;
     // Inne pola które są zwracane przez API
+}
+
+// Nowy interfejs dla odpowiedzi z API zawierającej listę ofert
+export interface OffersResponse {
+    content: OfferData[];
+    pageable: {
+        pageNumber: number;
+        pageSize: number;
+        sort: {
+            empty: boolean;
+            unsorted: boolean;
+            sorted: boolean;
+        }
+    };
+    totalElements: number;
+    totalPages: number;
+    last: boolean;
+    first: boolean;
+    empty?: boolean;
+    number?: number;
+    numberOfElements?: number;
+    size?: number;
 }
