@@ -2,11 +2,10 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
-  padding-bottom: 80px;
+  padding-bottom: 80px; /* Miejsce na pasek porównania */
 
   h1 {
     margin-bottom: 20px;
-    margin-top: 60px;
     text-align: center;
   }
 
@@ -25,7 +24,6 @@
       display: flex;
       flex-direction: column;
       position: relative;
-      padding-bottom: 40px;
 
       &:hover {
         box-shadow: 0 4px 8px rgba(0,0,0,0.15);
@@ -34,6 +32,7 @@
       .offer-clickable {
         display: flex;
         cursor: pointer;
+        height: 100%; /* Zapewnia, że clickable obejmuje całą wysokość */
 
         @media (max-width: 768px) {
           flex-direction: column;
@@ -42,7 +41,7 @@
 
       .offer-image-container {
         width: 300px;
-        height: 225px;
+        height: 225px; /* Stały rozmiar dla wszystkich zdjęć */
         flex-shrink: 0;
         overflow: hidden;
         background-color: #f5f5f5;
@@ -59,8 +58,8 @@
         img {
           width: 100%;
           height: 100%;
-          object-fit: cover;
-          object-position: center;
+          object-fit: cover; /* Zapewnia wypełnienie kontenera */
+          object-position: center; /* Centruje obraz */
         }
       }
 
@@ -69,6 +68,7 @@
         padding: 15px;
         display: flex;
         flex-direction: column;
+        position: relative; /* Dla pozycjonowania przycisku porównania */
 
         .offer-header {
           display: flex;
@@ -86,7 +86,7 @@
             font-size: 18px;
             font-weight: 600;
             color: #222;
-            padding-right: 10px;
+            padding-right: 10px; /* Odstęp między tytułem a ceną */
           }
 
           .price-actions {
@@ -107,32 +107,33 @@
         .offer-info {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-          gap: 12px 20px;
+          gap: 12px 20px; /* Zwiększony odstęp między wierszami */
+          margin-bottom: 30px; /* Dodajemy miejsce na przycisk porównania */
 
           p {
             margin: 5px 0;
             display: flex;
             align-items: center;
-            min-height: 24px;
+            min-height: 24px; /* Minimalna wysokość dla każdego wiersza ze specyfikacją */
 
             strong {
               margin-right: 8px;
               color: #555;
-              min-width: 110px;
-              flex-shrink: 0;
+              min-width: 110px; /* Zwiększona szerokość etykiety */
+              flex-shrink: 0; /* Zapobiega kurczeniu się etykiety */
             }
 
             span {
-              white-space: nowrap;
+              white-space: nowrap; /* Utrzymuje wartości w jednej linii */
             }
           }
         }
-      }
 
-      .offer-compare-bottom {
-        position: absolute;
-        bottom: 10px;
-        right: 15px;
+        .offer-compare-bottom {
+          position: absolute;
+          bottom: 10px;
+          right: 15px;
+        }
       }
     }
   }
@@ -179,6 +180,7 @@
     color: #666;
   }
 
+  /* Stylowanie checkboxa do porównania */
   input[type="checkbox"] {
     width: 18px;
     height: 18px;
@@ -192,6 +194,7 @@
     }
   }
 
+  /* Stylowanie etykiety "Dodaj do porównania" */
   label {
     font-size: 14px;
     color: #555;
@@ -203,11 +206,13 @@
     }
   }
 
+  /* Stylowanie gdy checkbox jest zaznaczony */
   input[type="checkbox"]:checked + label {
     color: #4285f4;
     font-weight: 500;
   }
 
+  /* Stylowanie gdy checkbox jest wyłączony */
   input[type="checkbox"]:disabled + label {
     color: #aaa;
     cursor: not-allowed;

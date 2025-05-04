@@ -158,16 +158,17 @@ const OfferList: React.FC = () => {
                               <p><strong>Moc silnika:</strong> <span>{offer.enginePower} KM</span></p>
                               <p><strong>Pojemność silnika:</strong> <span>{offer.displacement} cm³</span></p>
                             </div>
-                          </div>
-                        </div>
 
-                        <div className="offer-compare-bottom">
-                          <CompareCheckbox
-                              offerId={offer.id}
-                              isSelected={isOfferSelected(offer.id)}
-                              isDisabled={!canAddMoreOffers()}
-                              onToggle={handleToggleComparison}
-                          />
+                            {/* Przycisk porównania umieszczony w prawym dolnym rogu */}
+                            <div className="offer-compare-bottom">
+                              <CompareCheckbox
+                                  offerId={offer.id}
+                                  isSelected={isOfferSelected(offer.id)}
+                                  isDisabled={!canAddMoreOffers()}
+                                  onToggle={handleToggleComparison}
+                              />
+                            </div>
+                          </div>
                         </div>
                       </div>
                   ))
