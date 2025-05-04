@@ -5,6 +5,9 @@ import "./OfferList.scss";
 import useTitle from "../../hooks/useTitle";
 import { MiniOffer } from "../../types/miniOfferTypes";
 import LikeButton from "../../components/LikeButton/LikeButton";
+import CompareCheckbox from "../../components/CompareCheckbox/CompareCheckbox";
+import ComparisonBar from "../../components/ComparisonBar/ComparisonBar";
+import { useComparison } from "../../context/ComparisonContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const PAGE_SIZE = 5;
@@ -18,6 +21,14 @@ const OfferList: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
+
+  const {
+    selectedOffers,
+    addToComparison,
+    removeFromComparison,
+    isOfferSelected,
+    canAddMoreOffers
+  } = useComparison();
 
   useEffect(() => {
     const fetchOffers = async () => {
@@ -43,6 +54,17 @@ const OfferList: React.FC = () => {
 
   const handleOfferClick = (id: string) => {
     navigate(`/offer/${id}`);
+  };
+
+  const handleToggleComparison = (id: string, checked: boolean) => {
+    const offer = offers.find(o => o.id === id);
+    if (!offer) return;
+
+    if (checked) {
+      addToComparison(offer);
+    } else {
+      removeFromComparison(id);
+    }
   };
 
   const renderPaginationButtons = () => {
@@ -112,27 +134,40 @@ const OfferList: React.FC = () => {
             <div className="offer-list">
               {offers.length > 0 ? (
                   offers.map((offer) => (
-                      <div key={offer.id} className="offer-card" onClick={() => handleOfferClick(offer.id)}>
-                        <img
-                            src={`${API_URL}/images/${offer.mainImage}`}
-                            alt={offer.title}
-                            className="offer-image"
-                            loading="lazy"
-                        />
-                        <div className="offer-details">
-                        <div className="offer-header">
-                          <h2>{truncateText(offer.title, 50)}</h2>
-                          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                            <span className="offer-price">{offer.price.toLocaleString()} PLN</span>
-                            <LikeButton />
+                      <div key={offer.id} className="offer-card">
+                        <div className="offer-clickable" onClick={() => handleOfferClick(offer.id)}>
+                          <div className="offer-image-container">
+                            <img
+                                src={`${API_URL}/images/${offer.mainImage}`}
+                                alt={offer.title}
+                                loading="lazy"
+                            />
                           </div>
-                        </div>
-                          <div className="offer-info">
-                            <p><strong>Rok:</strong> {offer.year}</p>
-                            <p><strong>Przebieg:</strong> {offer.mileage.toLocaleString()} km</p>
-                            <p><strong>Typ paliwa:</strong> {offer.fuelType}</p>
-                            <p><strong>Moc silnika:</strong> {offer.enginePower} KM</p>
-                            <p><strong>Pojemność silnika:</strong> {offer.displacement} cm³</p>
+                          <div className="offer-details">
+                            <div className="offer-header">
+                              <h2>{truncateText(offer.title, 50)}</h2>
+                              <div className="price-actions">
+                                <span className="offer-price">{offer.price.toLocaleString()} PLN</span>
+                                <LikeButton />
+                              </div>
+                            </div>
+                            <div className="offer-info">
+                              <p><strong>Rok:</strong> <span>{offer.year}</span></p>
+                              <p><strong>Przebieg:</strong> <span>{offer.mileage.toLocaleString()} km</span></p>
+                              <p><strong>Typ paliwa:</strong> <span>{offer.fuelType}</span></p>
+                              <p><strong>Moc silnika:</strong> <span>{offer.enginePower} KM</span></p>
+                              <p><strong>Pojemność silnika:</strong> <span>{offer.displacement} cm³</span></p>
+                            </div>
+
+                            {/* Przycisk porównania umieszczony w prawym dolnym rogu */}
+                            <div className="offer-compare-bottom">
+                              <CompareCheckbox
+                                  offerId={offer.id}
+                                  isSelected={isOfferSelected(offer.id)}
+                                  isDisabled={!canAddMoreOffers()}
+                                  onToggle={handleToggleComparison}
+                              />
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -162,6 +197,11 @@ const OfferList: React.FC = () => {
               </button>
             </div>
         )}
+
+        <ComparisonBar
+            selectedOffers={selectedOffers}
+            removeFromComparison={removeFromComparison}
+        />
       </div>
   );
 };
