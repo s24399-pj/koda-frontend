@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./OfferComparison.scss";
 import { OfferData } from "../../types/offerTypes";
+import { MiniOffer } from "../../types/miniOfferTypes";
 import useTitle from "../../hooks/useTitle";
+import { useComparison } from "../../context/ComparisonContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -31,6 +33,40 @@ const OfferComparison: React.FC = () => {
 
   const [focusA, setFocusA] = useState(false);
   const [focusB, setFocusB] = useState(false);
+
+  const { clearComparison } = useComparison();
+
+  useEffect(() => {
+    const loadOffersFromSession = async () => {
+      try {
+        const storedOffers = sessionStorage.getItem("comparisonOffers");
+        if (storedOffers) {
+          const parsedOffers: MiniOffer[] = JSON.parse(storedOffers);
+
+          if (parsedOffers.length === 2) {
+            setInputA(parsedOffers[0].title);
+            setInputB(parsedOffers[1].title);
+
+            const detailedOfferA = await fetchOfferDetails(parsedOffers[0].id);
+            const detailedOfferB = await fetchOfferDetails(parsedOffers[1].id);
+
+            if (detailedOfferA) setOfferA(detailedOfferA);
+            if (detailedOfferB) setOfferB(detailedOfferB);
+
+            sessionStorage.removeItem("comparisonOffers");
+          }
+        }
+      } catch (error) {
+        console.error("Error loading offers from session:", error);
+      }
+    };
+
+    loadOffersFromSession();
+
+    return () => {
+      clearComparison();
+    };
+  }, [clearComparison]);
 
   const searchOffers = async (query: string, setLoading: React.Dispatch<React.SetStateAction<boolean>>,
                               setSuggestions: React.Dispatch<React.SetStateAction<OfferData[]>>) => {

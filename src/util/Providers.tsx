@@ -1,5 +1,6 @@
 import {ReactNode} from 'react'
 import {AuthProvider} from "../context/AuthContext.tsx";
+import {ComparisonProvider} from "../context/ComparisonContext";
 
 /**
  * A wrapper component that provides various context providers to all child components.
@@ -9,7 +10,9 @@ import {AuthProvider} from "../context/AuthContext.tsx";
 export default function Provider({children}: { children: ReactNode }) {
     return (
         <AuthProvider>
-            {children}
+            <ComparisonProvider>
+                {children}
+            </ComparisonProvider>
         </AuthProvider>
     )
 }
