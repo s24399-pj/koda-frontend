@@ -67,9 +67,18 @@ export const deleteOffer = async (offerId: string): Promise<boolean> => {
     try {
         const response = await axiosAuthClient.delete(`${OFFERS_ENDPOINT}/${offerId}`);
         return response.status === 200 || response.status === 204;
-    } catch (error) {
+    } catch (error: any) {
         console.error('Błąd podczas usuwania ogłoszenia:', error);
-        throw error;
+
+        if (error.response) {
+            if (error.response.status === 403) {
+                console.error('Brak uprawnień do usunięcia ogłoszenia');
+            } else if (error.response.status === 404) {
+                console.error('Ogłoszenie nie zostało znalezione');
+            }
+        }
+
+        return false;
     }
 };
 
