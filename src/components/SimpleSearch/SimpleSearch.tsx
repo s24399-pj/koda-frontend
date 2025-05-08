@@ -18,6 +18,9 @@ const SimpleSearch: React.FC = () => {
   const [priceError, setPriceError] = useState<string | null>(null);
   const [showNotification, setShowNotification] = useState(false);
 
+  const MIN_PRICE_POINTS = [1000, 5000, 10000, 25000, 50000, 100000, 250000];
+  const MAX_PRICE_POINTS = [10000, 25000, 50000, 100000, 250000, 500000, 1000000];
+
   useEffect(() => {
     if (priceError) {
       setShowNotification(true);
@@ -69,15 +72,7 @@ const SimpleSearch: React.FC = () => {
   const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formattedValue = formatNumber(e.target.value);
     setMinPrice(formattedValue);
-    
-    const minPriceNum = parseInt(cleanNumber(formattedValue) || "0", 10);
-    const maxPriceNum = parseInt(cleanNumber(maxPrice) || "0", 10);
-    
-    if (maxPriceNum > 0 && minPriceNum > maxPriceNum) {
-      setPriceError("Cena minimalna nie może być wyższa niż maksymalna");
-    } else {
-      setPriceError(null);
-    }
+    validatePrices(formattedValue, maxPrice);
   };
 
   const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,26 +81,32 @@ const SimpleSearch: React.FC = () => {
     const minPriceNum = parseInt(cleanNumber(minPrice) || "0", 10);
     const newMaxPriceNum = parseInt(cleanNumber(formattedValue) || "0", 10);
     
-    if (newMaxPriceNum === 0 || newMaxPriceNum >= minPriceNum) {
+    if (newMaxPriceNum === 0 || newMaxPriceNum > minPriceNum) {
       setMaxPrice(formattedValue);
       setPriceError(null);
     } else {
-      setPriceError("Cena maksymalna nie może być niższa niż minimalna");
+      setPriceError("Cena maksymalna nie może być równa lub niższa niż minimalna");
+    }
+  };
+
+  const validatePrices = (minPriceStr: string, maxPriceStr: string) => {
+    const minPriceNum = parseInt(cleanNumber(minPriceStr) || "0", 10);
+    const maxPriceNum = parseInt(cleanNumber(maxPriceStr) || "0", 10);
+    
+    if (maxPriceNum > 0 && minPriceNum >= maxPriceNum) {
+      setPriceError("Cena minimalna nie może być równa lub wyższa niż maksymalna");
+      return false;
+    } else {
+      setPriceError(null);
+      return true;
     }
   };
 
   const handleMinPriceClick = (price: number) => {
-    const maxPriceNum = parseInt(cleanNumber(maxPrice) || "0", 10);
-    
-    if (maxPriceNum > 0 && price >= maxPriceNum) {
-      setMinPrice(formatNumber(price.toString()));
-      setPriceError("Cena minimalna nie może być równa lub wyższa niż maksymalna");
-    } else {
-      setMinPrice(formatNumber(price.toString()));
-      setPriceError(null);
-    }
-    
+    const formattedPrice = formatNumber(price.toString());
+    setMinPrice(formattedPrice);
     setShowMinPriceSuggestions(false);
+    validatePrices(formattedPrice, maxPrice);
   };
 
   const handleMaxPriceClick = (price: number) => {
@@ -113,54 +114,26 @@ const SimpleSearch: React.FC = () => {
     
     if (price > minPriceNum) {
       setMaxPrice(formatNumber(price.toString()));
-      setShowMaxPriceSuggestions(false);
       setPriceError(null);
     } else {
       setPriceError("Cena maksymalna nie może być równa lub niższa niż minimalna");
-      setShowMaxPriceSuggestions(false);
     }
+    
+    setShowMaxPriceSuggestions(false);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const minPriceNum = parseInt(cleanNumber(minPrice) || "0", 10);
-    const maxPriceNum = parseInt(cleanNumber(maxPrice) || "0", 10);
-    
-    if (maxPriceNum > 0 && minPriceNum >= maxPriceNum) {
-      setPriceError("Cena minimalna nie może być równa lub wyższa niż maksymalna");
-      return;
-    }
+    const isValid = validatePrices(minPrice, maxPrice);
+    if (!isValid) return;
     
     navigate(`/offers?phrase=${encodeURIComponent(phrase)}&minPrice=${cleanNumber(minPrice)}&maxPrice=${cleanNumber(maxPrice)}`);
   };
 
-  const generatePriceSuggestions = (isForMin: boolean): number[] => {
-    const suggestions: number[] = [];
-    
-    if (isForMin) {
-      if (maxPriceValue > 1000) suggestions.push(1000);
-      if (maxPriceValue > 5000) suggestions.push(5000);
-      if (maxPriceValue > 10000) suggestions.push(10000);
-      if (maxPriceValue > 25000) suggestions.push(25000);
-      if (maxPriceValue > 50000) suggestions.push(50000);
-      if (maxPriceValue > 100000) suggestions.push(100000);
-      if (maxPriceValue > 250000) suggestions.push(250000);
-    } else {
-      if (maxPriceValue > 10000) suggestions.push(10000);
-      if (maxPriceValue > 25000) suggestions.push(25000);
-      if (maxPriceValue > 50000) suggestions.push(50000);
-      if (maxPriceValue > 100000) suggestions.push(100000);
-      if (maxPriceValue > 250000) suggestions.push(250000);
-      if (maxPriceValue > 500000) suggestions.push(500000);
-      if (maxPriceValue > 1000000) suggestions.push(1000000);
-    }
-    
-    return suggestions;
+  const getFilteredPrices = (pricePoints: number[]): number[] => {
+    return pricePoints.filter(price => price <= maxPriceValue);
   };
-
-  const minPriceSuggestions = generatePriceSuggestions(true);
-  const maxPriceSuggestions = generatePriceSuggestions(false);
 
   return (
     <div className="simple-search-wrapper">
@@ -209,7 +182,7 @@ const SimpleSearch: React.FC = () => {
           {showMinPriceSuggestions && (
             <div className="suggestions-container">
               <ul className="suggestions price-suggestions">
-                {minPriceSuggestions.map((price) => (
+                {getFilteredPrices(MIN_PRICE_POINTS).map((price) => (
                   <li 
                     key={`min-${price}`} 
                     onMouseDown={() => handleMinPriceClick(price)}
@@ -237,7 +210,7 @@ const SimpleSearch: React.FC = () => {
           {showMaxPriceSuggestions && (
             <div className="suggestions-container">
               <ul className="suggestions price-suggestions">
-                {maxPriceSuggestions.map((price) => (
+                {getFilteredPrices(MAX_PRICE_POINTS).map((price) => (
                   <li 
                     key={`max-${price}`} 
                     onMouseDown={() => handleMaxPriceClick(price)}
