@@ -1,4 +1,3 @@
-// Enumeracje
 import {OfferData} from "../offerTypes.ts";
 
 export enum FuelType {
@@ -132,8 +131,6 @@ export interface CreateOfferCommand {
     accidentFree?: boolean;
     serviceHistory?: boolean;
     additionalFeatures?: string;
-
-    // Wyposażenie pojazdu
     equipment?: CarEquipment;
 }
 
@@ -145,7 +142,6 @@ export interface OfferResponse {
     price: number;
     currency: string;
     createdAt: string;
-    // Inne pola które są zwracane przez API
 }
 
 // Nowy interfejs dla odpowiedzi z API zawierającej listę ofert
