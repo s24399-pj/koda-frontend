@@ -2,7 +2,6 @@ import React from 'react';
 import { FormikProps, Field, ErrorMessage } from 'formik';
 import { CreateOfferCommand } from '../../types/offer/OfferTypes';
 
-// Definiujemy typ dla wartości formularza
 type OfferFormValues = CreateOfferCommand & { termsAccepted: boolean };
 
 interface BasicInfoStepProps {
@@ -13,7 +12,6 @@ interface BasicInfoStepProps {
 const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ formik, onNext }) => {
     const handleNext = () => {
         formik.validateForm().then(errors => {
-            // Dotknij wszystkie pola, aby pokazać błędy walidacji
             formik.setTouched({
                 title: true,
                 description: true,
@@ -21,15 +19,28 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ formik, onNext }) => {
                 currency: true
             });
 
-            // Sprawdź czy są błędy w polach tego kroku
             const stepErrors = Object.keys(errors).filter(key =>
                 ['title', 'description', 'price', 'currency'].includes(key)
             );
 
             if (stepErrors.length === 0) {
                 onNext();
+            } else {
+                const firstErrorField = document.getElementById(stepErrors[0]);
+                if (firstErrorField) {
+                    firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstErrorField.focus();
+                }
             }
         });
+    };
+
+    const calculateTitleChars = () => {
+        return formik.values.title?.length || 0;
+    };
+
+    const calculateDescriptionChars = () => {
+        return formik.values.description?.length || 0;
     };
 
     return (
@@ -44,9 +55,12 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ formik, onNext }) => {
                     name="title"
                     placeholder="Np. BMW Seria 3 318i, 2020, Salon Polska"
                     className={formik.touched.title && formik.errors.title ? 'error' : ''}
+                    maxLength="100"
                 />
                 <ErrorMessage name="title" component="div" className="error-text" />
-                <small>3-100 znaków</small>
+                <small className={calculateTitleChars() >= 90 ? 'char-count warning' : 'char-count'}>
+                    {calculateTitleChars()}/100 znaków
+                </small>
             </div>
 
             <div className="form-group">
@@ -58,9 +72,12 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ formik, onNext }) => {
                     placeholder="Opisz dokładnie swój samochód. Wymień jego zalety, historię, stan techniczny i wszystko co może zainteresować potencjalnych kupujących."
                     rows={10}
                     className={formik.touched.description && formik.errors.description ? 'error' : ''}
+                    maxLength="2000"
                 />
                 <ErrorMessage name="description" component="div" className="error-text" />
-                <small>10-2000 znaków</small>
+                <small className={calculateDescriptionChars() >= 1900 ? 'char-count warning' : 'char-count'}>
+                    {calculateDescriptionChars()}/2000 znaków
+                </small>
             </div>
 
             <div className="form-row">

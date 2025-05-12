@@ -8,7 +8,6 @@ interface ContactAndSummaryStepProps {
     isSubmitting: boolean;
 }
 
-// Definicja typu dla render prop pola Formik
 interface TermsFieldProps {
     field: FieldInputProps<boolean>;
     form: FormikProps<CreateOfferCommand & { termsAccepted: boolean }>;
@@ -19,9 +18,21 @@ const ContactAndSummaryStep: React.FC<ContactAndSummaryStepProps> = ({
                                                                          onPrevious,
                                                                          isSubmitting
                                                                      }) => {
+    const handleSubmit = () => {
+        if (formik.values.expirationDate) {
+            const expirationDate = new Date(formik.values.expirationDate);
+
+            expirationDate.setHours(23, 59, 59, 999);
+
+            formik.setFieldValue('expirationDate', expirationDate.toISOString());
+        }
+
+        formik.handleSubmit();
+    };
+
     return (
         <div className="form-step">
-            <h2>Kontakt i finalizacja</h2>
+            <h2>Lokalizacja i finalizacja</h2>
 
             <div className="form-group">
                 <label htmlFor="location">Lokalizacja</label>
@@ -30,46 +41,23 @@ const ContactAndSummaryStep: React.FC<ContactAndSummaryStepProps> = ({
                     id="location"
                     name="location"
                     placeholder="Np. Warszawa, Mazowieckie"
+                    className={formik.touched.location && formik.errors.location ? 'error' : ''}
                 />
-            </div>
-
-            <div className="form-row">
-                <div className="form-group">
-                    <label htmlFor="contactPhone">Telefon kontaktowy</label>
-                    <Field
-                        type="tel"
-                        id="contactPhone"
-                        name="contactPhone"
-                        placeholder="Np. +48 123 456 789"
-                        className={formik.touched.contactPhone && formik.errors.contactPhone ? 'error' : ''}
-                    />
-                    <ErrorMessage name="contactPhone" component="div" className="error-text" />
-                </div>
-
-                <div className="form-group">
-                    <label htmlFor="contactEmail">Email kontaktowy</label>
-                    <Field
-                        type="email"
-                        id="contactEmail"
-                        name="contactEmail"
-                        placeholder="Np. jan.kowalski@example.com"
-                        className={formik.touched.contactEmail && formik.errors.contactEmail ? 'error' : ''}
-                    />
-                    <ErrorMessage name="contactEmail" component="div" className="error-text" />
-                </div>
+                <ErrorMessage name="location" component="div" className="error-text" />
+                <small>Podaj lokalizację pojazdu</small>
             </div>
 
             <div className="form-group">
                 <label htmlFor="expirationDate">Data wygaśnięcia ogłoszenia</label>
                 <Field
-                    type="datetime-local"
+                    type="date"
                     id="expirationDate"
                     name="expirationDate"
-                    min={new Date().toISOString().slice(0, 16)}
+                    min={new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0]}
                     className={formik.touched.expirationDate && formik.errors.expirationDate ? 'error' : ''}
                 />
                 <ErrorMessage name="expirationDate" component="div" className="error-text" />
-                <small>Jeśli nie wybierzesz daty, ogłoszenie wygaśnie po 30 dniach.</small>
+                <small>Jeśli nie wybierzesz daty, ogłoszenie wygaśnie po 30 dniach. Wybrana data określa pełny dzień wygaśnięcia.</small>
             </div>
 
             <div className="form-summary">
@@ -94,7 +82,7 @@ const ContactAndSummaryStep: React.FC<ContactAndSummaryStepProps> = ({
                         <span className="summary-label">Rok produkcji:</span>
                         <span className="summary-value">{formik.values.year}</span>
                     </div>
-                    {formik.values.mileage && (
+                    {formik.values.mileage !== undefined && formik.values.mileage !== null && (
                         <div className="summary-row">
                             <span className="summary-label">Przebieg:</span>
                             <span className="summary-value">{formik.values.mileage} km</span>
@@ -116,6 +104,12 @@ const ContactAndSummaryStep: React.FC<ContactAndSummaryStepProps> = ({
                         <div className="summary-row">
                             <span className="summary-label">Skrzynia biegów:</span>
                             <span className="summary-value">{formik.values.transmission}</span>
+                        </div>
+                    )}
+                    {formik.values.location && (
+                        <div className="summary-row">
+                            <span className="summary-label">Lokalizacja:</span>
+                            <span className="summary-value">{formik.values.location}</span>
                         </div>
                     )}
                 </div>
@@ -147,9 +141,10 @@ const ContactAndSummaryStep: React.FC<ContactAndSummaryStepProps> = ({
                     Wstecz
                 </button>
                 <button
-                    type="submit"
+                    type="button"
                     className="submit-offer-btn"
                     disabled={isSubmitting}
+                    onClick={handleSubmit}
                 >
                     {isSubmitting ? 'Wysyłanie...' : 'Opublikuj ogłoszenie'}
                 </button>
