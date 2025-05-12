@@ -9,17 +9,14 @@ import {
     VehicleCondition
 } from '../../types/offer/OfferTypes';
 
-// Definiujemy typ dla wartości formularza
 type OfferFormValues = CreateOfferCommand & { termsAccepted: boolean };
 
-// Interfejs dla props komponentu
 interface VehicleDetailsStepProps {
     formik: FormikProps<OfferFormValues>;
     onNext: () => void;
     onPrevious: () => void;
 }
 
-// Interfejs dla render props pola Field
 interface FieldRenderProps {
     field: FieldInputProps<any>;
     form: FormikProps<OfferFormValues>;
@@ -30,21 +27,40 @@ const VehicleDetailsStep: React.FC<VehicleDetailsStepProps> = ({ formik, onNext,
 
     const handleNext = () => {
         formik.validateForm().then(errors => {
-            // Dotknij wszystkie pola, aby pokazać błędy walidacji
             formik.setTouched({
                 brand: true,
                 model: true,
                 year: true,
-                vin: formik.values.vin ? true : false
+                mileage: true,
+                condition: true,
+                color: true,
+                fuelType: true,
+                transmission: true,
+                bodyType: true,
+                driveType: true,
+                displacement: true,
+                enginePower: true,
+                doors: true,
+                seats: true,
+                vin: true,
+                registrationNumber: true,
+                registrationCountry: true
             });
 
-            // Sprawdź czy są błędy w polach tego kroku
             const stepErrors = Object.keys(errors).filter(key =>
-                ['brand', 'model', 'year', 'vin'].includes(key)
+                ['brand', 'model', 'year', 'mileage', 'condition', 'color', 'fuelType',
+                    'transmission', 'bodyType', 'driveType', 'displacement', 'enginePower',
+                    'doors', 'seats', 'vin', 'registrationNumber', 'registrationCountry'].includes(key)
             );
 
             if (stepErrors.length === 0) {
                 onNext();
+            } else {
+                const firstErrorField = document.getElementById(stepErrors[0]);
+                if (firstErrorField) {
+                    firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstErrorField.focus();
+                }
             }
         });
     };
@@ -95,24 +111,27 @@ const VehicleDetailsStep: React.FC<VehicleDetailsStepProps> = ({ formik, onNext,
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="mileage">Przebieg (km)</label>
+                    <label htmlFor="mileage">Przebieg (km) *</label>
                     <Field
                         type="number"
                         id="mileage"
                         name="mileage"
                         placeholder="Np. 75000"
                         min="0"
+                        className={formik.touched.mileage && formik.errors.mileage ? 'error' : ''}
                     />
+                    <ErrorMessage name="mileage" component="div" className="error-text" />
                 </div>
             </div>
 
             <div className="form-row">
                 <div className="form-group">
-                    <label htmlFor="condition">Stan pojazdu</label>
+                    <label htmlFor="condition">Stan pojazdu *</label>
                     <Field
                         as="select"
                         id="condition"
                         name="condition"
+                        className={formik.touched.condition && formik.errors.condition ? 'error' : ''}
                     >
                         <option value="">Wybierz stan pojazdu</option>
                         <option value={VehicleCondition.NEW}>Nowy</option>
@@ -122,26 +141,31 @@ const VehicleDetailsStep: React.FC<VehicleDetailsStepProps> = ({ formik, onNext,
                         <option value={VehicleCondition.RESTORED}>Odrestaurowany</option>
                         <option value={VehicleCondition.CLASSIC}>Klasyczny</option>
                     </Field>
+                    <ErrorMessage name="condition" component="div" className="error-text" />
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="color">Kolor</label>
+                    <label htmlFor="color">Kolor *</label>
                     <Field
                         type="text"
                         id="color"
                         name="color"
                         placeholder="Np. Czarny, Srebrny, Biały"
+                        maxLength="30"
+                        className={formik.touched.color && formik.errors.color ? 'error' : ''}
                     />
+                    <ErrorMessage name="color" component="div" className="error-text" />
                 </div>
             </div>
 
             <div className="form-row">
                 <div className="form-group">
-                    <label htmlFor="fuelType">Rodzaj paliwa</label>
+                    <label htmlFor="fuelType">Rodzaj paliwa *</label>
                     <Field
                         as="select"
                         id="fuelType"
                         name="fuelType"
+                        className={formik.touched.fuelType && formik.errors.fuelType ? 'error' : ''}
                     >
                         <option value="">Wybierz rodzaj paliwa</option>
                         <option value={FuelType.PETROL}>Benzyna</option>
@@ -152,30 +176,34 @@ const VehicleDetailsStep: React.FC<VehicleDetailsStepProps> = ({ formik, onNext,
                         <option value={FuelType.HYDROGEN}>Wodór</option>
                         <option value={FuelType.OTHER}>Inny</option>
                     </Field>
+                    <ErrorMessage name="fuelType" component="div" className="error-text" />
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="transmission">Skrzynia biegów</label>
+                    <label htmlFor="transmission">Skrzynia biegów *</label>
                     <Field
                         as="select"
                         id="transmission"
                         name="transmission"
+                        className={formik.touched.transmission && formik.errors.transmission ? 'error' : ''}
                     >
                         <option value="">Wybierz skrzynię biegów</option>
                         <option value={TransmissionType.MANUAL}>Manualna</option>
                         <option value={TransmissionType.AUTOMATIC}>Automatyczna</option>
                         <option value={TransmissionType.SEMI_AUTOMATIC}>Półautomatyczna</option>
                     </Field>
+                    <ErrorMessage name="transmission" component="div" className="error-text" />
                 </div>
             </div>
 
             <div className="form-row">
                 <div className="form-group">
-                    <label htmlFor="bodyType">Typ nadwozia</label>
+                    <label htmlFor="bodyType">Typ nadwozia *</label>
                     <Field
                         as="select"
                         id="bodyType"
                         name="bodyType"
+                        className={formik.touched.bodyType && formik.errors.bodyType ? 'error' : ''}
                     >
                         <option value="">Wybierz typ nadwozia</option>
                         <option value={BodyType.SEDAN}>Sedan</option>
@@ -189,14 +217,16 @@ const VehicleDetailsStep: React.FC<VehicleDetailsStepProps> = ({ formik, onNext,
                         <option value={BodyType.MINIBUS}>Minibus</option>
                         <option value={BodyType.OTHER}>Inny</option>
                     </Field>
+                    <ErrorMessage name="bodyType" component="div" className="error-text" />
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="driveType">Napęd</label>
+                    <label htmlFor="driveType">Napęd *</label>
                     <Field
                         as="select"
                         id="driveType"
                         name="driveType"
+                        className={formik.touched.driveType && formik.errors.driveType ? 'error' : ''}
                     >
                         <option value="">Wybierz rodzaj napędu</option>
                         <option value={DriveType.FRONT_WHEEL_DRIVE}>Przedni (FWD)</option>
@@ -205,58 +235,71 @@ const VehicleDetailsStep: React.FC<VehicleDetailsStepProps> = ({ formik, onNext,
                         <option value={DriveType.FOUR_WHEEL_DRIVE}>4x4</option>
                         <option value={DriveType.OTHER}>Inny</option>
                     </Field>
+                    <ErrorMessage name="driveType" component="div" className="error-text" />
                 </div>
             </div>
 
             <div className="form-row">
                 <div className="form-group">
-                    <label htmlFor="displacement">Pojemność silnika (cm³)</label>
+                    <label htmlFor="displacement">Pojemność silnika (cm³) *</label>
                     <Field
-                        type="text"
+                        type="number"
                         id="displacement"
                         name="displacement"
                         placeholder="Np. 1998"
+                        min="0"
+                        max="20000"
+                        className={formik.touched.displacement && formik.errors.displacement ? 'error' : ''}
                     />
+                    <ErrorMessage name="displacement" component="div" className="error-text" />
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="enginePower">Moc silnika (KM)</label>
+                    <label htmlFor="enginePower">Moc silnika (KM) *</label>
                     <Field
                         type="number"
                         id="enginePower"
                         name="enginePower"
                         placeholder="Np. 150"
-                        min="0"
+                        min="1"
+                        className={formik.touched.enginePower && formik.errors.enginePower ? 'error' : ''}
                     />
+                    <ErrorMessage name="enginePower" component="div" className="error-text" />
                 </div>
             </div>
 
             <div className="form-row">
                 <div className="form-group">
-                    <label htmlFor="doors">Liczba drzwi</label>
+                    <label htmlFor="doors">Liczba drzwi *</label>
                     <Field
                         type="number"
                         id="doors"
                         name="doors"
                         placeholder="Np. 5"
-                        min="0"
+                        min="1"
+                        max="10"
+                        className={formik.touched.doors && formik.errors.doors ? 'error' : ''}
                     />
+                    <ErrorMessage name="doors" component="div" className="error-text" />
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="seats">Liczba miejsc</label>
+                    <label htmlFor="seats">Liczba miejsc *</label>
                     <Field
                         type="number"
                         id="seats"
                         name="seats"
                         placeholder="Np. 5"
-                        min="0"
+                        min="1"
+                        max="50"
+                        className={formik.touched.seats && formik.errors.seats ? 'error' : ''}
                     />
+                    <ErrorMessage name="seats" component="div" className="error-text" />
                 </div>
             </div>
 
             <div className="form-group">
-                <label htmlFor="vin">Numer VIN</label>
+                <label htmlFor="vin">Numer VIN *</label>
                 <Field
                     type="text"
                     id="vin"
@@ -266,28 +309,34 @@ const VehicleDetailsStep: React.FC<VehicleDetailsStepProps> = ({ formik, onNext,
                     className={formik.touched.vin && formik.errors.vin ? 'error' : ''}
                 />
                 <ErrorMessage name="vin" component="div" className="error-text" />
-                <small>Numer VIN składa się z 17 znaków</small>
+                <small>Numer VIN składa się z 17 znaków (litery I, O, Q są niedozwolone)</small>
             </div>
 
             <div className="form-row">
                 <div className="form-group">
-                    <label htmlFor="registrationNumber">Numer rejestracyjny</label>
+                    <label htmlFor="registrationNumber">Numer rejestracyjny *</label>
                     <Field
                         type="text"
                         id="registrationNumber"
                         name="registrationNumber"
                         placeholder="Np. WA12345"
+                        maxLength="15"
+                        className={formik.touched.registrationNumber && formik.errors.registrationNumber ? 'error' : ''}
                     />
+                    <ErrorMessage name="registrationNumber" component="div" className="error-text" />
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="registrationCountry">Kraj rejestracji</label>
+                    <label htmlFor="registrationCountry">Kraj rejestracji *</label>
                     <Field
                         type="text"
                         id="registrationCountry"
                         name="registrationCountry"
                         placeholder="Np. Polska"
+                        maxLength="30"
+                        className={formik.touched.registrationCountry && formik.errors.registrationCountry ? 'error' : ''}
                     />
+                    <ErrorMessage name="registrationCountry" component="div" className="error-text" />
                 </div>
             </div>
 

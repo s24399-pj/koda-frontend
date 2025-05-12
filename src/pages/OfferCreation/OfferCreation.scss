@@ -7,9 +7,23 @@ $border-color: #e0e0e0;
 $background-light: #f8f9fa;
 $danger-color: #dc3545;
 $success-color: #28a745;
+$warning-color: #ffc107;
 
 $tablet: 768px;
 $mobile: 576px;
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
 
 .offer-creation-container {
   max-width: 1200px;
@@ -23,6 +37,12 @@ $mobile: 576px;
     padding: 20px;
     margin: 60px 10px 20px;
   }
+
+  @media (max-width: $mobile) {
+    padding: 15px;
+    margin: 40px 8px 15px;
+    margin-top: 150px;
+  }
 }
 
 .offer-creation-header {
@@ -34,6 +54,15 @@ $mobile: 576px;
     color: $text-color;
     font-size: 26px;
     text-align: center;
+  }
+
+  @media (max-width: $mobile) {
+    margin-bottom: 10px;
+
+    h1 {
+      font-size: 22px;
+      margin-bottom: 15px;
+    }
   }
 }
 
@@ -97,10 +126,42 @@ $mobile: 576px;
     }
   }
 
+  @media (max-width: $tablet) {
+    margin-top: 20px;
+    margin-bottom: 40px;
+    padding-top: 20px;
+
+    &::before {
+      left: 20px;
+      right: 20px;
+    }
+  }
+
   @media (max-width: $mobile) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 25px;
+    margin-bottom: 50px;
+    padding-top: 10px;
+
+    &::before {
+      display: none;
+    }
+
     .step {
+      width: calc(50% - 10px);
+      margin-bottom: 15px;
+
+      .step-number {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+      }
+
       span {
         font-size: 12px;
+        max-width: 100%;
       }
     }
   }
@@ -116,7 +177,31 @@ $mobile: 576px;
   font-size: 14px;
 }
 
+.offer-creation-form {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
 .form-step {
+  animation: fadeIn 0.3s ease-in-out;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   h2 {
     font-size: 20px;
     margin-bottom: 25px;
@@ -131,10 +216,28 @@ $mobile: 576px;
     margin-bottom: 15px;
     color: $text-color;
   }
+
+  @media (max-width: $mobile) {
+    padding: 0;
+
+    h2 {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      font-size: 16px;
+      margin-top: 20px;
+      margin-bottom: 12px;
+    }
+  }
 }
 
 .form-group {
   margin-bottom: 20px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 
   label {
     display: block;
@@ -152,19 +255,26 @@ $mobile: 576px;
   input[type="email"],
   input[type="tel"],
   input[type="number"],
-  input[type="datetime-local"],
+  input[type="date"],
   textarea,
   select {
     width: 100%;
+    max-width: 100%;
     padding: 10px;
     border: 1px solid $border-color;
     border-radius: 4px;
     font-size: 14px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
 
     &:focus {
       outline: none;
       border-color: $primary-color;
       box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+    }
+
+    &:hover:not(:focus) {
+      border-color: darken($border-color, 10%);
     }
 
     &.error {
@@ -183,26 +293,63 @@ $mobile: 576px;
     margin-top: 4px;
     color: $text-light;
     font-size: 12px;
+
+    &.char-count {
+      text-align: right;
+
+      &.warning {
+        color: $warning-color;
+        font-weight: 600;
+      }
+    }
   }
 
   .error-text {
     color: $danger-color;
     font-size: 12px;
     margin-top: 5px;
+    font-weight: 500;
+  }
+
+  @media (max-width: $mobile) {
+    margin-bottom: 15px;
+
+    label {
+      font-size: 13px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="number"],
+    input[type="date"],
+    textarea,
+    select {
+      padding: 8px;
+      font-size: 14px;
+    }
   }
 }
 
 .form-row {
   display: flex;
   gap: 20px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 
   .form-group {
     flex: 1;
+    min-width: 0;
   }
 
   @media (max-width: $mobile) {
     flex-direction: column;
     gap: 10px;
+
+    .form-group {
+      width: 100%;
+    }
   }
 }
 
@@ -210,14 +357,34 @@ $mobile: 576px;
   display: flex;
   align-items: center;
   margin-bottom: 10px;
+  width: 100%;
+  box-sizing: border-box;
 
   input[type="checkbox"] {
     margin-right: 8px;
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
   }
 
   label {
     margin-bottom: 0;
     font-weight: normal;
+    cursor: pointer;
+  }
+
+  @media (max-width: $mobile) {
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+    }
+
+    label {
+      font-size: 13px;
+      line-height: 1.4;
+    }
   }
 }
 
@@ -258,6 +425,7 @@ $mobile: 576px;
   color: $primary-color;
   margin-top: 15px;
   font-size: 14px;
+  font-weight: 500;
 }
 
 .equipment-grid {
@@ -278,6 +446,8 @@ $mobile: 576px;
   display: flex;
   justify-content: space-between;
   margin-top: 30px;
+  width: 100%;
+  box-sizing: border-box;
 
   button {
     padding: 12px 24px;
@@ -290,6 +460,14 @@ $mobile: 576px;
     &:disabled {
       opacity: 0.7;
       cursor: not-allowed;
+    }
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
     }
   }
 
@@ -315,14 +493,35 @@ $mobile: 576px;
 
   .submit-offer-btn {
     padding: 12px 30px;
+    background-color: $success-color;
+
+    &:hover {
+      background-color: darken($success-color, 5%);
+    }
+  }
+
+  @media (max-width: $mobile) {
+    margin-top: 20px;
+
+    button {
+      padding: 10px 15px;
+      font-size: 13px;
+    }
+
+    .submit-offer-btn {
+      padding: 10px 20px;
+    }
   }
 }
 
 .form-summary {
-  background-color: $background-light;
+  background-color: $primary-light;
   border-radius: 6px;
   padding: 20px;
   margin-bottom: 25px;
+  border: 1px solid rgba($primary-color, 0.2);
+  width: 100%;
+  box-sizing: border-box;
 
   h3 {
     margin-top: 0;
@@ -334,10 +533,14 @@ $mobile: 576px;
   .summary-details {
     .summary-row {
       display: flex;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed rgba($border-color, 0.8);
 
       &:last-child {
         margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
       }
 
       .summary-label {
@@ -351,8 +554,24 @@ $mobile: 576px;
         flex: 1;
         color: $text-color;
         font-size: 14px;
+        word-break: break-word;
       }
     }
+
+    @media (max-width: $mobile) {
+      .summary-row {
+        flex-direction: column;
+
+        .summary-label {
+          width: 100%;
+          margin-bottom: 4px;
+        }
+      }
+    }
+  }
+
+  @media (max-width: $mobile) {
+    padding: 15px;
   }
 }
 
@@ -361,5 +580,36 @@ $mobile: 576px;
 
   .checkbox-group {
     margin-bottom: 0;
+    align-items: flex-start;
+
+    input[type="checkbox"] {
+      margin-top: 3px;
+    }
+
+    label.error {
+      color: $danger-color;
+    }
+  }
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+  outline: 2px solid $primary-color;
+  outline-offset: 2px;
+}
+
+.form-validated {
+  input:valid,
+  select:valid,
+  textarea:valid {
+    border-color: rgba($success-color, 0.5);
+  }
+
+  input:invalid,
+  select:invalid,
+  textarea:invalid {
+    border-color: rgba($danger-color, 0.5);
   }
 }
