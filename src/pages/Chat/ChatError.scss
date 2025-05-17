@@ -1,0 +1,92 @@
+/* Style dla obsługi błędów i statusu połączenia w czacie */
+
+/* Komunikat o błędzie połączenia */
+.chat-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 70px);
+  text-align: center;
+  padding: 20px;
+  background-color: #f5f7fb;
+  font-family: 'Roboto', sans-serif;
+
+  h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #e74c3c;
+  }
+
+  p {
+    margin-bottom: 2rem;
+    max-width: 500px;
+    color: #6c757d;
+    font-size: 14px;
+  }
+
+  button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #0069d9;
+    }
+  }
+}
+
+/* Wskaźnik statusu połączenia */
+.connection-status {
+  display: flex;
+  align-items: center;
+  padding: 8px 15px;
+  margin: 10px 15px;
+  font-size: 13px;
+  border-radius: 20px;
+  background-color: #f8f9fa;
+
+  &.connected {
+    background-color: rgba(39, 174, 96, 0.1);
+    color: #27ae60;
+    border: 1px solid rgba(39, 174, 96, 0.2);
+  }
+
+  &.connecting {
+    background-color: rgba(241, 196, 15, 0.1);
+    color: #f39c12;
+    border: 1px solid rgba(241, 196, 15, 0.2);
+  }
+
+  &.disconnected {
+    background-color: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+    border: 1px solid rgba(231, 76, 60, 0.2);
+  }
+
+  .icon {
+    margin-right: 8px;
+    font-size: 14px;
+  }
+
+  .reconnect-button {
+    margin-left: auto;
+    padding: 4px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #0069d9;
+    }
+  }
+}

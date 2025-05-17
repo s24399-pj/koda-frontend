@@ -5,7 +5,7 @@
   align-items: center;
   padding: 30px 0;
   position: relative;
-  
+
   .notification-container {
     position: absolute;
     top: -60px;
@@ -15,7 +15,7 @@
     justify-content: center;
     z-index: 1000;
     pointer-events: none;
-    
+
     .notification {
       display: flex;
       align-items: center;
@@ -27,22 +27,22 @@
       width: auto;
       pointer-events: auto;
       animation: slideDown 0.3s ease-out forwards;
-      
+
       &.error {
         border-left: 4px solid #e74c3c;
       }
-      
+
       .notification-icon {
         margin-right: 10px;
         font-size: 20px;
       }
-      
+
       .notification-message {
         flex: 1;
         font-size: 14px;
         color: #333;
       }
-      
+
       .notification-close {
         background: none;
         border: none;
@@ -51,14 +51,14 @@
         cursor: pointer;
         padding: 0 0 0 10px;
         line-height: 1;
-        
+
         &:hover {
           color: #333;
         }
       }
     }
   }
-  
+
   @keyframes slideDown {
     from {
       transform: translateY(-20px);
@@ -83,6 +83,50 @@
     gap: 15px;
     flex-wrap: nowrap;
     position: relative;
+
+    /* Nowe style dla stanu ładowania */
+    &.loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .loading-indicator {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.8);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      border-radius: 12px;
+
+      .spinner {
+        width: 30px;
+        height: 30px;
+        border: 3px solid rgba(0, 123, 229, 0.3);
+        border-radius: 50%;
+        border-top-color: #007be5;
+        animation: spin 1s linear infinite;
+        margin-bottom: 10px;
+      }
+
+      p {
+        font-size: 14px;
+        font-weight: 500;
+        color: #333;
+        margin: 0;
+      }
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
 
     .price-error {
       position: absolute;
@@ -121,10 +165,17 @@
           border-color: #007be5;
           box-shadow: 0 0 5px rgba(0, 123, 229, 0.5);
         }
-        
+
         &.error {
           border-color: #e74c3c;
           box-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
+        }
+
+        /* Nowy styl dla wyłączonych pól */
+        &:disabled {
+          cursor: not-allowed;
+          opacity: 0.7;
+          background-color: #f2f2f2;
         }
       }
 
@@ -205,6 +256,14 @@
         background-color: #005299; /* Even darker blue for active */
         transform: translateY(0);
       }
+
+      /* Nowy styl dla wyłączonego przycisku */
+      &:disabled {
+        background-color: #99c4ea;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
     }
   }
 
@@ -213,7 +272,7 @@
       flex-direction: column;
       gap: 20px;
       padding: 25px;
-      
+
       .price-error {
         position: static;
         margin: 5px 0;
