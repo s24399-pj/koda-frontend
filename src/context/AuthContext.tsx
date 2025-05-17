@@ -1,11 +1,15 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode } from "react";
-import {AuthContextType} from "../types/auth/AuthContextType.ts";
+import { AuthContextType } from "../types/auth/AuthContextType.ts";
+import axios from "axios";
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8137";
 
 const AuthContext = createContext<AuthContextType>({
     isAuthenticated: false,
     setIsAuthenticated: () => {},
     checkIsAuthenticated: () => false,
-    logout: () => {},
+    logout: () => Promise.resolve(),
+    validateToken: () => Promise.resolve(false)
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -22,19 +26,61 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(checkIsAuthenticated());
 
-    const logout = async (): Promise<void> => {
+    const validateToken = async (): Promise<boolean> => {
+        const token = localStorage.getItem("accessToken");
+        
+        if (!token) {
+            return false;
+        }
+        
         try {
-            await logout();
-            setIsAuthenticated(false);
+            const response = await axios.get(`${API_BASE_URL}/auth/validate`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            
+            return response.status === 200;
         } catch (error) {
-            console.error("Logout error:", error);
+            console.error("Token validation failed:", error);
+            localStorage.removeItem("accessToken");
             setIsAuthenticated(false);
+            
+            return false;
         }
     };
 
+    const logout = async (): Promise<void> => {
+        const token = localStorage.getItem("accessToken");
+        
+        if (token) {
+            try {
+                await axios.post(`${API_BASE_URL}/auth/logout`, {}, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+            } catch (error) {
+                console.error("Logout request error:", error);
+            }
+        }
+        
+        localStorage.removeItem("accessToken");
+        setIsAuthenticated(false);
+        
+        window.location.href = '/';
+    };
+
     useEffect(() => {
-        const checkAuth = () => {
-            setIsAuthenticated(checkIsAuthenticated());
+        const checkAuth = async () => {
+            const authenticated = checkIsAuthenticated();
+            
+            if (authenticated) {
+                const isValid = await validateToken();
+                setIsAuthenticated(isValid);
+            } else {
+                setIsAuthenticated(false);
+            }
         };
 
         checkAuth();
@@ -45,10 +91,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             }
         };
 
+        const tokenValidationInterval = setInterval(() => {
+            if (checkIsAuthenticated()) {
+                validateToken();
+            }
+        }, 5 * 60 * 1000);
+
         window.addEventListener("storage", handleStorageChange);
 
         return () => {
             window.removeEventListener("storage", handleStorageChange);
+            clearInterval(tokenValidationInterval);
         };
     }, []);
 
@@ -56,7 +109,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         isAuthenticated,
         setIsAuthenticated,
         checkIsAuthenticated,
-        logout
+        logout,
+        validateToken
     };
 
     return (
@@ -65,5 +119,3 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         </AuthContext.Provider>
     );
 };
-
-export default AuthContext;

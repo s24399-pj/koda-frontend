@@ -1,0 +1,140 @@
+.auth-required-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  color: #333;
+  
+  @media (max-width: 768px) {
+    padding: 30px 15px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 20px 10px;
+  }
+  
+  h1 {
+    font-size: 32px;
+    text-align: center;
+    margin: 40px 0 30px;
+    color: #007be5;
+    
+    @media (max-width: 768px) {
+      font-size: 28px;
+      margin: 30px 0 25px;
+    }
+    
+    @media (max-width: 480px) {
+      font-size: 24px;
+      margin: 20px 0 20px;
+    }
+  }
+  
+  .auth-required-container {
+    background-color: #f6f6f6;
+    border-radius: 8px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin: 20px 0;
+    
+    @media (max-width: 768px) {
+      padding: 30px;
+    }
+    
+    @media (max-width: 480px) {
+      padding: 20px;
+    }
+    
+    h1 {
+      font-size: 22px;
+      margin-bottom: 15px;
+      color: #444;
+      
+      @media (max-width: 768px) {
+        font-size: 20px;
+      }
+      
+      @media (max-width: 480px) {
+        font-size: 18px;
+      }
+    }
+    
+    .auth-message {
+      margin-bottom: 25px;
+      font-size: 16px;
+      color: #666;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      
+      p {
+        margin-bottom: 12px;
+        
+        @media (max-width: 480px) {
+          font-size: 15px;
+          margin-bottom: 20px;
+        }
+      }
+    }
+    
+    .auth-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      
+      @media (max-width: 480px) {
+        flex-direction: column;
+        width: 100%;
+        max-width: 250px;
+        margin: 0 auto;
+      }
+      
+      .login-btn, .register-btn {
+        display: inline-block;
+        padding: 10px 25px;
+        border-radius: 4px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        
+        @media (max-width: 480px) {
+          width: 100%;
+          text-align: center;
+        }
+      }
+      
+      .login-btn {
+        background-color: #007be5;
+        color: white;
+        
+        &:hover {
+          background-color: #005bb5;
+        }
+      }
+      
+      .register-btn {
+        background-color: white;
+        color: #007be5;
+        border: 1px solid #007be5;
+        
+        &:hover {
+          background-color: #f0f8ff;
+        }
+      }
+    }
+    
+    .back-link {
+      margin-top: 25px;
+      
+      a {
+        color: #666;
+        text-decoration: none;
+        font-size: 14px;
+        
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}
