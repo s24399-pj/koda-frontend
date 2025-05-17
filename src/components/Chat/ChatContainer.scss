@@ -1,0 +1,140 @@
+.chat-container {
+  display: flex;
+  height: calc(100vh - 70px); /* Odejmuje wysokość paska nawigacji */
+  background-color: #f5f7fb;
+  font-family: 'Roboto', sans-serif;
+}
+
+.chat-sidebar {
+  width: 300px;
+  background-color: #ffffff;
+  border-right: 1px solid #e1e4e8;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-search {
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #e1e4e8;
+
+  input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #e1e4e8;
+    border-radius: 20px;
+    outline: none;
+    font-size: 14px;
+
+    &:focus {
+      border-color: #007bff;
+    }
+  }
+
+  .search-button {
+    background: none;
+    border: none;
+    margin-left: 10px;
+    cursor: pointer;
+    color: #6c757d;
+    outline: none;
+
+    &:hover {
+      color: #007bff;
+    }
+  }
+}
+
+.search-results {
+  flex: 1;
+  overflow-y: auto;
+
+  h3 {
+    padding: 15px;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+    color: #343a40;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  li {
+    display: flex;
+    padding: 15px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-bottom: 1px solid #f1f1f1;
+
+    &:hover {
+      background-color: #f8f9fa;
+    }
+  }
+
+  .user-avatar {
+    margin-right: 12px;
+
+    img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+  }
+
+  .user-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .user-name {
+    font-weight: 500;
+    color: #343a40;
+  }
+
+  .back-button {
+    margin: 15px;
+    padding: 8px 15px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    color: #495057;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #e2e6ea;
+    }
+  }
+}
+
+.chat-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #f5f7fb;
+  overflow: hidden;
+}
+
+.no-conversation-selected {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #6c757d;
+  padding: 20px;
+
+  h3 {
+    font-size: 18px;
+    font-weight: 400;
+  }
+}
