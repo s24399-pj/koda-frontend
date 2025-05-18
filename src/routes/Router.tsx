@@ -10,7 +10,10 @@ import OfferComparison from "../pages/OfferComparison/OfferComparison.tsx";
 import WhyUs from "../pages/WhyUs/WhyUs.tsx";
 import OfferCreation from "../pages/OfferCreation/OfferCreation.tsx";
 import LikedOffers from "../pages/LikedOffers/LikedOffers.tsx";
+likedOfferFE
+
 import RequireAuth from "../components/RequireAuth/RequireAuth.tsx";
+main
 
 const AppRouter = () => {
     return (
@@ -24,6 +27,11 @@ const AppRouter = () => {
             <Route path="/whyus" element={<WhyUs />} />
             <Route path="/user/login" element={<LoginPage />} />
             <Route path="/user/register" element={<RegisterPage />} />
+likedOfferFE
+
+            <Route path="/user/panel" element={<UserPanel />} />
+            <Route path="/offer/create" element={<OfferCreation />} />
+
             <Route path="/liked" element={<LikedOffers />} />
             
             {/* Chronione ścieżki (z wyświetleniem AuthRequiredPage) */}
@@ -37,6 +45,7 @@ const AppRouter = () => {
                     <OfferCreation />
                 </RequireAuth>
             } />
+main
         </Routes>
     );
 };
