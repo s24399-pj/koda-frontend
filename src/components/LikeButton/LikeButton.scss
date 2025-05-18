@@ -1,17 +1,24 @@
 .like-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 2px;
-    display: flex;
-    align-items: center;
-    transition: transform 0.2s ease;
-  
-    &:hover {
-      transform: scale(1.1);
-    }
-  
-    svg {
-      display: block;
-    }
-  }  
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+  border-radius: 50%;
+
+  &:hover:not(:disabled) {
+    transform: scale(1.1);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.liked svg {
+    fill: #3b82f6;
+  }
+}

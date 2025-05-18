@@ -9,7 +9,7 @@ import UserPanel from "../pages/UserPanel/UserPanel.tsx";
 import OfferComparison from "../pages/OfferComparison/OfferComparison.tsx";
 import WhyUs from "../pages/WhyUs/WhyUs.tsx";
 import OfferCreation from "../pages/OfferCreation/OfferCreation.tsx";
-import LikedOffers from "../pages/LikedOffers/likedOffers.tsx";
+import LikedOffers from "../pages/LikedOffers/LikedOffers.tsx";
 
 const AppRouter = () => {
     return (
@@ -24,7 +24,6 @@ const AppRouter = () => {
             <Route path="/user/login" element={<LoginPage />} />
             <Route path="/user/register" element={<RegisterPage />} />
 
-            {/* Private routes - we need to validate on the FE if user is authenticated before launching this component*/}
             <Route path="/user/panel" element={<UserPanel />} />
             <Route path="/offer/create" element={<OfferCreation />} />
         </Routes>

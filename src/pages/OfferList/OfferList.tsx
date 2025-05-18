@@ -148,7 +148,7 @@ const OfferList: React.FC = () => {
                               <h2>{truncateText(offer.title, 50)}</h2>
                               <div className="price-actions">
                                 <span className="offer-price">{offer.price.toLocaleString()} PLN</span>
-                                <LikeButton />
+                                <LikeButton offerId={offer.id} />
                               </div>
                             </div>
                             <div className="offer-info">
@@ -159,7 +159,6 @@ const OfferList: React.FC = () => {
                               <p><strong>Pojemność silnika:</strong> <span>{offer.displacement} cm³</span></p>
                             </div>
 
-                            {/* Przycisk porównania umieszczony w prawym dolnym rogu */}
                             <div className="offer-compare-bottom">
                               <CompareCheckbox
                                   offerId={offer.id}
