@@ -10,10 +10,8 @@ import OfferComparison from "../pages/OfferComparison/OfferComparison.tsx";
 import WhyUs from "../pages/WhyUs/WhyUs.tsx";
 import OfferCreation from "../pages/OfferCreation/OfferCreation.tsx";
 import LikedOffers from "../pages/LikedOffers/LikedOffers.tsx";
-likedOfferFE
 
 import RequireAuth from "../components/RequireAuth/RequireAuth.tsx";
-main
 
 const AppRouter = () => {
     return (
