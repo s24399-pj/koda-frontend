@@ -9,6 +9,11 @@ import { useComparison } from "../../context/ComparisonContext";
 import { likedOfferApi } from "../../api/likedOfferApi";
 import { MiniOffer } from "../../types/miniOfferTypes";
 
+import { useAuth } from "../../context/AuthContext.tsx";
+import AuthRequiredPage from "../AuthRequired/AuthRequired.tsx";
+import authClient from "../../api/axiosAuthClient";
+
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 interface RawOfferData {
@@ -31,6 +36,7 @@ interface RawOfferData {
 }
 
 const LikedOffersList: React.FC = () => {
+
     useTitle("Ulubione");
 
     const [likedOffers, setLikedOffers] = useState<MiniOffer[]>([]);
@@ -108,6 +114,7 @@ const LikedOffersList: React.FC = () => {
             setIsLoading(false);
         }
     };
+
 
     const handleOfferClick = (id: string) => {
         navigate(`/offer/${id}`);
@@ -217,17 +224,20 @@ const LikedOffersList: React.FC = () => {
         );
     };
 
-    return (
-        <div className="liked-offers-page">
-            <h1>Ulubione oferty</h1>
-            {isAuthenticated ? renderAuthenticatedContent() : renderUnauthenticatedContent()}
 
-            <ComparisonBar
-                selectedOffers={selectedOffers}
-                removeFromComparison={removeFromComparison}
-            />
-        </div>
-    );
+  if (!isAuthenticated) {
+    return <AuthRequiredPage 
+      pageTitle="Ulubione oferty" 
+      message="Dodawaj interesujące Cię oferty do ulubionych i miej do nich szybki dostęp."
+    />;
+  }
+
+  return (
+    <div className="liked-offers-page">
+      <h1>Ulubione oferty</h1>
+      {renderAuthenticatedContent()}
+    </div>
+  );
 };
 
 export default LikedOffersList;
