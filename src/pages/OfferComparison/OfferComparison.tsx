@@ -336,7 +336,7 @@ const OfferComparison: React.FC = () => {
                         <table>
                             <thead>
                             <tr>
-                                <th>Cecha</th>
+                                <th>Zdjęcie</th>
                                 <th>
                                     <div className="car-header">
                                         <img
