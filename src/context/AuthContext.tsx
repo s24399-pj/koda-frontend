@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode } from "react";
 import { AuthContextType } from "../types/auth/AuthContextType.ts";
-import axios from "axios";
+import authClient, { setLogoutFunction } from "../api/axiosAuthClient";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8137";
 
@@ -27,39 +27,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(checkIsAuthenticated());
 
     const validateToken = async (): Promise<boolean> => {
-        const token = localStorage.getItem("accessToken");
-        
-        if (!token) {
+        if (!checkIsAuthenticated()) {
             return false;
         }
         
         try {
-            const response = await axios.get(`${API_BASE_URL}/auth/validate`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            
+            const response = await authClient.get(`${API_BASE_URL}/auth/validate`);
             return response.status === 200;
         } catch (error) {
             console.error("Token validation failed:", error);
             localStorage.removeItem("accessToken");
             setIsAuthenticated(false);
-            
             return false;
         }
     };
 
     const logout = async (): Promise<void> => {
-        const token = localStorage.getItem("accessToken");
-        
-        if (token) {
+        if (checkIsAuthenticated()) {
             try {
-                await axios.post(`${API_BASE_URL}/auth/logout`, {}, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
+                await authClient.post(`${API_BASE_URL}/auth/logout`, {});
             } catch (error) {
                 console.error("Logout request error:", error);
             }
@@ -72,6 +58,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     useEffect(() => {
+        // Register the logout function with axiosAuthClient
+        setLogoutFunction(logout);
+
         const checkAuth = async () => {
             const authenticated = checkIsAuthenticated();
             
@@ -95,7 +84,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             if (checkIsAuthenticated()) {
                 validateToken();
             }
-        }, 5 * 60 * 1000);
+        }, 5 * 60 * 1000); // Sprawdzanie co 5 minut
 
         window.addEventListener("storage", handleStorageChange);
 
