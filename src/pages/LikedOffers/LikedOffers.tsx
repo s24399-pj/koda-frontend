@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
 import "./LikedOffers.scss";
 import useTitle from "../../hooks/useTitle";
 import { MiniOffer } from "../../types/miniOfferTypes";
 import { useAuth } from "../../context/AuthContext.tsx";
+import AuthRequiredPage from "../AuthRequired/AuthRequired.tsx";
+import authClient from "../../api/axiosAuthClient";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -27,14 +28,7 @@ const LikedOffersList: React.FC = () => {
   const fetchLikedOffers = async () => {
     setIsLoading(true);
     try {
-      const token = localStorage.getItem('authToken');
-      
-      const response = await axios.get(`${API_URL}/api/v1/offers/liked`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
+      const response = await authClient.get(`${API_URL}/api/v1/offers/liked`);
       setLikedOffers(response.data || []);
     } catch (error) {
       console.error("Błąd podczas pobierania ulubionych ofert:", error);
@@ -50,13 +44,7 @@ const LikedOffersList: React.FC = () => {
   const handleUnlikeOffer = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation(); // Prevent navigation to offer details
     try {
-      const token = localStorage.getItem('authToken');
-      
-      await axios.post(`${API_URL}/api/v1/offers/${id}/unlike`, {}, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      await authClient.post(`${API_URL}/api/v1/offers/${id}/unlike`, {});
       
       // Remove unliked offer from the list
       setLikedOffers(prev => prev.filter(offer => offer.id !== id));
@@ -123,25 +111,17 @@ const LikedOffersList: React.FC = () => {
     );
   };
 
-  // Content for non-authenticated users
-  const renderUnauthenticatedContent = () => {
-    return (
-      <div className="login-section">
-        <h2>Zaloguj się, aby zobaczyć swoje ulubione oferty</h2>
-        <p>Dodawaj interesujące Cię oferty do ulubionych i miej do nich szybki dostęp.</p>
-        <div className="login-buttons">
-          <Link to="/user/login" className="login">Zaloguj się</Link>
-          <Link to="/user/register" className="signup">Zarejestruj się</Link>
-        </div>
-      </div>
-    );
-  };
+  if (!isAuthenticated) {
+    return <AuthRequiredPage 
+      pageTitle="Ulubione oferty" 
+      message="Dodawaj interesujące Cię oferty do ulubionych i miej do nich szybki dostęp."
+    />;
+  }
 
   return (
     <div className="liked-offers-page">
       <h1>Ulubione oferty</h1>
-      
-      {isAuthenticated ? renderAuthenticatedContent() : renderUnauthenticatedContent()}
+      {renderAuthenticatedContent()}
     </div>
   );
 };

@@ -9,24 +9,34 @@ import UserPanel from "../pages/UserPanel/UserPanel.tsx";
 import OfferComparison from "../pages/OfferComparison/OfferComparison.tsx";
 import WhyUs from "../pages/WhyUs/WhyUs.tsx";
 import OfferCreation from "../pages/OfferCreation/OfferCreation.tsx";
-import LikedOffers from "../pages/LikedOffers/likedOffers.tsx";
+import LikedOffers from "../pages/LikedOffers/LikedOffers.tsx";
+import RequireAuth from "../components/RequireAuth/RequireAuth.tsx";
 
 const AppRouter = () => {
     return (
         <Routes>
+            {/* Publiczne ścieżki */}
             <Route path="/" element={<HomePage />} />
             <Route path="*" element={<NotFound />} />
             <Route path="/offers" element={<OfferList />} />
             <Route path="/offer/:id" element={<Offer />} />
             <Route path="comparison" element={<OfferComparison />} />
             <Route path="/whyus" element={<WhyUs />} />
-            <Route path="/liked" element={<LikedOffers />} />
             <Route path="/user/login" element={<LoginPage />} />
             <Route path="/user/register" element={<RegisterPage />} />
-
-            {/* Private routes - we need to validate on the FE if user is authenticated before launching this component*/}
-            <Route path="/user/panel" element={<UserPanel />} />
-            <Route path="/offer/create" element={<OfferCreation />} />
+            <Route path="/liked" element={<LikedOffers />} />
+            
+            {/* Chronione ścieżki (z wyświetleniem AuthRequiredPage) */}
+            <Route path="/user/panel" element={
+                <RequireAuth>
+                    <UserPanel />
+                </RequireAuth>
+            } />
+            <Route path="/offer/create" element={
+                <RequireAuth>
+                    <OfferCreation />
+                </RequireAuth>
+            } />
         </Routes>
     );
 };
