@@ -6,29 +6,13 @@ import LikeButton from "../../components/LikeButton/LikeButton";
 import CompareCheckbox from "../../components/CompareCheckbox/CompareCheckbox";
 import ComparisonBar from "../../components/ComparisonBar/ComparisonBar";
 import { useComparison } from "../../context/ComparisonContext";
+import { useAuth } from "../../context/AuthContext";
+import AuthRequired from "../AuthRequired/AuthRequired";
 import { likedOfferApi } from "../../api/likedOfferApi";
 import { MiniOffer } from "../../types/miniOfferTypes";
+import { RawOfferData } from "../../types/offer/RawOfferData"
 
 const API_URL = import.meta.env.VITE_API_URL;
-
-interface RawOfferData {
-    id: string;
-    title: string;
-    price: number;
-    description?: string;
-    CarDetailsDto?: {
-        mileage?: number;
-        fuelType?: string;
-        year?: number;
-        enginePower?: number;
-        displacement?: string;
-        [key: string]: any;
-    };
-    mainImage?: string;
-    imageUrls?: string[];
-    images?: string[];
-    [key: string]: any;
-}
 
 const LikedOffersList: React.FC = () => {
     useTitle("Ulubione");
@@ -36,6 +20,7 @@ const LikedOffersList: React.FC = () => {
     const [likedOffers, setLikedOffers] = useState<MiniOffer[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
+    const { isAuthenticated } = useAuth();
 
     const {
         selectedOffers,
@@ -44,8 +29,6 @@ const LikedOffersList: React.FC = () => {
         isOfferSelected,
         canAddMoreOffers
     } = useComparison();
-
-    const isAuthenticated = !!localStorage.getItem("accessToken");
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -204,23 +187,17 @@ const LikedOffersList: React.FC = () => {
         );
     };
 
-    const renderUnauthenticatedContent = () => {
-        return (
-            <div className="login-section">
-                <h2>Zaloguj się, aby zobaczyć swoje ulubione oferty</h2>
-                <p>Dodawaj interesujące Cię oferty do ulubionych i miej do nich szybki dostęp.</p>
-                <div className="login-buttons">
-                    <Link to="/user/login" className="login">Zaloguj się</Link>
-                    <Link to="/user/register" className="signup">Zarejestruj się</Link>
-                </div>
-            </div>
-        );
-    };
+    if (!isAuthenticated) {
+        return <AuthRequired 
+            pageTitle="Ulubione oferty" 
+            message="Dodawaj interesujące Cię oferty do ulubionych i miej do nich szybki dostęp."
+        />;
+    }
 
     return (
         <div className="liked-offers-page">
             <h1>Ulubione oferty</h1>
-            {isAuthenticated ? renderAuthenticatedContent() : renderUnauthenticatedContent()}
+            {renderAuthenticatedContent()}
 
             <ComparisonBar
                 selectedOffers={selectedOffers}
