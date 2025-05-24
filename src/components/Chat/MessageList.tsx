@@ -1,4 +1,3 @@
-// components/MessageList.tsx
 import React, {useEffect, useRef} from 'react';
 import {ChatMessage} from '../../api/chatApi';
 import {UserProfile} from '../../types/user/UserProfile';
@@ -10,7 +9,7 @@ interface MessageListProps {
 
 const formatMessageDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+    return date.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
 };
 
 const MessageList: React.FC<MessageListProps> = ({messages, currentUser}) => {
@@ -20,41 +19,40 @@ const MessageList: React.FC<MessageListProps> = ({messages, currentUser}) => {
         messagesEndRef.current?.scrollIntoView({behavior: 'smooth'});
     }, [messages]);
 
+    if (messages.length === 0) {
+        return (
+            <div className="chat-messages">
+                <div className="no-messages">
+                    <div className="no-messages-content">
+                        <div className="no-messages-icon">💬</div>
+                        <h4>Brak wiadomości</h4>
+                        <p>Rozpocznij konwersację wysyłając pierwszą wiadomość</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="chat-messages">
-            {messages.length > 0 ? (
-                messages.map((message) => {
-                    const isCurrentUser = currentUser?.id === message.senderId;
-                    return (
-                        <div
-                            key={message.id}
-                            className={`message ${isCurrentUser ? 'sent' : 'received'}`}
-                        >
-                            <div className="message-content">
-                                <p>{message.content}</p>
-                                <div className="message-meta">
-                                    <span className="message-time">{formatMessageDate(message.createdAt)}</span>
-                                    {isCurrentUser && (
-                                        <span className="message-status">
-                                            {message.status === 'READ' ? (
-                                                <i className="fas fa-check-double"></i>
-                                            ) : message.status === 'DELIVERED' ? (
-                                                <i className="fas fa-check"></i>
-                                            ) : (
-                                                <i className="fas fa-clock"></i>
-                                            )}
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
+            {messages.map((message) => {
+                const isCurrentUser = currentUser?.id === message.senderId;
+                return (
+                    <div
+                        key={message.id}
+                        className={`message ${isCurrentUser ? 'sent' : 'received'}`}
+                    >
+                        <div className="message-content">
+                            <p>{message.content}</p>
                         </div>
-                    );
-                })
-            ) : (
-                <div className="no-messages">
-                    <p>Rozpocznij konwersację</p>
-                </div>
-            )}
+                        <div className="message-meta">
+                            <span className="message-time">
+                                {formatMessageDate(message.createdAt)}
+                            </span>
+                        </div>
+                    </div>
+                );
+            })}
             <div ref={messagesEndRef}/>
         </div>
     );

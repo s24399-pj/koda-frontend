@@ -5,12 +5,12 @@ import './ChatError.scss';
 import {getUserProfile, searchUsers} from '../../api/useInternalApi';
 import {UserProfile} from '../../types/user/UserProfile';
 import {ChatMessage, chatService, Conversation, isTokenValid} from "../../api/chatApi";
-import {ConnectionStatus, ConnectionStatusComponent} from "../../components/Chat/ConnectionStatus.tsx";
 import SearchUsers from "../../components/Chat/SearchUsers.tsx";
 import ChatHeader from "../../components/Chat/ChatHeader.tsx";
 import MessageList from "../../components/Chat/MessageList.tsx";
 import MessageInput from "../../components/Chat/MessageInput.tsx";
 import ConversationList from "../../components/Chat/ConversationList.tsx";
+import {UserMiniDto} from "../../types/user/UserMiniDto.ts";
 
 interface LocationState {
     sellerInfo?: {
@@ -36,12 +36,12 @@ const ChatPage: React.FC = () => {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>('');
-    const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
+    const [searchResults, setSearchResults] = useState<UserMiniDto[]>([]); // Zmienione z UserProfile[] na UserMiniDto[]
     const [isSearching, setIsSearching] = useState<boolean>(false);
-    const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(ConnectionStatus.DISCONNECTED);
     const [connectionError, setConnectionError] = useState<string | null>(null);
     const [isInitialized, setIsInitialized] = useState<boolean>(false);
     const [isLoadingMessages, setIsLoadingMessages] = useState<boolean>(false);
+    const [isWebSocketConnected, setIsWebSocketConnected] = useState<boolean>(false);
 
     const redirectToLogin = useCallback(() => {
         localStorage.removeItem("accessToken");
@@ -51,20 +51,17 @@ const ChatPage: React.FC = () => {
     const connectWebSocket = useCallback(async () => {
         if (!isTokenValid()) {
             setConnectionError("Brak tokenu uwierzytelniającego. Zaloguj się ponownie.");
-            setConnectionStatus(ConnectionStatus.DISCONNECTED);
             return;
         }
 
         try {
-            setConnectionStatus(ConnectionStatus.CONNECTING);
             setConnectionError(null);
             await chatService.connect();
-            setConnectionStatus(ConnectionStatus.CONNECTED);
+            setIsWebSocketConnected(true);
         } catch (error) {
-            console.error('Błąd podczas łączenia z WebSocket:', error);
             const errorMessage = error instanceof Error ? error.message : "Nie udało się połączyć z serwerem czatu.";
             setConnectionError(errorMessage);
-            setConnectionStatus(ConnectionStatus.DISCONNECTED);
+            setIsWebSocketConnected(false);
 
             if (errorMessage.includes('token')) {
                 setTimeout(redirectToLogin, 3000);
@@ -72,16 +69,18 @@ const ChatPage: React.FC = () => {
         }
     }, [redirectToLogin]);
 
-    // Ładowanie konwersacji niezależnie od WebSocket
     const loadConversations = useCallback(async () => {
-        console.log("Rozpoczęto ładowanie konwersacji");
         try {
             const allConversations = await chatService.getAllConversations();
-            console.log("Pobrano konwersacje z API:", allConversations);
-            setConversations(allConversations);
-            return allConversations;
+            // Sortuj konwersacje według ostatniej wiadomości
+            const sortedConversations = allConversations.sort((a, b) => {
+                if (!a.lastMessageDate) return 1;
+                if (!b.lastMessageDate) return -1;
+                return new Date(b.lastMessageDate).getTime() - new Date(a.lastMessageDate).getTime();
+            });
+            setConversations(sortedConversations);
+            return sortedConversations;
         } catch (error) {
-            console.error("Błąd podczas ładowania konwersacji:", error);
             if ((error as any).response?.status === 401) {
                 redirectToLogin();
             }
@@ -89,23 +88,17 @@ const ChatPage: React.FC = () => {
         }
     }, [redirectToLogin]);
 
-    // KLUCZOWA ZMIANA: Ładowanie wiadomości niezależnie od WebSocket
     const loadMessages = useCallback(async (recipientId: string) => {
-        console.log(`Ładowanie wiadomości dla odbiorcy ${recipientId}`);
         setIsLoadingMessages(true);
-
         try {
             const chatHistory = await chatService.getChatHistory(recipientId);
-            console.log(`Pobrano ${chatHistory.length} wiadomości dla ${recipientId}:`, chatHistory);
             setMessages(chatHistory);
             return chatHistory;
         } catch (error) {
-            console.error('Error loading chat history:', error);
             if ((error as any).response?.status === 401) {
                 redirectToLogin();
             } else {
                 setMessages([]);
-                // Pokaż błąd użytkownikowi
                 setConnectionError("Nie udało się załadować historii wiadomości.");
             }
             return [];
@@ -115,44 +108,50 @@ const ChatPage: React.FC = () => {
     }, [redirectToLogin]);
 
     const loadRecipientProfile = useCallback(async (userId: string) => {
-        try {
-            console.log(`Ładowanie profilu dla ${userId}`);
-            const profile = await getUserProfile(userId);
-            console.log(`Pobrano profil dla ${userId}:`, profile);
-            setActiveRecipient(profile);
-            return profile;
-        } catch (error) {
-            console.error('Error loading recipient profile:', error);
-            if ((error as any).response?.status === 401) {
-                redirectToLogin();
-            }
-            return null;
+        // Użyj danych z konwersacji zamiast API
+        const conversation = conversations.find(conv => conv.userId === userId);
+        if (conversation) {
+            const profileFromConversation: UserProfile = {
+                id: userId,
+                firstName: conversation.userName.split(' ')[0] || 'User',
+                lastName: conversation.userName.split(' ').slice(1).join(' ') || '',
+                email: '',
+                profilePictureBase64: conversation.profilePicture
+            };
+            setActiveRecipient(profileFromConversation);
+            return profileFromConversation;
         }
-    }, [redirectToLogin]);
+
+        // Fallback dla nowych użytkowników
+        const basicProfile: UserProfile = {
+            id: userId,
+            firstName: 'User',
+            lastName: '',
+            email: '',
+            profilePictureBase64: undefined
+        };
+        setActiveRecipient(basicProfile);
+        return basicProfile;
+    }, [conversations]);
 
     // Główny effect inicjalizujący
     useEffect(() => {
         if (!isTokenValid()) {
             setConnectionError("Brak tokenu uwierzytelniającego. Zaloguj się ponownie.");
-            setConnectionStatus(ConnectionStatus.DISCONNECTED);
             return;
         }
 
         const initializeChat = async () => {
             try {
-                // Załaduj profil użytkownika
                 const profile = await getUserProfile();
                 setCurrentUser(profile);
 
-                // Załaduj konwersacje niezależnie od WebSocket
                 await loadConversations();
 
-                // Połącz z WebSocket (może się nie udać, ale nie blokuje reszty)
-                connectWebSocket().catch(error => {
-                    console.warn('WebSocket connection failed, but chat history will still work:', error);
+                connectWebSocket().catch(() => {
+                    // WebSocket failed, ale to nie blokuje działania
                 });
 
-                // Obsługa nowej konwersacji ze strony oferty
                 if (state?.sellerInfo && state.sellerInfo.isNewConversation && recipientId) {
                     const sellerInfo = state.sellerInfo;
 
@@ -185,7 +184,6 @@ const ChatPage: React.FC = () => {
 
                 setIsInitialized(true);
             } catch (error) {
-                console.error('Error initializing chat:', error);
                 setConnectionError("Wystąpił błąd podczas inicjalizacji czatu.");
 
                 if ((error as any).response?.status === 401) {
@@ -201,27 +199,24 @@ const ChatPage: React.FC = () => {
         };
     }, [connectWebSocket, redirectToLogin, location, state, navigate, recipientId, loadConversations]);
 
-    // Effect dla zmiany recipientId - teraz działa niezależnie od WebSocket
     useEffect(() => {
-        if (recipientId && isInitialized) {
-            console.log("Ładowanie profilu i wiadomości dla recipientId:", recipientId);
-            setActiveRecipientId(recipientId);
-            loadRecipientProfile(recipientId);
-            loadMessages(recipientId);
+        if (recipientId && isInitialized && !isLoadingMessages) {
+            if (recipientId !== activeRecipientId) {
+                setActiveRecipientId(recipientId);
+                loadRecipientProfile(recipientId);
+                loadMessages(recipientId);
+            }
         }
-    }, [recipientId, isInitialized, loadRecipientProfile, loadMessages]);
+    }, [recipientId, isInitialized, isLoadingMessages, activeRecipientId, loadRecipientProfile, loadMessages]);
 
-    // Effect do nasłuchiwania nowych wiadomości - tylko dla WebSocket
     useEffect(() => {
-        if (connectionStatus === ConnectionStatus.CONNECTED) {
+        if (isWebSocketConnected) {
             const unsubscribe = chatService.onMessageReceived(handleNewMessage);
             return () => unsubscribe();
         }
-    }, [connectionStatus, currentUser, activeRecipientId]);
+    }, [isWebSocketConnected, currentUser, activeRecipientId]);
 
     const handleNewMessage = (message: ChatMessage) => {
-        console.log("Otrzymano nową wiadomość:", message);
-
         setMessages(prevMessages => {
             const exists = prevMessages.some(m => m.id === message.id);
             if (exists) {
@@ -277,50 +272,39 @@ const ChatPage: React.FC = () => {
     const handleSendMessage = async (content: string) => {
         if (!activeRecipientId || !activeRecipient || !currentUser || !currentUser.id) return;
 
-        // Sprawdź czy WebSocket jest połączony
-        if (connectionStatus !== ConnectionStatus.CONNECTED) {
+        if (!isWebSocketConnected) {
             alert('Brak połączenia z serwerem. Sprawdź połączenie internetowe i spróbuj ponownie.');
             return;
         }
 
-        try {
-            console.log(`Wysyłanie wiadomości do ${activeRecipientId}: ${content}`);
+        const tempId = `temp-${Date.now()}`;
+        const newMessage: ChatMessage = {
+            id: tempId,
+            senderId: currentUser.id,
+            senderName: `${currentUser.firstName} ${currentUser.lastName}`,
+            recipientId: activeRecipientId,
+            recipientName: `${activeRecipient.firstName} ${activeRecipient.lastName}`,
+            content: content,
+            createdAt: new Date().toISOString(),
+            status: 'SENT'
+        };
 
-            const tempId = `temp-${Date.now()}`;
-            const newMessage: ChatMessage = {
-                id: tempId,
-                senderId: currentUser.id,
-                senderName: `${currentUser.firstName} ${currentUser.lastName}`,
-                recipientId: activeRecipientId,
-                recipientName: `${activeRecipient.firstName} ${activeRecipient.lastName}`,
-                content: content,
-                createdAt: new Date().toISOString(),
-                status: 'SENT'
-            };
+        setMessages(prev => [...prev, newMessage]);
+        updateConversationsFromMessages([newMessage]);
 
-            setMessages(prev => [...prev, newMessage]);
-            updateConversationsFromMessages([newMessage]);
+        await chatService.sendMessage(activeRecipientId, content);
 
-            await chatService.sendMessage(activeRecipientId, content);
-
-            // Po wysłaniu wiadomości odśwież listę konwersacji
-            setTimeout(() => {
-                loadConversations();
-            }, 1000);
-        } catch (error) {
-            console.error('Error sending message:', error);
-            alert('Nie udało się wysłać wiadomości. Sprawdź połączenie i spróbuj ponownie.');
-        }
+        setTimeout(() => {
+            loadConversations();
+        }, 1000);
     };
 
     const handleSelectConversation = (userId: string) => {
         if (userId === activeRecipientId) return;
 
-        console.log(`Wybrano konwersację z ${userId}`);
         setActiveRecipientId(userId);
         navigate(`/chat/${userId}`);
 
-        // Załaduj profil i wiadomości natychmiast
         loadRecipientProfile(userId);
         loadMessages(userId);
 
@@ -335,28 +319,24 @@ const ChatPage: React.FC = () => {
             return;
         }
 
-        try {
-            setIsSearching(true);
-            const results = await searchUsers(searchQuery);
-            if (currentUser) {
-                const filteredResults = results.filter(user => user.id !== currentUser.id);
-                setSearchResults(filteredResults);
-            } else {
-                setSearchResults(results);
-            }
-        } catch (error) {
-            console.error('Error searching users:', error);
+        setIsSearching(true);
+        const results = await searchUsers(searchQuery);
+        if (currentUser) {
+            const filteredResults = results.filter(user => user.id !== currentUser.id);
+            setSearchResults(filteredResults);
+        } else {
+            setSearchResults(results);
         }
     };
 
-    if (connectionError && connectionStatus === ConnectionStatus.DISCONNECTED && !isInitialized) {
+    if (connectionError && !isInitialized) {
         const isTokenError = connectionError.includes('token');
         return (
             <div className="chat-error">
                 <h3>{isTokenError ? 'Błąd uwierzytelniania' : 'Problem z połączeniem'}</h3>
                 <p>{connectionError}</p>
                 <button onClick={isTokenError ? redirectToLogin : connectWebSocket}>
-                    {isTokenError ? 'Zaloguj się ponownie' : 'Połącz ponownie'}
+                    {isTokenError ? 'Zaloguj się ponownie' : 'Spróbuj ponownie'}
                 </button>
             </div>
         );
@@ -365,11 +345,6 @@ const ChatPage: React.FC = () => {
     return (
         <div className="chat-page">
             <div className="chat-sidebar">
-                <ConnectionStatusComponent
-                    status={connectionStatus}
-                    onReconnect={connectWebSocket}
-                />
-
                 <SearchUsers
                     searchQuery={searchQuery}
                     onSearchQueryChange={setSearchQuery}
@@ -399,6 +374,7 @@ const ChatPage: React.FC = () => {
                         <ChatHeader recipient={activeRecipient}/>
                         {isLoadingMessages ? (
                             <div className="loading-messages">
+                                <div className="loading-spinner"></div>
                                 <p>Ładowanie wiadomości...</p>
                             </div>
                         ) : (
@@ -406,12 +382,15 @@ const ChatPage: React.FC = () => {
                         )}
                         <MessageInput
                             onSendMessage={handleSendMessage}
-                            connectionStatus={connectionStatus}
+                            isConnected={isWebSocketConnected}
                         />
                     </>
                 ) : (
                     <div className="no-conversation-selected">
-                        <h3>Wybierz konwersację lub wyszukaj użytkownika, aby rozpocząć czat</h3>
+                        <div className="welcome-content">
+                            <h3>Witaj w czacie!</h3>
+                            <p>Wybierz konwersację z listy lub wyszukaj użytkownika, aby rozpocząć rozmowę</p>
+                        </div>
                     </div>
                 )}
             </div>
