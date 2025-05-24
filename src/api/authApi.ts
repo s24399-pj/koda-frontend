@@ -1,5 +1,5 @@
 import axios from "axios";
-import axiosAuthClient, {setLogoutFunction} from "./axiosAuthClient";
+import axiosAuthClient from "./axiosAuthClient";
 import {RegisterCredentials} from "../types/auth/RegisterCredentials.ts";
 import {LoginCredentials} from "../types/auth/LoginCredentials.ts";
 import {AuthResponse} from "../types/auth/AuthResponse.ts";
@@ -49,5 +49,3 @@ export const logout = (): Promise<void> => {
             localStorage.removeItem("accessToken");
         });
 };
-
-setLogoutFunction(logout);
