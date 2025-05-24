@@ -15,7 +15,7 @@ import RequireAuth from "../components/RequireAuth/RequireAuth.tsx";
 const AppRouter = () => {
     return (
         <Routes>
-            {/* Publiczne ścieżki */}
+            {/* Public */}
             <Route path="/" element={<HomePage />} />
             <Route path="*" element={<NotFound />} />
             <Route path="/offers" element={<OfferList />} />
@@ -26,7 +26,7 @@ const AppRouter = () => {
             <Route path="/user/register" element={<RegisterPage />} />
             <Route path="/liked" element={<LikedOffers />} />
            
-            {/* Chronione ścieżki */}
+            {/* Protected */}
             <Route path="/user/panel" element={
                 <RequireAuth>
                     <UserPanel />
