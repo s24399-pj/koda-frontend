@@ -4,7 +4,6 @@ import './UserPanel.scss';
 import {getUserProfile} from "../../api/useInternalApi";
 import UserOffers from '../../components/UserOffers/UserOffers';
 
-// TODO Outsource it to a separate file
 const DEFAULT_AVATAR = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYgMjU2Ij48Y2lyY2xlIGN4PSIxMjgiIGN5PSIxMjgiIHI9IjEyMCIgZmlsbD0iI2U5ZWNlZiIvPjxjaXJjbGUgY3g9IjEyOCIgY3k9IjExMCIgcj0iMzUiIGZpbGw9IiM2Yzc1N2QiLz48cGF0aCBkPSJNMTk4LDE4OGMwLTI1LjQtMzEuNC00Ni03MC00NnMtNzAsMjAuNi03MCw0NnMzMS40LDQ2LDcwLDQ2UzE5OCwyMTMuNCwxOTgsMTg4WiIgZmlsbD0iIzZjNzU3ZCIvPjwvc3ZnPg==";
 
 const UserPanel: React.FC = () => {
@@ -21,18 +20,15 @@ const UserPanel: React.FC = () => {
                 const profile = await getUserProfile();
                 setUserProfile(profile);
 
-                // Ustawienie zdjęcia profilowego, jeśli jest dostępne
                 if (profile.profilePictureBase64) {
                     setProfileImage(profile.profilePictureBase64);
                 }
 
-                // Zapisanie ID użytkownika w localStorage dla wykorzystania w UserOffers
                 if (profile.id) {
                     localStorage.setItem('userId', profile.id);
                 }
             } catch (err) {
                 setError('Nie udało się pobrać danych użytkownika.');
-                console.error(err);
             } finally {
                 setLoading(false);
             }
@@ -45,7 +41,6 @@ const UserPanel: React.FC = () => {
         setProfileImage(DEFAULT_AVATAR);
     };
 
-    // Obsługa zmiany aktywnej zakładki
     const handleTabChange = (tab: 'profile' | 'offers' | 'settings') => {
         setActiveTab(tab);
     };
@@ -117,17 +112,13 @@ const UserPanel: React.FC = () => {
                                 <label>Email:</label>
                                 <p>{userProfile?.email}</p>
                             </div>
-                            <div className="detail-group">
-                                <label>ID użytkownika:</label>
-                                <p className="user-id">{userProfile?.id}</p>
-                            </div>
                         </div>
                         <button className="edit-profile-btn">Edytuj profil</button>
                     </div>
                 )}
 
                 {activeTab === 'offers' && (
-                    <UserOffers /> // Używamy komponentu UserOffers zamiast statycznej treści
+                    <UserOffers/>
                 )}
 
                 {activeTab === 'settings' && (

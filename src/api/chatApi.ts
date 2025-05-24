@@ -198,7 +198,6 @@ class ChatService {
         try {
             console.log(`Pobieranie historii czatu z ${recipientId}...`);
 
-            // Dodaj walidację tokenu przed zapytaniem
             if (!isTokenValid()) {
                 throw new Error('Token wygasł - wymagane ponowne logowanie');
             }
@@ -208,7 +207,6 @@ class ChatService {
             return response.data;
         } catch (error) {
             console.error('Error fetching chat history:', error);
-            // Rzuć błąd dalej zamiast zwracać pustą tablicę
             throw error;
         }
     }

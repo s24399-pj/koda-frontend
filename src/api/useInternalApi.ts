@@ -1,5 +1,6 @@
 import axiosAuthClient from "./axiosAuthClient";
 import {UserProfile} from "../types/user/UserProfile.ts";
+import {UserMiniDto} from "../types/user/UserMiniDto.ts";
 
 export const getUserProfile = (userId?: string): Promise<UserProfile> => {
     const url = userId
@@ -16,10 +17,9 @@ export const getUserProfile = (userId?: string): Promise<UserProfile> => {
             throw error;
         });
 };
-
-export const searchUsers = (query: string): Promise<UserProfile[]> => {
+export const searchUsers = (query: string): Promise<UserMiniDto[]> => {
     return axiosAuthClient
-        .get<UserProfile[]>(`/api/v1/internal/users/search?query=${encodeURIComponent(query)}`)
+        .get<UserMiniDto[]>(`/api/v1/internal/users/search?query=${encodeURIComponent(query)}`)
         .then(response => {
             return response.data;
         })
@@ -28,3 +28,4 @@ export const searchUsers = (query: string): Promise<UserProfile[]> => {
             throw error;
         });
 };
+
