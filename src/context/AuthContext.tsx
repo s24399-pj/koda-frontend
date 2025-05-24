@@ -18,6 +18,9 @@ interface AuthProviderProps {
     children: ReactNode;
 }
 
+/**
+ * Decodes JWT token and checks if it's not expired
+ */
 const isTokenValid = (token: string): boolean => {
     try {
         const parts = token.split('.');
@@ -39,6 +42,9 @@ const isTokenValid = (token: string): boolean => {
     }
 };
 
+/**
+ * Get token expiration time in milliseconds
+ */
 const getTokenExpirationTime = (token: string): number | null => {
     try {
         const parts = token.split('.');
@@ -78,6 +84,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(checkIsAuthenticated());
+    const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
     const validateToken = async (): Promise<boolean> => {
         if (!checkIsAuthenticated()) {
@@ -85,23 +92,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
        
         try {
-            const response = await authClient.get(`${API_BASE_URL}/auth/validate`);
+            const response = await authClient.get(`/auth/validate`);
             return response.status === 200;
         } catch (error) {
             console.error("Token validation failed:", error);
-            localStorage.removeItem("accessToken");
-            setIsAuthenticated(false);
+            // Don't auto-logout here - let axiosAuthClient handle it
             return false;
         }
     };
 
     const logout = async (): Promise<void> => {
-        if (checkIsAuthenticated()) {
-            try {
-                await authClient.post(`${API_BASE_URL}/auth/logout`, {});
-            } catch (error) {
-                console.error("Logout request error:", error);
+        try {
+            if (checkIsAuthenticated()) {
+                await authClient.post(`/auth/logout`, {});
             }
+        } catch (error) {
+            console.error("Logout request error:", error);
         }
        
         localStorage.removeItem("accessToken");
@@ -110,26 +116,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         window.location.href = '/';
     };
 
+    const handleAuthError = () => {
+        localStorage.removeItem("accessToken");
+        setIsAuthenticated(false);
+        window.location.href = '/';
+    };
+
     useEffect(() => {
-        // Register the logout function with axiosAuthClient
-        setLogoutFunction(logout);
+        // Register the auth error handler with axiosAuthClient
+        setLogoutFunction(handleAuthError);
         
-        const checkAuth = async () => {
+        const initializeAuth = () => {
             const authenticated = checkIsAuthenticated();
-           
-            if (authenticated) {
-                const isValid = await validateToken();
-                setIsAuthenticated(isValid);
-            } else {
-                setIsAuthenticated(false);
-            }
+            setIsAuthenticated(authenticated);
+            setIsInitialized(true);
         };
         
-        checkAuth();
+        initializeAuth();
         
         const handleStorageChange = (e: StorageEvent) => {
             if (e.key === "accessToken") {
-                checkAuth();
+                const authenticated = checkIsAuthenticated();
+                setIsAuthenticated(authenticated);
             }
         };
         
@@ -146,18 +154,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 window.clearTimeout(tokenExpirationTimeout);
             }
             
-            // Time until token expires (minus 10 seconds buffer)
-            const timeUntilExpiry = Math.max(0, expirationTime - Date.now() - 10000);
+            // Time until token expires (minus 30 seconds buffer)
+            const timeUntilExpiry = Math.max(0, expirationTime - Date.now() - 30000);
             
             tokenExpirationTimeout = window.setTimeout(() => {
-                checkAuth();
-                // After checking, setup next expiration if a new token exists
-                setupExpirationCheck();
+                console.log("Token expired, logging out...");
+                handleAuthError();
             }, timeUntilExpiry);
         };
         
-        // Initial setup of expiration check
-        setupExpirationCheck();
+        // Setup expiration check only if we have a valid token
+        if (checkIsAuthenticated()) {
+            setupExpirationCheck();
+        }
         
         window.addEventListener("storage", handleStorageChange);
         
@@ -168,6 +177,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             }
         };
     }, []);
+
+    // Don't render until we've initialized
+    if (!isInitialized) {
+        return null;
+    }
 
     const value = {
         isAuthenticated,
