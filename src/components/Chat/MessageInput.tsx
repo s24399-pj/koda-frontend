@@ -12,7 +12,7 @@ const MessageInput: React.FC<MessageInputProps> = ({onSendMessage, isConnected})
 
     useEffect(() => {
         if (isConnected && inputRef.current) {
-            inputRef.current.focus();
+            inputRef.current?.focus({preventScroll: true});
         }
     }, [isConnected]);
 
@@ -32,7 +32,7 @@ const MessageInput: React.FC<MessageInputProps> = ({onSendMessage, isConnected})
 
             // Focus input after sending
             if (inputRef.current) {
-                inputRef.current.focus();
+                inputRef.current?.focus({preventScroll: true});
             }
         } catch (error) {
             // Error is handled by parent component

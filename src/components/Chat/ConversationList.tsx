@@ -41,14 +41,8 @@ const ConversationList: React.FC<ConversationListProps> = ({
                                                                activeRecipientId,
                                                                onSelectConversation
                                                            }) => {
-    // Automatyczne sortowanie konwersacji - najnowsze na górze
     const sortedConversations = useMemo(() => {
         return [...conversations].sort((a, b) => {
-            // Konwersacje z nieprzeczytanymi wiadomościami na górze
-            if (a.unreadCount > 0 && b.unreadCount === 0) return -1;
-            if (b.unreadCount > 0 && a.unreadCount === 0) return 1;
-
-            // Potem sortuj według daty ostatniej wiadomości
             if (!a.lastMessageDate && !b.lastMessageDate) return 0;
             if (!a.lastMessageDate) return 1;
             if (!b.lastMessageDate) return -1;
@@ -59,6 +53,8 @@ const ConversationList: React.FC<ConversationListProps> = ({
 
     const handleConversationClick = (userId: string, event: React.MouseEvent) => {
         event.preventDefault();
+        event.stopPropagation();
+
         onSelectConversation(userId);
     };
 
@@ -93,11 +89,6 @@ const ConversationList: React.FC<ConversationListProps> = ({
                                     onError={handleImageError}
                                     loading="lazy"
                                 />
-                                {conversation.unreadCount > 0 && (
-                                    <span className="unread-badge">
-                                        {conversation.unreadCount > 99 ? '99+' : conversation.unreadCount}
-                                    </span>
-                                )}
                             </div>
                             <div className="conversation-info">
                                 <div className="conversation-header">

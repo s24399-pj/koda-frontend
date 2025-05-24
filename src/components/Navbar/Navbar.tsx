@@ -3,6 +3,7 @@ import {Link, useNavigate} from "react-router-dom";
 import logo from "../../assets/images/koda_logo.svg";
 import './navbar.scss';
 import {useAuth} from "../../context/AuthContext.tsx";
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 const Navbar: React.FC = () => {
     const {isAuthenticated, logout} = useAuth();

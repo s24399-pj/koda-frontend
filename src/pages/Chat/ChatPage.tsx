@@ -36,7 +36,7 @@ const ChatPage: React.FC = () => {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>('');
-    const [searchResults, setSearchResults] = useState<UserMiniDto[]>([]); // Zmienione z UserProfile[] na UserMiniDto[]
+    const [searchResults, setSearchResults] = useState<UserMiniDto[]>([]);
     const [isSearching, setIsSearching] = useState<boolean>(false);
     const [connectionError, setConnectionError] = useState<string | null>(null);
     const [isInitialized, setIsInitialized] = useState<boolean>(false);
@@ -72,7 +72,6 @@ const ChatPage: React.FC = () => {
     const loadConversations = useCallback(async () => {
         try {
             const allConversations = await chatService.getAllConversations();
-            // Sortuj konwersacje według ostatniej wiadomości
             const sortedConversations = allConversations.sort((a, b) => {
                 if (!a.lastMessageDate) return 1;
                 if (!b.lastMessageDate) return -1;
@@ -108,7 +107,6 @@ const ChatPage: React.FC = () => {
     }, [redirectToLogin]);
 
     const loadRecipientProfile = useCallback(async (userId: string) => {
-        // Użyj danych z konwersacji zamiast API
         const conversation = conversations.find(conv => conv.userId === userId);
         if (conversation) {
             const profileFromConversation: UserProfile = {
@@ -122,7 +120,6 @@ const ChatPage: React.FC = () => {
             return profileFromConversation;
         }
 
-        // Fallback dla nowych użytkowników
         const basicProfile: UserProfile = {
             id: userId,
             firstName: 'User',
@@ -134,7 +131,6 @@ const ChatPage: React.FC = () => {
         return basicProfile;
     }, [conversations]);
 
-    // Główny effect inicjalizujący
     useEffect(() => {
         if (!isTokenValid()) {
             setConnectionError("Brak tokenu uwierzytelniającego. Zaloguj się ponownie.");
@@ -149,7 +145,6 @@ const ChatPage: React.FC = () => {
                 await loadConversations();
 
                 connectWebSocket().catch(() => {
-                    // WebSocket failed, ale to nie blokuje działania
                 });
 
                 if (state?.sellerInfo && state.sellerInfo.isNewConversation && recipientId) {
@@ -167,8 +162,7 @@ const ChatPage: React.FC = () => {
                     const newConversation: Conversation = {
                         userId: sellerInfo.id,
                         userName: `${sellerInfo.firstName} ${sellerInfo.lastName}`,
-                        profilePicture: sellerInfo.profilePicture,
-                        unreadCount: 0
+                        profilePicture: sellerInfo.profilePicture
                     };
 
                     setConversations(prev => {
@@ -245,8 +239,7 @@ const ChatPage: React.FC = () => {
                 if (!conversation) {
                     conversation = {
                         userId: conversationUserId,
-                        userName: conversationUserName,
-                        unreadCount: 0,
+                        userName: conversationUserName
                     };
                     updatedConversations.push(conversation);
                 }
@@ -254,10 +247,6 @@ const ChatPage: React.FC = () => {
                 if (!conversation.lastMessageDate || new Date(message.createdAt) > new Date(conversation.lastMessageDate)) {
                     conversation.lastMessage = message.content;
                     conversation.lastMessageDate = message.createdAt;
-
-                    if (!isCurrentUserSender && message.status !== 'READ') {
-                        conversation.unreadCount = (conversation.unreadCount || 0) + 1;
-                    }
                 }
             });
 
@@ -300,17 +289,26 @@ const ChatPage: React.FC = () => {
     };
 
     const handleSelectConversation = (userId: string) => {
-        if (userId === activeRecipientId) return;
+        setIsSearching(false);
+        setSearchQuery('');
+        setSearchResults([]);
+
+        if (userId === activeRecipientId) {
+            return;
+        }
 
         setActiveRecipientId(userId);
-        navigate(`/chat/${userId}`);
+        navigate(`/chat/${userId}`, {replace: true});
 
         loadRecipientProfile(userId);
         loadMessages(userId);
 
-        setIsSearching(false);
-        setSearchQuery('');
-        setSearchResults([]);
+        setTimeout(() => {
+            const chatMain = document.querySelector('.chat-main');
+            if (chatMain) {
+                (chatMain as HTMLElement).focus({preventScroll: true});
+            }
+        }, 0);
     };
 
     const handleSearch = async () => {
@@ -357,6 +355,7 @@ const ChatPage: React.FC = () => {
                         setSearchResults([]);
                     }}
                     isSearching={isSearching}
+                    activeUserId={activeRecipientId || undefined}
                 />
 
                 {!isSearching && (

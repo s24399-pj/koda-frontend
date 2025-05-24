@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useRef} from 'react';
 import {ChatMessage} from '../../api/chatApi';
 import {UserProfile} from '../../types/user/UserProfile';
 
@@ -14,10 +14,6 @@ const formatMessageDate = (dateString: string) => {
 
 const MessageList: React.FC<MessageListProps> = ({messages, currentUser}) => {
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
-
-    useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({behavior: 'smooth'});
-    }, [messages]);
 
     if (messages.length === 0) {
         return (

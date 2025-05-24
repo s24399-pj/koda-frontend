@@ -34,43 +34,34 @@
     align-items: center;
     justify-content: center;
     transition: all 0.2s;
-    position: relative;
+    padding: 0;
+    color: white;
+
+    svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+    }
 
     &:hover:not(:disabled) {
       background-color: #4338ca;
       transform: scale(1.05);
     }
 
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
+    }
+
+    &:active:not(:disabled) {
+      transform: scale(0.95);
+    }
+
     &:disabled {
       background-color: #e9ecef;
+      color: #6c757d;
       cursor: not-allowed;
-    }
-
-    // Ikona lupy
-    &::before {
-      content: '';
-      width: 16px;
-      height: 16px;
-      border: 2px solid white;
-      border-radius: 50%;
-      position: absolute;
-    }
-
-    &::after {
-      content: '';
-      width: 8px;
-      height: 2px;
-      background-color: white;
-      position: absolute;
-      transform: rotate(45deg);
-      right: 11px;
-      bottom: 11px;
-    }
-
-    &:disabled::before,
-    &:disabled::after {
-      border-color: #6c757d;
-      background-color: #6c757d;
     }
   }
 }
@@ -240,7 +231,6 @@
   }
 }
 
-// Responsywność
 @media (max-width: 768px) {
   .search-results {
     .search-header {

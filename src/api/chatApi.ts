@@ -19,10 +19,8 @@ export interface Conversation {
     profilePicture?: string;
     lastMessage?: string;
     lastMessageDate?: string;
-    unreadCount: number;
 }
 
-// Funkcja do sprawdzania ważności tokenu JWT
 const isTokenValid = (): boolean => {
     const token = localStorage.getItem("accessToken");
     if (!token) return false;

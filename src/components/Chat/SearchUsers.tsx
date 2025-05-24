@@ -12,6 +12,7 @@ interface SearchUsersProps {
     onSelectUser: (userId: string) => void;
     onCancel: () => void;
     isSearching: boolean;
+    activeUserId?: string;
 }
 
 const SearchUsers: React.FC<SearchUsersProps> = ({
@@ -21,7 +22,8 @@ const SearchUsers: React.FC<SearchUsersProps> = ({
                                                      searchResults,
                                                      onSelectUser,
                                                      onCancel,
-                                                     isSearching
+                                                     isSearching,
+                                                     activeUserId
                                                  }) => {
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter') {
@@ -50,7 +52,14 @@ const SearchUsers: React.FC<SearchUsersProps> = ({
                     onClick={() => searchQuery.trim() && onSearch()}
                     className="search-button"
                     disabled={!searchQuery.trim()}
+                    title="Szukaj użytkowników"
+                    aria-label="Szukaj użytkowników"
                 >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.35-4.35"/>
+                    </svg>
                 </button>
             </div>
 
@@ -66,7 +75,11 @@ const SearchUsers: React.FC<SearchUsersProps> = ({
                     {searchResults.length > 0 ? (
                         <ul>
                             {searchResults.map((user) => (
-                                <li key={user.id} onClick={() => user.id && onSelectUser(user.id)}>
+                                <li
+                                    key={user.id}
+                                    onClick={() => user.id && onSelectUser(user.id)}
+                                    className={activeUserId === user.id ? 'active-user' : ''}
+                                >
                                     <div className="user-avatar">
                                         <img
                                             src={DEFAULT_AVATAR}
@@ -79,6 +92,9 @@ const SearchUsers: React.FC<SearchUsersProps> = ({
                                     </div>
                                     <div className="user-info">
                                         <span className="user-name">{user.fullName}</span>
+                                        {activeUserId === user.id && (
+                                            <span className="active-indicator">Aktywna rozmowa</span>
+                                        )}
                                     </div>
                                 </li>
                             ))}
