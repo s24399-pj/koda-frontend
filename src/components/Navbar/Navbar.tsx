@@ -3,6 +3,7 @@ import {Link, useNavigate} from "react-router-dom";
 import logo from "../../assets/images/koda_logo.svg";
 import './navbar.scss';
 import {useAuth} from "../../context/AuthContext.tsx";
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 const Navbar: React.FC = () => {
     const {isAuthenticated, logout} = useAuth();
@@ -38,8 +39,18 @@ const Navbar: React.FC = () => {
                 <div className="navbar-buttons">
                     {isAuthenticated ? (
                         <>
-                            <Link to="/user/panel" className="profile">Mój profil</Link>
-                            <button onClick={handleLogout} className="logout">Wyloguj się</button>
+                            <Link to="/chat" className="chat-link">
+                                <i className="fas fa-comments"></i>
+                                <span>Wiadomości</span>
+                            </Link>
+                            <Link to="/user/panel" className="profile">
+                                <i className="fas fa-user"></i>
+                                <span>Mój profil</span>
+                            </Link>
+                            <button onClick={handleLogout} className="logout">
+                                <i className="fas fa-sign-out-alt"></i>
+                                <span>Wyloguj się</span>
+                            </button>
                         </>
                     ) : (
                         <>
@@ -52,6 +63,5 @@ const Navbar: React.FC = () => {
         </nav>
     );
 };
-
 
 export default Navbar;

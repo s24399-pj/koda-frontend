@@ -69,16 +69,22 @@
 
   .navbar-buttons {
     display: flex;
-    gap: 1rem;
+    gap: 0.75rem;
+    align-items: center;
 
     a, button {
       font-size: 0.875rem;
       padding: 0.5rem 1rem;
       border-radius: 0.375rem;
       font-weight: 500;
-      transition: background-color 0.3s ease, color 0.3s ease;
+      transition: all 0.2s ease;
       text-decoration: none;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.375rem;
+      height: 2.5rem;
     }
 
     button {
@@ -89,40 +95,89 @@
     .signup {
       color: #3b82f6;
       border: 1px solid #3b82f6;
+      background-color: transparent;
 
       &:hover {
-        background-color: #3b82f6;
-        color: white;
+        background-color: rgba(59, 130, 246, 0.05);
       }
     }
 
     .login {
       background-color: #3b82f6;
       color: white;
+      border: 1px solid #3b82f6;
 
       &:hover {
         background-color: #2563eb;
+        border-color: #2563eb;
       }
     }
 
-    .profile {
-      color: #4b5563;
-      border: 1px solid #d1d5db;
+    .profile, .chat-link {
+      background-color: #3b82f6;
+      color: white;
+      border: 1px solid #3b82f6;
 
       &:hover {
-        background-color: #f3f4f6;
-        color: #3b82f6;
-        border-color: #3b82f6;
+        background-color: #2563eb;
+        border-color: #2563eb;
+      }
+
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+      }
+    }
+
+    .chat-link {
+      background-color: #2563eb;
+      border-color: #2563eb;
+
+      &:hover {
+        background-color: #1d4ed8;
+        border-color: #1d4ed8;
       }
     }
 
     .logout {
       background-color: #ef4444;
       color: white;
+      border: 1px solid #ef4444;
 
       &:hover {
         background-color: #dc2626;
+        border-color: #dc2626;
       }
+
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.5);
+      }
+    }
+
+    .unread-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #ef4444;
+      color: white;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      min-width: 1.25rem;
+      height: 1.25rem;
+      padding: 0 0.25rem;
+      margin-left: 0.25rem;
+      font-weight: 600;
+    }
+
+    a:hover, button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    a:focus, button:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
     }
   }
 }
@@ -147,6 +202,8 @@
     .navbar-buttons {
       justify-content: center;
       width: 100%;
+      flex-wrap: wrap;
+      gap: 0.5rem;
     }
 
     .navbar-links {
@@ -176,6 +233,13 @@
       a, button {
         font-size: 0.75rem;
         padding: 0.375rem 0.75rem;
+        height: 2.25rem;
+      }
+
+      .unread-badge {
+        font-size: 0.65rem;
+        min-width: 1rem;
+        height: 1rem;
       }
     }
   }
@@ -206,6 +270,24 @@
 
       a {
         white-space: nowrap;
+      }
+    }
+
+    .navbar-buttons {
+      a, button {
+        flex: 1;
+        min-width: calc(33.33% - 0.5rem);
+        padding: 0.375rem 0.5rem;
+        font-size: 0.7rem;
+
+        span {
+          display: none;
+        }
+
+        i {
+          font-size: 1rem;
+          margin: 0;
+        }
       }
     }
   }
