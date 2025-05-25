@@ -1,6 +1,3 @@
-/* Style dla obsługi błędów i statusu połączenia w czacie */
-
-/* Komunikat o błędzie połączenia */
 .chat-error {
   display: flex;
   flex-direction: column;
@@ -41,7 +38,6 @@
   }
 }
 
-/* Wskaźnik statusu połączenia */
 .connection-status {
   display: flex;
   align-items: center;

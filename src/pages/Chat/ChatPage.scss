@@ -9,7 +9,6 @@
   overflow: hidden;
 }
 
-// Mobile header
 .mobile-header {
   display: none;
   position: fixed;
@@ -38,7 +37,6 @@
   }
 }
 
-// Hamburger button
 .hamburger-button {
   position: relative;
   width: 44px;
@@ -90,7 +88,6 @@
   }
 }
 
-// Sidebar overlay
 .sidebar-overlay {
   display: none;
   position: fixed;
@@ -768,7 +765,6 @@
   }
 }
 
-// Animacje
 @keyframes messageSlideIn {
   from {
     opacity: 0;
@@ -820,16 +816,16 @@
 
 @media (max-width: 768px) {
   .chat-page {
-    margin-top: 90px; // Miejsce na mobile header
+    margin-top: 90px;
     height: calc(100vh - 60px);
   }
 
   .chat-sidebar {
     position: fixed;
-    top: 60px; // Pod mobile header
+    top: 60px;
     left: 0;
     height: calc(100vh - 60px);
-    width: 85%; // Zajmuje 85% szerokości ekranu
+    width: 85%;
     max-width: 320px;
     transform: translateX(-100%);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);

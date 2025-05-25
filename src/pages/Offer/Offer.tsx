@@ -8,8 +8,7 @@ import "leaflet/dist/leaflet.css";
 import "./Offer.scss";
 import LikeButton from "../../components/LikeButton/LikeButton";
 import {useAuth} from "../../context/AuthContext";
-
-const DEFAULT_AVATAR = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYgMjU2Ij48Y2lyY2xlIGN4PSIxMjgiIGN5PSIxMjgiIHI9IjEyMCIgZmlsbD0iI2U5ZWNlZiIvPjxjaXJjbGUgY3g9IjEyOCIgY3k9IjExMCIgcj0iMzUiIGZpbGw9IiM2Yzc1N2QiLz48cGF0aCBkPSJNMTk4LDE4OGMwLTI1LjQtMzEuNC00Ni03MC00NnMtNzAsMjAuNi03MCw0NnMzMS40LDQ2LDcwLDQ2UzE5OCwyMTMuNCwxOTgsMTg4WiIgZmlsbD0iIzZjNzU3ZCIvPjwvc3ZnPg==";
+import {DEFAULT_PROFILE_IMAGE} from "../../assets/defaultProfilePicture.ts";
 
 interface LightboxProps {
     images: string[];
@@ -157,7 +156,7 @@ const Offer: React.FC = () => {
     const [mapLat, setMapLat] = useState<number | null>(null);
     const [mapLng, setMapLng] = useState<number | null>(null);
     const [selectedImage, setSelectedImage] = useState<string>("");
-    const [profileImage, setProfileImage] = useState<string>(DEFAULT_AVATAR);
+    const [profileImage, setProfileImage] = useState<string>(DEFAULT_PROFILE_IMAGE);
     const mapRef = useRef<HTMLDivElement | null>(null);
     const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth <= 768);
     const [imageIndex, setImageIndex] = useState<number>(0);
@@ -300,7 +299,7 @@ const Offer: React.FC = () => {
 
     const handleProfileImageError = () => {
         console.log("Wystąpił błąd ładowania zdjęcia profilowego");
-        setProfileImage(DEFAULT_AVATAR);
+        setProfileImage(DEFAULT_PROFILE_IMAGE);
     };
 
     const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
@@ -438,7 +437,7 @@ const Offer: React.FC = () => {
                         <LikeButton
                             offerId={offer.id}
                             onLikeToggle={(isLiked) => {
-                                console.log(`Oferta ${offer.id} ${isLiked ? 'polubiona' : 'niepolubiona'}`);
+                                console.log(`Offer ${offer.id} ${isLiked ? 'liked' : 'not liked'}`);
                             }}
                         />
                     </div>
@@ -495,7 +494,7 @@ const Offer: React.FC = () => {
                                     className="start-chat-button"
                                     onClick={handleStartChat}
                                     disabled={!isAuthenticated}
-                                    title={!isAuthenticated ? "Musisz być zalogowany, aby rozpocząć czat" : ""}
+                                    title={!isAuthenticated ? "You need to be logged in!" : ""}
                                 >
                                     <i className="fas fa-comments"></i> Rozpocznij czat
                                 </button>

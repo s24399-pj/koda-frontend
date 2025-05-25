@@ -1,13 +1,6 @@
 import React, {useMemo} from 'react';
-import {Conversation} from '../../api/chatApi';
-
-const DEFAULT_AVATAR = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYgMjU2Ij48Y2lyY2xlIGN4PSIxMjgiIGN5PSIxMjgiIHI9IjEyMCIgZmlsbD0iI2U5ZWNlZiIvPjxjaXJjbGUgY3g9IjEyOCIgY3k9IjExMCIgcj0iMzUiIGZpbGw9IiM2Yzc1N2QiLz48cGF0aCBkPSJNMTk4LDE4OGMwLTI1LjQtMzEuNC00Ni03MC00NnMtNzAsMjAuNi03MCw0NnMzMS40LDQ2LDcwLDQ2UzE5OCwyMTMuNCwxOTgsMTg4WiIgZmlsbD0iIzZjNzU3ZCIvPjwvc3ZnPg==";
-
-interface ConversationListProps {
-    conversations: Conversation[];
-    activeRecipientId: string | null;
-    onSelectConversation: (userId: string) => void;
-}
+import {DEFAULT_PROFILE_IMAGE} from "../../assets/defaultProfilePicture.ts";
+import {ConversationListProps} from "../../types/chat/ConversationListProps.ts";
 
 const formatConversationDate = (dateString: string | undefined) => {
     if (!dateString) return '';
@@ -60,7 +53,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
 
     const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
         const target = event.currentTarget;
-        target.src = DEFAULT_AVATAR;
+        target.src = DEFAULT_PROFILE_IMAGE;
     };
 
     return (
@@ -84,7 +77,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
                         >
                             <div className="user-avatar">
                                 <img
-                                    src={conversation.profilePicture || DEFAULT_AVATAR}
+                                    src={conversation.profilePicture || DEFAULT_PROFILE_IMAGE}
                                     alt={`${conversation.userName} avatar`}
                                     onError={handleImageError}
                                     loading="lazy"

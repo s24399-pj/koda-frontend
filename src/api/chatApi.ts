@@ -1,25 +1,8 @@
 import {Client, IMessage} from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import axiosAuthClient from "./axiosAuthClient.ts";
-
-export interface ChatMessage {
-    id: string;
-    senderId: string;
-    senderName: string;
-    recipientId: string;
-    recipientName: string;
-    content: string;
-    createdAt: string;
-    status: 'SENT' | 'DELIVERED' | 'READ';
-}
-
-export interface Conversation {
-    userId: string;
-    userName: string;
-    profilePicture?: string;
-    lastMessage?: string;
-    lastMessageDate?: string;
-}
+import {ChatMessage} from "../types/chat/ChatMessage.ts";
+import {Conversation} from "../types/chat/Conversation.ts";
 
 const isTokenValid = (): boolean => {
     const token = localStorage.getItem("accessToken");
@@ -31,7 +14,7 @@ const isTokenValid = (): boolean => {
         const currentTime = Math.floor(Date.now() / 1000);
         return payload.exp > currentTime;
     } catch (error) {
-        console.error('Błąd podczas walidacji tokenu', error);
+        console.error('Error validating token', error);
         return false;
     }
 };
@@ -44,29 +27,29 @@ class ChatService {
 
     async getAllConversations(): Promise<Conversation[]> {
         try {
-            console.log('Pobieranie wszystkich konwersacji...');
+            console.log('Fetching all conversations...');
             const response = await axiosAuthClient.get<Conversation[]>('/api/v1/chat/conversations');
-            console.log(`Pobrano ${response.data.length} konwersacji`);
+            console.log(`Fetched ${response.data.length} conversations`);
             return response.data;
         } catch (error) {
             console.error('Error fetching all conversations:', error);
-            throw error; // Rzuć błąd dalej zamiast zwracać pustą tablicę
+            throw error;
         }
     }
 
     async connect(): Promise<void> {
         const token = localStorage.getItem("accessToken");
         if (!token || !isTokenValid()) {
-            throw new Error('Brak ważnego tokenu uwierzytelniającego');
+            throw new Error('No valid authentication token');
         }
 
         if (this.client?.connected) {
-            console.log('WebSocket już połączony');
+            console.log('WebSocket already connected');
             return Promise.resolve();
         }
 
         if (this.isConnecting) {
-            console.log('Połączenie WebSocket w trakcie...');
+            console.log('WebSocket connection in progress...');
             return new Promise((resolve, reject) => {
                 const checkConnection = setInterval(() => {
                     if (this.client?.connected) {
@@ -77,7 +60,7 @@ class ChatService {
 
                 setTimeout(() => {
                     clearInterval(checkConnection);
-                    reject(new Error('Timeout podczas oczekiwania na połączenie WebSocket'));
+                    reject(new Error('Timeout waiting for WebSocket connection'));
                 }, 10000);
             });
         }
@@ -130,7 +113,7 @@ class ChatService {
 
     disconnect(): void {
         if (this.client) {
-            console.log('Rozłączanie WebSocket...');
+            console.log('Disconnecting WebSocket...');
             this.client.deactivate();
             this.client = null;
             this.isConnecting = false;
@@ -139,34 +122,34 @@ class ChatService {
 
     private subscribeToPersonalQueue(): void {
         if (!this.client || !this.client.connected) {
-            console.error('Próba subskrypcji bez połączenia WebSocket');
+            console.error('Attempting to subscribe without WebSocket connection');
             return;
         }
 
         try {
-            console.log('Subskrypcja do /user/queue/messages...');
+            console.log('Subscribing to /user/queue/messages...');
             this.client.subscribe('/user/queue/messages', (message: IMessage) => {
-                console.log('Otrzymano wiadomość WebSocket:', message.body);
+                console.log('Received WebSocket message:', message.body);
                 try {
                     const chatMessage = JSON.parse(message.body) as ChatMessage;
                     this.messageHandlers.forEach(handler => handler(chatMessage));
                 } catch (error) {
-                    console.error('Błąd parsowania wiadomości WebSocket:', error);
+                    console.error('Error parsing WebSocket message:', error);
                 }
             });
-            console.log('Subskrypcja do /user/queue/messages została utworzona pomyślnie');
+            console.log('Successfully subscribed to /user/queue/messages');
         } catch (error) {
-            console.error('Błąd podczas subskrypcji:', error);
+            console.error('Error during subscription:', error);
         }
     }
 
     async sendMessage(recipientId: string, content: string): Promise<void> {
         if (!this.client || !this.client.connected) {
-            console.error('Nie połączono z WebSocket, próba ponownego połączenia...');
+            console.error('Not connected to WebSocket, attempting to reconnect...');
             try {
                 await this.connect();
             } catch (error) {
-                throw new Error('Nie można połączyć z serwerem czatu');
+                throw new Error('Cannot connect to chat server');
             }
         }
 
@@ -175,7 +158,7 @@ class ChatService {
             content
         };
 
-        console.log(`Wysyłanie wiadomości do ${recipientId}:`, content);
+        console.log(`Sending message to ${recipientId}:`, content);
 
         this.client!.publish({
             destination: '/app/chat.sendMessage',
@@ -194,14 +177,14 @@ class ChatService {
 
     async getChatHistory(recipientId: string): Promise<ChatMessage[]> {
         try {
-            console.log(`Pobieranie historii czatu z ${recipientId}...`);
+            console.log(`Fetching chat history with ${recipientId}...`);
 
             if (!isTokenValid()) {
-                throw new Error('Token wygasł - wymagane ponowne logowanie');
+                throw new Error('Token expired - re-authentication required');
             }
 
             const response = await axiosAuthClient.get<ChatMessage[]>(`/api/v1/chat/messages?recipientId=${recipientId}`);
-            console.log(`Pobrano ${response.data.length} wiadomości dla ${recipientId}:`, response.data);
+            console.log(`Fetched ${response.data.length} messages for ${recipientId}:`, response.data);
             return response.data;
         } catch (error) {
             console.error('Error fetching chat history:', error);

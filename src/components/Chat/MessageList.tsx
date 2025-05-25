@@ -1,11 +1,5 @@
 import React, {useRef} from 'react';
-import {ChatMessage} from '../../api/chatApi';
-import {UserProfile} from '../../types/user/UserProfile';
-
-interface MessageListProps {
-    messages: ChatMessage[];
-    currentUser: UserProfile | null;
-}
+import {MessageListProps} from "../../types/chat/MessageListProps.ts";
 
 const formatMessageDate = (dateString: string) => {
     const date = new Date(dateString);

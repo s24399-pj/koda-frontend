@@ -4,25 +4,16 @@ import './ChatPage.scss';
 import './ChatError.scss';
 import {getUserProfile, searchUsers} from '../../api/useInternalApi';
 import {UserProfile} from '../../types/user/UserProfile';
-import {ChatMessage, chatService, Conversation, isTokenValid} from "../../api/chatApi";
 import SearchUsers from "../../components/Chat/SearchUsers.tsx";
 import ChatHeader from "../../components/Chat/ChatHeader.tsx";
 import MessageList from "../../components/Chat/MessageList.tsx";
 import MessageInput from "../../components/Chat/MessageInput.tsx";
 import ConversationList from "../../components/Chat/ConversationList.tsx";
 import {UserMiniDto} from "../../types/user/UserMiniDto.ts";
-
-interface LocationState {
-    sellerInfo?: {
-        id: string;
-        firstName: string;
-        lastName: string;
-        profilePicture?: string;
-        email: string;
-        isNewConversation: boolean;
-    };
-    returnUrl?: string;
-}
+import {LocationState} from "../../types/chat/LocationState.ts";
+import { ChatMessage } from '../../types/chat/ChatMessage.ts';
+import { Conversation } from '../../types/chat/Conversation.ts';
+import {chatService, isTokenValid} from "../../api/chatApi.ts";
 
 const ChatPage: React.FC = () => {
     const {recipientId} = useParams<{ recipientId: string }>();
@@ -50,7 +41,7 @@ const ChatPage: React.FC = () => {
 
     const connectWebSocket = useCallback(async () => {
         if (!isTokenValid()) {
-            setConnectionError("Brak tokenu uwierzytelniającego. Zaloguj się ponownie.");
+            setConnectionError("Authentication token missing. Log in again.");
             return;
         }
 
@@ -59,7 +50,7 @@ const ChatPage: React.FC = () => {
             await chatService.connect();
             setIsWebSocketConnected(true);
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : "Nie udało się połączyć z serwerem czatu.";
+            const errorMessage = error instanceof Error ? error.message : "Failed to connect to chat server.";
             setConnectionError(errorMessage);
             setIsWebSocketConnected(false);
 
@@ -98,7 +89,7 @@ const ChatPage: React.FC = () => {
                 redirectToLogin();
             } else {
                 setMessages([]);
-                setConnectionError("Nie udało się załadować historii wiadomości.");
+                setConnectionError("Failed to load messages history");
             }
             return [];
         } finally {
@@ -133,7 +124,7 @@ const ChatPage: React.FC = () => {
 
     useEffect(() => {
         if (!isTokenValid()) {
-            setConnectionError("Brak tokenu uwierzytelniającego. Zaloguj się ponownie.");
+            setConnectionError("Authentication token missing. Log in again.");
             return;
         }
 
@@ -178,7 +169,7 @@ const ChatPage: React.FC = () => {
 
                 setIsInitialized(true);
             } catch (error) {
-                setConnectionError("Wystąpił błąd podczas inicjalizacji czatu.");
+                setConnectionError("An error occurred during chat initialization.");
 
                 if ((error as any).response?.status === 401) {
                     setTimeout(redirectToLogin, 3000);
@@ -262,7 +253,7 @@ const ChatPage: React.FC = () => {
         if (!activeRecipientId || !activeRecipient || !currentUser || !currentUser.id) return;
 
         if (!isWebSocketConnected) {
-            alert('Brak połączenia z serwerem. Sprawdź połączenie internetowe i spróbuj ponownie.');
+            alert('No connection to the server. Check your Internet connection and try again.');
             return;
         }
 
@@ -331,10 +322,10 @@ const ChatPage: React.FC = () => {
         const isTokenError = connectionError.includes('token');
         return (
             <div className="chat-error">
-                <h3>{isTokenError ? 'Błąd uwierzytelniania' : 'Problem z połączeniem'}</h3>
+                <h3>{isTokenError ? 'Authentication error' : 'Connection problem'}</h3>
                 <p>{connectionError}</p>
                 <button onClick={isTokenError ? redirectToLogin : connectWebSocket}>
-                    {isTokenError ? 'Zaloguj się ponownie' : 'Spróbuj ponownie'}
+                    {isTokenError ? 'Login again' : 'Try again'}
                 </button>
             </div>
         );

@@ -1,9 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-
-interface MessageInputProps {
-    onSendMessage: (content: string) => void;
-    isConnected: boolean;
-}
+import {MessageInputProps} from "../../types/chat/MessageInputProps.ts";
 
 const MessageInput: React.FC<MessageInputProps> = ({onSendMessage, isConnected}) => {
     const [message, setMessage] = useState<string>('');
@@ -30,12 +26,11 @@ const MessageInput: React.FC<MessageInputProps> = ({onSendMessage, isConnected})
             await onSendMessage(trimmedMessage);
             setMessage('');
 
-            // Focus input after sending
             if (inputRef.current) {
                 inputRef.current?.focus({preventScroll: true});
             }
         } catch (error) {
-            // Error is handled by parent component
+
         } finally {
             setIsSending(false);
         }
