@@ -10,7 +10,7 @@ const WhyUs: React.FC = () => {
 
   return (
       <div className="why-us-page">
-        <h1>Dlaczego warto wybrać nas?</h1>
+        <h1>Nie daj się oszukać - z nami to niemożliwe!</h1>
 
         <section>
           <h2>Transparentność</h2>
@@ -42,74 +42,46 @@ const WhyUs: React.FC = () => {
           </div>
         </section>
 
-        <section>
-          <h2>Nowoczesne i użyteczne narzędzia</h2>
-          <p>
-            Nasz serwis to coś więcej niż katalog ogłoszeń. Oferujemy rozbudowaną porównywarkę samochodów, która pozwala łatwo zestawić ze sobą różne oferty, ich parametry techniczne oraz historię. Dzięki intuicyjnym filtrom znajdziesz dokładnie to, czego szukasz – bez przeszukiwania setek niepasujących ogłoszeń.
-          </p>
-        </section>
+        <section className="education-section">
+          <h2>Edukacja i bezpieczeństwo w cyfrowym handlu samochodami</h2>
 
-        <section>
-          <h2>Bezpośredni kontakt między kupującym, a sprzedającym</h2>
-          <p>
-            Wbudowany czat – szybka i wygodna komunikacja bezpośrednio w obrębie platformy. Bez potrzeby dzwonienia czy udostępniania prywatnych danych. Szybko, wygodnie i bezpiecznie.
-          </p>
-        </section>
+          <div className="education-content">
+            <div className="safety-tips">
+              <h3>Jak bezpiecznie kupować samochody online?</h3>
+              <p>
+                Wraz z rozwojem cyfrowych platform handlowych rośnie również ryzyko oszustw.
+                Według danych CERT Orange, phishing stanowi aż 40% wszystkich incydentów bezpieczeństwa.
+                W handlu samochodami najpopularniejszą metodą oszustwa jest wyłudzanie zaliczek za nieistniejące pojazdy.
+              </p>
 
-        <section className="security-section">
-          <h2>Bezpieczeństwo na pierwszym miejscu</h2>
-          <div className="security-features">
-            <div className="security-item">
-              <h3>🛡️ System ocen i opinii</h3>
-              <p>Każdy sprzedawca ma swój profil z ocenami od poprzednich kupujących. Dzięki temu możesz łatwo sprawdzić wiarygodność osoby, z którą chcesz przeprowadzić transakcję.</p>
+              <div className="safety-guidelines">
+                <h4>Nasze zasady bezpieczeństwa:</h4>
+                <ul>
+                  <li><strong>Weryfikacja tożsamości</strong> - każdy sprzedawca musi przejść proces weryfikacji</li>
+                  <li><strong>Integracja z CEPiK</strong> - automatyczne sprawdzanie danych pojazdu w rządowych bazach</li>
+                  <li><strong>System ocen</strong> - przejrzysty system opinii o sprzedawcach</li>
+                  <li><strong>Bezpieczne płatności</strong> - zabezpieczone metody płatności z możliwością zwrotu</li>
+                </ul>
+              </div>
             </div>
-            <div className="security-item">
-              <h3>🔒 Ochrona danych osobowych</h3>
-              <p>Twoje dane są bezpieczne dzięki szyfrowanej komunikacji (HTTPS) i zgodności z RODO. Nie musisz udostępniać swojego numeru telefonu – wszystko odbywa się przez bezpieczny czat.</p>
-            </div>
-            <div className="security-item">
-              <h3>⚠️ Weryfikacja ogłoszeń</h3>
-              <p>Naszy administratorzy aktywnie moderują treści, usuwając podejrzane ogłoszenia i blokując nieuczciwe konta.</p>
-            </div>
-            <div className="security-item">
-              <h3>📋 Wymagane dane pojazdu</h3>
-              <p>Każde ogłoszenie wymaga podania kluczowych informacji jak numer VIN, przebieg czy rok produkcji. To zapewnia wiarygodność ofert i ułatwia weryfikację historii pojazdu.</p>
-            </div>
-          </div>
-        </section>
 
-        <section className="innovation-section">
-          <h2>Innowacyjne funkcje</h2>
-          <div className="innovation-grid">
-            <div className="innovation-item">
-              <h3>📊 Historia cen pojazdu</h3>
-              <p>Zobacz, jak zmieniała się cena konkretnego samochodu w czasie. To pomoże Ci ocenić, czy obecna cena jest uczciwa, czy warto jeszcze poczekać.</p>
-            </div>
-            <div className="innovation-item">
-              <h3>💾 Lista zapisanych ofert</h3>
-              <p>Zapisuj interesujące Cię ogłoszenia i wracaj do nich później. Twoja lista jest zawsze dostępna w profilu użytkownika.</p>
-            </div>
-            <div className="innovation-item">
-              <h3>📈 Licznik wyświetleń</h3>
-              <p>Jeśli sprzedajesz samochód, zobacz ile osób obejrzało Twoje ogłoszenie. To pomoże Ci ocenić zainteresowanie i ewentualnie dostosować cenę.</p>
-            </div>
-          </div>
-        </section>
+            <div className="digital-inclusion">
+              <h3>Dostępność dla wszystkich</h3>
+              <p>
+                Zdajemy sobie sprawę z problemu wykluczenia cyfrowego, szczególnie wśród osób starszych.
+                Dlatego projektujemy naszą platformę z myślą o intuicyjności i przystępności dla wszystkich użytkowników,
+                niezależnie od ich doświadczenia z technologią.
+              </p>
 
-        <section className="user-experience-section">
-          <h2>Doświadczenie użytkownika</h2>
-          <div className="ux-features">
-            <div className="ux-item">
-              <h3>📱 Pełna responsywność</h3>
-              <p>Nasza platforma działa płynnie na wszystkich urządzeniach – od smartfona po komputer stacjonarny. Interfejs automatycznie dostosowuje się do rozmiaru ekranu.</p>
-            </div>
-            <div className="ux-item">
-              <h3>⚡ Szybkość działania</h3>
-              <p>Strony ładują się w mniej niż 3 sekundy, a wyszukiwanie działa w czasie rzeczywistym. Ne musisz czekać – wyniki pojawiają się natychmiast.</p>
-            </div>
-            <div className="ux-item">
-              <h3>🎯 Zaawansowane filtry</h3>
-              <p>Filtruj oferty według marki, modelu, roku produkcji, przebiegu, ceny, lokalizacji i wielu innych kryteriów. Znajdź dokładnie to, czego szukasz.</p>
+              <div className="accessibility-features">
+                <h4>Nasze rozwiązania dostępności:</h4>
+                <ul>
+                  <li><strong>Prosty interface</strong> - czytelny design bez zbędnych komplikacji</li>
+                  <li><strong>Wsparcie telefoniczne</strong> - możliwość kontaktu dla osób preferujących rozmowę</li>
+                  <li><strong>Przewodniki krok po kroku</strong> - szczegółowe instrukcje dla każdego procesu</li>
+                  <li><strong>Alternatywne kanały</strong> - utrzymujemy możliwość kontaktu poza platformą</li>
+                </ul>
+              </div>
             </div>
           </div>
         </section>
@@ -121,6 +93,27 @@ const WhyUs: React.FC = () => {
             a interfejs jest intuicyjny i przystępny również dla osób starszych czy mniej zaznajomionych z technologią.
             Wspieramy również polskie źródła danych, integrując się z rządowymi bazami jak CEPiK.
           </p>
+        </section>
+
+        <section className="market-trends-section">
+          <h2>Trendy w cyfryzacji handlu samochodami</h2>
+          <p>
+            Współczesny rynek motoryzacyjny przechodzi przez dynamiczną transformację cyfrową.
+            Według najnowszych danych, 42% przedsiębiorców rozpoczyna poszukiwanie samochodu od stron internetowych dealerów,
+            podczas gdy tylko 23% zaczyna od wizyty w tradycyjnym salonie.
+            To pokazuje, jak internet stał się pierwszym punktem kontaktu z ofertą motoryzacyjną.
+          </p>
+
+          <div className="trend-stats">
+            <div className="stat-item">
+              <span className="stat-number">52%</span>
+              <span className="stat-description">małych i średnich przedsiębiorstw jest zainteresowanych całkowitym zakupem online</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-number">28%</span>
+              <span className="stat-description">firm chce dokonać transakcji bez wychodzenia z biura</span>
+            </div>
+          </div>
         </section>
 
         <section>
@@ -183,25 +176,6 @@ const WhyUs: React.FC = () => {
               </tbody>
             </table>
           </div>
-        </section>
-
-        <section className="mission-section">
-          <h2>Nasza misja</h2>
-          <p>
-            Chcemy demokratyzować rynek motoryzacyjny w Polsce. Wierzymy, że kupno i sprzedaż samochodu powinny być
-            procesami prostymi, bezpiecznymi i przejrzystymi dla wszystkich uczestników. Dlatego tworzymy narzędzia,
-            które wyrównują szanse i dają każdemu dostęp do pełnej informacji o pojeździe – bez ukrytych kosztów
-            i nieprzejrzystych praktyk.
-          </p>
-        </section>
-
-        <section className="future-section">
-          <h2>Patrzymy w przyszłość</h2>
-          <p>
-            Nasza platforma jest zaprojektowana z myślą o przyszłości. Planujemy integrację z dodatkowymi źródłami danych,
-            rozwijanie funkcji AI do lepszego dopasowywania ofert oraz wprowadzenie nowych narzędzi ułatwiających
-            proces decyzyjny. Słuchamy głosu naszych użytkowników i stale ulepszamy serwis.
-          </p>
         </section>
       </div>
   );
