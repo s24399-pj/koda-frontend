@@ -10,7 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.7.2",
     "@rollup/rollup-darwin-arm64": "^4.40.0",
+    "@stomp/stompjs": "7.1.1",
     "axios": "^1.8.4",
     "formik": "^2.4.6",
     "leaflet": "^1.9.4",
@@ -21,6 +23,7 @@
     "react-router-dom": "^7.2.0",
     "react-slick": "^0.30.3",
     "slick-carousel": "^1.8.1",
+    "sockjs-client": "1.6.1",
     "yup": "^1.6.1"
   },
   "devDependencies": {
@@ -29,6 +32,7 @@
     "@types/react": "^18.3.17",
     "@types/react-dom": "^18.3.5",
     "@types/react-slick": "^0.23.13",
+    "@types/sockjs-client": "^1.5.4",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.17.0",
@@ -36,10 +40,13 @@
     "eslint-plugin-react-refresh": "^0.4.16",
     "globals": "^15.13.0",
     "postcss": "^8.5.3",
+    "process": "^0.11.10",
     "sass": "^1.85.1",
+    "stream-browserify": "^3.0.0",
     "tailwindcss": "^4.0.9",
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.18.1",
+    "util": "^0.12.5",
     "vite": "^6.0.3"
   }
 }

@@ -158,6 +158,7 @@
           font-size: 22px;
         }
       }
+
       .price {
         font-size: 24px;
         font-weight: bold;
@@ -167,6 +168,7 @@
           font-size: 20px;
         }
       }
+
       .location {
         font-size: 16px;
         color: #777;
@@ -198,6 +200,7 @@
         cursor: pointer;
         margin-top: 15px;
         transition: background 0.3s;
+
         &:hover {
           background: #005bb5;
         }
@@ -310,8 +313,8 @@
           overflow-x: auto;
           padding: 10px 0;
           scroll-behavior: smooth;
-          -ms-overflow-style: none;  /* IE and Edge */
-          scrollbar-width: none;  /* Firefox */
+          -ms-overflow-style: none; /* IE and Edge */
+          scrollbar-width: none; /* Firefox */
           max-width: 100%;
 
           &::-webkit-scrollbar {
@@ -458,6 +461,9 @@
 
         .seller-details {
           margin-left: 15px;
+          // Zaktualizowana sekcja seller-details
+          display: flex;
+          flex-direction: column;
 
           h3 {
             margin: 0 0 5px 0;
@@ -467,9 +473,49 @@
           }
 
           .seller-email {
-            margin: 0;
+            margin: 0 0 8px 0;
             color: #666;
             font-size: 14px;
+          }
+
+          // Nowy przycisk czatu
+          .start-chat-button {
+            margin-top: 8px;
+            padding: 8px 16px;
+            background-color: #007be5;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+            &:hover {
+              background-color: #0067c2;
+              transform: translateY(-2px);
+            }
+
+            &:active {
+              background-color: #005299;
+              transform: translateY(0);
+            }
+
+            &:disabled {
+              background-color: #99c4ea;
+              cursor: not-allowed;
+              transform: none;
+              box-shadow: none;
+            }
+
+            i {
+              font-size: 16px;
+            }
           }
         }
       }

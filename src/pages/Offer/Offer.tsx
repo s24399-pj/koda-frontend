@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useRef} from "react";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import useTitle from "../../hooks/useTitle";
 import axios from "axios";
 import L from "leaflet";
@@ -7,9 +7,8 @@ import {OfferData} from "../../types/offerTypes";
 import "leaflet/dist/leaflet.css";
 import "./Offer.scss";
 import LikeButton from "../../components/LikeButton/LikeButton";
-
-// TODO outsource it somewhere
-const DEFAULT_AVATAR = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYgMjU2Ij48Y2lyY2xlIGN4PSIxMjgiIGN5PSIxMjgiIHI9IjEyMCIgZmlsbD0iI2U5ZWNlZiIvPjxjaXJjbGUgY3g9IjEyOCIgY3k9IjExMCIgcj0iMzUiIGZpbGw9IiM2Yzc1N2QiLz48cGF0aCBkPSJNMTk4LDE4OGMwLTI1LjQtMzEuNC00Ni03MC00NnMtNzAsMjAuNi03MCw0NnMzMS40LDQ2LDcwLDQ2UzE5OCwyMTMuNCwxOTgsMTg4WiIgZmlsbD0iIzZjNzU3ZCIvPjwvc3ZnPg==";
+import {useAuth} from "../../context/AuthContext";
+import {DEFAULT_PROFILE_IMAGE} from "../../assets/defaultProfilePicture.ts";
 
 interface LightboxProps {
     images: string[];
@@ -147,6 +146,8 @@ const Lightbox: React.FC<LightboxProps> = ({images, currentIndex, onClose, onIma
 
 const Offer: React.FC = () => {
     useTitle("Offer");
+    const navigate = useNavigate();
+    const {isAuthenticated} = useAuth();
 
     const {id} = useParams<{ id: string }>();
     const [offer, setOffer] = useState<OfferData | null>(null);
@@ -155,7 +156,7 @@ const Offer: React.FC = () => {
     const [mapLat, setMapLat] = useState<number | null>(null);
     const [mapLng, setMapLng] = useState<number | null>(null);
     const [selectedImage, setSelectedImage] = useState<string>("");
-    const [profileImage, setProfileImage] = useState<string>(DEFAULT_AVATAR);
+    const [profileImage, setProfileImage] = useState<string>(DEFAULT_PROFILE_IMAGE);
     const mapRef = useRef<HTMLDivElement | null>(null);
     const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth <= 768);
     const [imageIndex, setImageIndex] = useState<number>(0);
@@ -298,7 +299,7 @@ const Offer: React.FC = () => {
 
     const handleProfileImageError = () => {
         console.log("Wystąpił błąd ładowania zdjęcia profilowego");
-        setProfileImage(DEFAULT_AVATAR);
+        setProfileImage(DEFAULT_PROFILE_IMAGE);
     };
 
     const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
@@ -317,6 +318,36 @@ const Offer: React.FC = () => {
     const handleLightboxImageChange = (index: number) => {
         setImageIndex(index);
         setSelectedImage(allImages[index]);
+    };
+
+    const handleStartChat = () => {
+        if (!isAuthenticated) {
+            navigate('/user/login', {state: {returnUrl: `/offer/${id}`}});
+            return;
+        }
+
+        if (offer?.seller?.id) {
+            const sellerInfo = {
+                id: offer.seller.id,
+                firstName: offer.seller.firstName,
+                lastName: offer.seller.lastName,
+                profilePicture: offer.seller.profilePictureBase64,
+                email: offer.seller.email,
+                isNewConversation: true
+            };
+
+            navigate(`/chat/${offer.seller.id}`, { state: { sellerInfo } });
+        } else {
+            console.error('Brak ID sprzedającego');
+        }
+    };
+
+    const handleContactButton = () => {
+        if (offer?.seller?.id) {
+            handleStartChat();
+        } else {
+            window.location.href = `mailto:${offer?.contactEmail}`;
+        }
     };
 
     useEffect(() => {
@@ -406,7 +437,7 @@ const Offer: React.FC = () => {
                         <LikeButton
                             offerId={offer.id}
                             onLikeToggle={(isLiked) => {
-                                console.log(`Oferta ${offer.id} ${isLiked ? 'polubiona' : 'niepolubiona'}`);
+                                console.log(`Offer ${offer.id} ${isLiked ? 'liked' : 'not liked'}`);
                             }}
                         />
                     </div>
@@ -420,7 +451,7 @@ const Offer: React.FC = () => {
                         <p>📧 <a href={`mailto:${offer.contactEmail}`}>{offer.contactEmail}</a></p>
                     </div>
 
-                    <button className="contact-button">Skontaktuj się</button>
+                    <button className="contact-button" onClick={handleContactButton}>Skontaktuj się</button>
                 </div>
             </div>
 
@@ -458,6 +489,15 @@ const Offer: React.FC = () => {
                             <div className="seller-details">
                                 <h3>{offer.seller.firstName} {offer.seller.lastName}</h3>
                                 <p className="seller-email">{offer.seller.email}</p>
+
+                                <button
+                                    className="start-chat-button"
+                                    onClick={handleStartChat}
+                                    disabled={!isAuthenticated}
+                                    title={!isAuthenticated ? "You need to be logged in!" : ""}
+                                >
+                                    <i className="fas fa-comments"></i> Rozpocznij czat
+                                </button>
                             </div>
                         </div>
                         <button className="view-seller-offers">
