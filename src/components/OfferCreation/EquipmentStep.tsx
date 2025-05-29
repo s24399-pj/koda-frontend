@@ -1,25 +1,19 @@
 import React from 'react';
 import { FormikProps, Field, FieldInputProps } from 'formik';
-import { CreateOfferCommand } from '../../types/offer/OfferTypes';
+import { OfferFormValues } from '../../types/offer/OfferTypes';
 
-// Definiujemy typ dla wartości formularza
-type OfferFormValues = CreateOfferCommand & { termsAccepted: boolean };
-
-// Interfejs dla props komponentu
 interface EquipmentStepProps {
     formik: FormikProps<OfferFormValues>;
     onNext: () => void;
     onPrevious: () => void;
 }
 
-// Interfejs dla render props pola Field
 interface FieldRenderProps {
     field: FieldInputProps<any>;
     form: FormikProps<OfferFormValues>;
 }
 
 const EquipmentStep: React.FC<EquipmentStepProps> = ({ formik, onNext, onPrevious }) => {
-    // Sprawdzamy czy jakiekolwiek wyposażenie zostało wybrane
     const hasSelectedEquipment = () => {
         const equipment = formik.values.equipment || {};
         return Object.values(equipment).some(value => value === true);

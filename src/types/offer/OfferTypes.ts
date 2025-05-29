@@ -1,5 +1,3 @@
-import {OfferData} from "../offerTypes.ts";
-
 export enum FuelType {
     PETROL = 'PETROL',
     DIESEL = 'DIESEL',
@@ -46,7 +44,6 @@ export enum VehicleCondition {
     CLASSIC = 'CLASSIC'
 }
 
-// Interface dla wyposażenia samochodu
 export interface CarEquipment {
     // Komfort
     airConditioning?: boolean;
@@ -94,22 +91,18 @@ export interface CarEquipment {
     aromatherapy?: boolean;
 }
 
-// Interface dla tworzenia oferty
 export interface CreateOfferCommand {
-    // Podstawowe informacje o ofercie
     title: string;
     description: string;
     price: number;
     currency: string;
     negotiable?: boolean;
 
-    // Informacje kontaktowe
     location?: string;
     contactPhone?: string;
     contactEmail?: string;
     expirationDate?: string;
 
-    // Szczegóły pojazdu
     brand: string;
     model: string;
     year: number;
@@ -132,9 +125,15 @@ export interface CreateOfferCommand {
     serviceHistory?: boolean;
     additionalFeatures?: string;
     equipment?: CarEquipment;
+
+    images?: string[];
 }
 
-// Interface dla odpowiedzi z API
+export interface OfferFormValues extends CreateOfferCommand {
+    termsAccepted: boolean;
+    imageFiles?: File[];
+}
+
 export interface OfferResponse {
     id: string;
     title: string;
@@ -144,7 +143,6 @@ export interface OfferResponse {
     createdAt: string;
 }
 
-// Nowy interfejs dla odpowiedzi z API zawierającej listę ofert
 export interface OffersResponse {
     content: OfferData[];
     pageable: {
@@ -164,4 +162,69 @@ export interface OffersResponse {
     number?: number;
     numberOfElements?: number;
     size?: number;
+}
+
+export interface CarDetails {
+    brand: string;
+    model: string;
+    year: number;
+    color: string;
+    displacement: string;
+    mileage: number;
+    fuelType: string;
+    transmission: string;
+    bodyType: string;
+    driveType: string;
+    enginePower: number;
+    doors: number;
+    seats: number;
+}
+
+export interface SellerData {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    profilePictureBase64?: string;
+}
+
+export interface OfferData {
+    id: string;
+    title: string;
+    description: string;
+    price: number;
+    currency: string;
+    seller: SellerData;
+    location: string;
+    contactPhone: string;
+    contactEmail: string;
+    mainImage: string;
+    imageUrls?: string[];
+    CarDetailsDto: CarDetails;
+}
+
+export interface ApiOffer {
+    id: string;
+    title: string;
+    price: number;
+    mainImage: string | null;
+    mileage: number;
+    fuelType: string;
+    year: number;
+    enginePower: number;
+    displacement: string;
+    brand?: string;
+    model?: string;
+    description?: string;
+    currency?: string;
+    seller?: SellerData;
+    location?: string;
+    contactPhone?: string;
+    contactEmail?: string;
+    color?: string;
+    transmission?: string;
+    bodyType?: string;
+    driveType?: string;
+    doors?: number;
+    seats?: number;
 }

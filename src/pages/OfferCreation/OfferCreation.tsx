@@ -4,8 +4,10 @@ import {Form, Formik, FormikProps} from 'formik';
 import * as Yup from 'yup';
 import {
     CreateOfferCommand,
+    OfferFormValues
 } from '../../types/offer/OfferTypes';
 import {createOffer} from '../../api/offerApi';
+import { uploadMultipleImages } from '../../api/imageApi';
 import StepsIndicator from '../../components/OfferCreation/StepsIndicator';
 import BasicInfoStep from '../../components/OfferCreation/BasicInfoStep';
 import VehicleDetailsStep from '../../components/OfferCreation/VehicleDetailsStep';
@@ -13,10 +15,8 @@ import EquipmentStep from '../../components/OfferCreation/EquipmentStep';
 import ContactAndSummaryStep from '../../components/OfferCreation/ContactAndSummaryStep';
 import './OfferCreation.scss';
 
-type OfferFormValues = CreateOfferCommand & { termsAccepted: boolean };
-
 const validationSchemas = [
-    // Krok 1: Podstawowe informacje
+    // Krok 1: Podstawowe informacje + zdjęcia
     Yup.object({
         title: Yup.string()
             .required('Tytuł jest wymagany')
@@ -30,7 +30,10 @@ const validationSchemas = [
             .required('Cena jest wymagana')
             .positive('Cena musi być większa od 0')
             .typeError('Cena musi być liczbą'),
-        currency: Yup.string().required('Waluta jest wymagana')
+        currency: Yup.string().required('Waluta jest wymagana'),
+        images: Yup.array()
+            .min(1, 'Dodaj co najmniej jedno zdjęcie')
+            .max(10, 'Możesz dodać maksymalnie 10 zdjęć')
     }),
 
     // Krok 2: Szczegóły pojazdu
@@ -80,7 +83,7 @@ const validationSchemas = [
             .max(10, 'Liczba drzwi nie może być większa niż 10')
             .typeError('Liczba drzwi musi być liczbą'),
         seats: Yup.number()
-            .required('Liczba miejsc jest wymagana')
+            .required('Liczba miejść jest wymagana')
             .min(1, 'Liczba miejsc musi być większa od 0')
             .max(50, 'Liczba miejsc nie może być większa niż 50')
             .typeError('Liczba miejsc musi być liczbą'),
@@ -118,6 +121,7 @@ const OfferCreation: React.FC = () => {
     const [activeStep, setActiveStep] = useState<number>(0);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [serverError, setServerError] = useState<string | null>(null);
+    const [uploadProgress, setUploadProgress] = useState<number>(0);
 
     const initialValues: OfferFormValues = {
         title: '',
@@ -132,7 +136,7 @@ const OfferCreation: React.FC = () => {
         color: '',
         enginePower: 1,
         doors: 1,
-        seats: 1, // Zmieniono z 0 na 1 dla konsystencji z walidacją
+        seats: 1,
         vin: '',
         registrationNumber: '',
         registrationCountry: 'Polska',
@@ -141,7 +145,9 @@ const OfferCreation: React.FC = () => {
         serviceHistory: false,
         additionalFeatures: '',
         equipment: {},
-        termsAccepted: false
+        termsAccepted: false,
+        imageFiles: [], // Pliki do uploadu
+        images: [] // ID zdjęć z serwera
     };
 
     const handleNextStep = () => {
@@ -154,42 +160,44 @@ const OfferCreation: React.FC = () => {
         window.scrollTo(0, 0);
     };
 
-    const normalizeFormValues = (values: OfferFormValues): CreateOfferCommand => {
-        const {termsAccepted, ...offerData} = values;
+    const normalizeFormValues = async (values: OfferFormValues): Promise<CreateOfferCommand> => {
+        const {termsAccepted, imageFiles, ...offerData} = values;
 
+        // Jeśli mamy pliki do uploadu
+        if (imageFiles && imageFiles.length > 0) {
+            try {
+                setUploadProgress(10);
+                const uploadedImages = await uploadMultipleImages(imageFiles);
+                const imageIds = uploadedImages.map(img => img.id);
+                offerData.images = imageIds;
+                setUploadProgress(50);
+            } catch (error) {
+                console.error('Błąd podczas przesyłania zdjęć:', error);
+                throw new Error('Błąd podczas przesyłania zdjęć. Spróbuj ponownie.');
+            }
+        }
+
+        // Normalizacja daty wygaśnięcia
         if (offerData.expirationDate) {
-            if (Object.prototype.toString.call(offerData.expirationDate) === '[object Date]') {
-            } else if (typeof offerData.expirationDate === 'string' && !offerData.expirationDate.includes('T')) {
+            if (typeof offerData.expirationDate === 'string' && !offerData.expirationDate.includes('T')) {
                 const date = new Date(offerData.expirationDate);
                 date.setHours(23, 59, 59, 999);
                 offerData.expirationDate = date.toISOString();
             }
         }
 
+        // Normalizacja wyposażenia
         if (offerData.equipment) {
             const normalizedEquipment: Record<string, boolean> = {};
-
             Object.entries(offerData.equipment).forEach(([key, value]) => {
-                normalizedEquipment[key] = Array.isArray(value) ? true : Boolean(value);
+                normalizedEquipment[key] = Boolean(value);
             });
-
             offerData.equipment = normalizedEquipment;
-        }
 
-        if (Array.isArray(offerData.firstOwner)) {
-            offerData.firstOwner = true;
-        }
-
-        if (Array.isArray(offerData.accidentFree)) {
-            offerData.accidentFree = true;
-        }
-
-        if (Array.isArray(offerData.serviceHistory)) {
-            offerData.serviceHistory = true;
-        }
-
-        if (Object.values(offerData.equipment || {}).every(v => v === false || v === undefined)) {
-            offerData.equipment = undefined;
+            // Usuń equipment jeśli wszystkie wartości są false
+            if (Object.values(normalizedEquipment).every(v => !v)) {
+                offerData.equipment = undefined;
+            }
         }
 
         return offerData;
@@ -204,20 +212,29 @@ const OfferCreation: React.FC = () => {
 
             setIsSubmitting(true);
             setServerError(null);
+            setUploadProgress(0);
 
-            const offerData = normalizeFormValues(values);
+            const offerData = await normalizeFormValues(values);
+            setUploadProgress(75);
 
             console.log('Wysyłanie danych:', offerData);
 
             const response = await createOffer(offerData);
+            setUploadProgress(100);
+
             console.log('Oferta utworzona pomyślnie:', response);
 
             navigate(`/offer/${response.id}`);
         } catch (err) {
             console.error('Błąd podczas tworzenia oferty:', err);
-            setServerError('Wystąpił błąd podczas tworzenia oferty. Spróbuj ponownie później.');
+            if (err instanceof Error) {
+                setServerError(err.message);
+            } else {
+                setServerError('Wystąpił błąd podczas tworzenia oferty. Spróbuj ponownie później.');
+            }
         } finally {
             setIsSubmitting(false);
+            setUploadProgress(0);
         }
     };
 
@@ -234,6 +251,22 @@ const OfferCreation: React.FC = () => {
             {serverError && (
                 <div className="error-message">
                     {serverError}
+                </div>
+            )}
+
+            {isSubmitting && uploadProgress > 0 && (
+                <div className="upload-progress">
+                    <div className="progress-bar">
+                        <div
+                            className="progress-fill"
+                            style={{ width: `${uploadProgress}%` }}
+                        ></div>
+                    </div>
+                    <span className="progress-text">
+                        {uploadProgress < 50 ? 'Przesyłanie zdjęć...' :
+                            uploadProgress < 75 ? 'Przetwarzanie zdjęć...' :
+                                uploadProgress < 100 ? 'Tworzenie oferty...' : 'Gotowe!'}
+                    </span>
                 </div>
             )}
 
