@@ -7,7 +7,7 @@ import useTitle from "../../hooks/useTitle";
 import { useComparison } from "../../context/ComparisonContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
-const PLACEHOLDER_IMAGE = "/assets/placeholder.jpg";
+const PLACEHOLDER_IMAGE = "https://via.placeholder.com/300x200?text=Brak+zdjęcia";
 
 type ComparisonType = 'higher' | 'lower';
 
@@ -36,6 +36,15 @@ const OfferComparison: React.FC = () => {
     const [focusB, setFocusB] = useState(false);
 
     const { clearComparison } = useComparison();
+
+    const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
+        const target = event.target as HTMLImageElement;
+        if (!target.dataset.errorHandled) {
+            target.dataset.errorHandled = "true";
+            target.src = PLACEHOLDER_IMAGE;
+            console.warn('Błąd ładowania zdjęcia w porównywance:', target.src);
+        }
+    };
 
     useEffect(() => {
         const loadOffersFromSession = async () => {
@@ -199,24 +208,19 @@ const OfferComparison: React.FC = () => {
         if (!offer) return null;
 
         if (offer.imageUrls && offer.imageUrls.length > 0) {
-            return `${API_URL}/images/${offer.imageUrls[0]}`;
+            return `${API_URL}${offer.imageUrls[0]}`;
         }
 
         if (offer.mainImage) {
-            return `${API_URL}/images/${offer.mainImage}`;
+            return `${API_URL}${offer.mainImage}`;
         }
 
         const imagesField = (offer as any)['images'];
         if (imagesField && Array.isArray(imagesField) && imagesField.length > 0) {
-            return `${API_URL}/images/${imagesField[0]}`;
+            return `${API_URL}${imagesField[0]}`;
         }
 
         return null;
-    };
-
-    const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
-        const target = event.target as HTMLImageElement;
-        target.src = PLACEHOLDER_IMAGE;
     };
 
     const features: Feature[] = [

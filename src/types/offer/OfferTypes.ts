@@ -45,7 +45,6 @@ export enum VehicleCondition {
 }
 
 export interface CarEquipment {
-    // Komfort
     airConditioning?: boolean;
     automaticClimate?: boolean;
     heatedSeats?: boolean;
@@ -56,8 +55,6 @@ export interface CarEquipment {
     electricMirrors?: boolean;
     keylessEntry?: boolean;
     wheelHeating?: boolean;
-
-    // Multimedia
     navigationSystem?: boolean;
     bluetooth?: boolean;
     usbPort?: boolean;
@@ -65,8 +62,6 @@ export interface CarEquipment {
     androidAuto?: boolean;
     appleCarPlay?: boolean;
     soundSystem?: boolean;
-
-    // Systemy wspomagające
     parkingSensors?: boolean;
     rearCamera?: boolean;
     cruiseControl?: boolean;
@@ -75,15 +70,11 @@ export interface CarEquipment {
     blindSpotDetection?: boolean;
     emergencyBraking?: boolean;
     startStop?: boolean;
-
-    // Oświetlenie
     xenonLights?: boolean;
     ledLights?: boolean;
     ambientLighting?: boolean;
     automaticLights?: boolean;
     adaptiveLights?: boolean;
-
-    // Dodatkowe funkcje
     heatedSteeringWheel?: boolean;
     electricTrunk?: boolean;
     electricSunBlind?: boolean;
@@ -97,12 +88,10 @@ export interface CreateOfferCommand {
     price: number;
     currency: string;
     negotiable?: boolean;
-
     location?: string;
     contactPhone?: string;
     contactEmail?: string;
     expirationDate?: string;
-
     brand: string;
     model: string;
     year: number;
@@ -125,13 +114,42 @@ export interface CreateOfferCommand {
     serviceHistory?: boolean;
     additionalFeatures?: string;
     equipment?: CarEquipment;
-
-    images?: string[];
 }
 
-export interface OfferFormValues extends CreateOfferCommand {
+export interface OfferFormValues {
+    title: string;
+    description: string;
+    price: number;
+    currency: string;
+    negotiable: boolean;
+    brand: string;
+    model: string;
+    year: number;
+    mileage: number;
+    color: string;
+    enginePower: number;
+    doors: number;
+    seats: number;
+    vin: string;
+    registrationNumber: string;
+    registrationCountry: string;
+    firstOwner: boolean;
+    accidentFree: boolean;
+    serviceHistory: boolean;
+    additionalFeatures: string;
+    equipment?: CarEquipment; // Zmienione na opcjonalne
+    location?: string;
+    expirationDate?: string;
     termsAccepted: boolean;
-    imageFiles?: File[];
+    imageFiles: File[];
+    fuelType?: FuelType;
+    transmission?: TransmissionType;
+    bodyType?: BodyType;
+    driveType?: DriveType;
+    condition?: VehicleCondition;
+    displacement?: string;
+    contactPhone?: string;
+    contactEmail?: string;
 }
 
 export interface OfferResponse {

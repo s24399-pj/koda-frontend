@@ -18,30 +18,16 @@ const getAuthToken = (): string | null => {
         for (const key of possibleKeys) {
             const token = localStorage.getItem(key);
             if (token) {
-                console.log(`🔑 Found token at key: ${key}`);
                 return token;
             }
         }
 
-        console.warn('❌ No auth token found in localStorage');
         return null;
     }
     return null;
 };
 
-
-export const uploadMultipleImages = async (files: File[]): Promise<ImageUploadResponse[]> => {
-    console.log('=== DEBUG API CONFIG ===');
-    console.log('API_BASE_URL:', API_BASE_URL);
-    console.log('Final upload URL:', `${API_BASE_URL}/images/upload`);
-    console.log('Expected URL should be: http://localhost:8137/api/v1/images/upload');
-    console.log('Environment variables:');
-    console.log('VITE_API_URL:', import.meta.env?.VITE_API_URL);
-    console.log('REACT_APP_API_URL:', process.env?.REACT_APP_API_URL);
-    console.log('========================');
-
-    console.log('=== DEBUG UPLOAD START ===');
-
+export const uploadMultipleImages = async (offerId: string, files: File[]): Promise<ImageUploadResponse[]> => {
     const formData = new FormData();
     files.forEach((file) => {
         formData.append('images', file);
@@ -49,23 +35,14 @@ export const uploadMultipleImages = async (files: File[]): Promise<ImageUploadRe
 
     try {
         const token = getAuthToken();
-        console.log('🔑 Token retrieved:', token ? 'EXISTS' : 'MISSING');
-        console.log('🔑 Token length:', token?.length || 0);
-        console.log('🔑 Token starts with:', token?.substring(0, 20) + '...');
 
         const headers: Record<string, string> = {};
 
         if (token) {
             headers['Authorization'] = `Bearer ${token}`;
-            console.log('✅ Authorization header set');
-        } else {
-            console.error('❌ NO TOKEN - Request will fail');
         }
 
-        console.log('📤 Sending request to:', `${API_BASE_URL}/images/upload`);
-        console.log('📤 Headers:', headers);
-
-        const response = await axios.post(`${API_BASE_URL}/images/upload`, formData, {
+        const response = await axios.post(`${API_BASE_URL}/images/${offerId}/upload`, formData, {
             headers,
             timeout: 30000,
             onUploadProgress: (progressEvent) => {
@@ -76,11 +53,8 @@ export const uploadMultipleImages = async (files: File[]): Promise<ImageUploadRe
             }
         });
 
-        console.log('✅ Upload successful:', response.data);
         return response.data;
     } catch (error) {
-        console.error('❌ Upload failed:', error);
-
         if (axios.isAxiosError(error)) {
             if (error.response) {
                 const errorMessage = error.response.data?.message ||
@@ -98,9 +72,51 @@ export const uploadMultipleImages = async (files: File[]): Promise<ImageUploadRe
     }
 };
 
-/**
- * Usuwa zdjęcie z serwera
- */
+export const uploadMultipleImagesWithoutOffer = async (files: File[]): Promise<ImageUploadResponse[]> => {
+    const formData = new FormData();
+    files.forEach((file) => {
+        formData.append('images', file);
+    });
+
+    try {
+        const token = getAuthToken();
+
+        const headers: Record<string, string> = {};
+
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const response = await axios.post(`${API_BASE_URL}/images/upload`, formData, {
+            headers,
+            timeout: 30000,
+            onUploadProgress: (progressEvent) => {
+                if (progressEvent.total) {
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    console.log(`📊 Upload progress: ${percentCompleted}%`);
+                }
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            if (error.response) {
+                const errorMessage = error.response.data?.message ||
+                    error.response.data?.error ||
+                    `HTTP ${error.response.status}: ${error.response.statusText}`;
+                throw new Error(errorMessage);
+            } else if (error.request) {
+                throw new Error('Brak odpowiedzi z serwera. Sprawdź połączenie internetowe.');
+            } else {
+                throw new Error(`Błąd konfiguracji: ${error.message}`);
+            }
+        }
+
+        throw new Error('Nieznany błąd podczas przesyłania zdjęć');
+    }
+};
+
 export const deleteImage = async (imageId: string): Promise<void> => {
     try {
         const token = getAuthToken();
@@ -121,9 +137,6 @@ export const deleteImage = async (imageId: string): Promise<void> => {
     }
 };
 
-/**
- * Pomocnicza funkcja do walidacji obrazów
- */
 export const validateImageFile = (file: File): string | null => {
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
     const maxSizeInMB = 5;

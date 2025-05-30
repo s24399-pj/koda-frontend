@@ -30,6 +30,15 @@ const OfferList: React.FC = () => {
     canAddMoreOffers
   } = useComparison();
 
+  const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = event.target as HTMLImageElement;
+    if (!target.dataset.errorHandled) {
+      target.dataset.errorHandled = "true";
+      target.src = "https://via.placeholder.com/300x200?text=Brak+zdjęcia";
+      console.warn('Błąd ładowania zdjęcia w liście ofert:', target.src);
+    }
+  };
+
   useEffect(() => {
     const fetchOffers = async () => {
       setIsLoading(true);
@@ -138,9 +147,10 @@ const OfferList: React.FC = () => {
                         <div className="offer-clickable" onClick={() => handleOfferClick(offer.id)}>
                           <div className="offer-image-container">
                             <img
-                                src={`${API_URL}/images/${offer.mainImage}`}
+                                src={offer.mainImage ? `${API_URL}${offer.mainImage}` : "https://via.placeholder.com/300x200?text=Brak+zdjęcia"}
                                 alt={offer.title}
                                 loading="lazy"
+                                onError={handleImageError}
                             />
                           </div>
                           <div className="offer-details">

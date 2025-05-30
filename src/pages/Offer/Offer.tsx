@@ -77,7 +77,11 @@ const Lightbox: React.FC<LightboxProps> = ({images, currentIndex, onClose, onIma
 
     const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
         const target = event.target as HTMLImageElement;
-        target.src = "https://via.placeholder.com/400x300?text=Brak+zdjęcia";
+        if (!target.dataset.errorHandled) {
+            target.dataset.errorHandled = "true";
+            target.src = "https://via.placeholder.com/400x300?text=Brak+zdjęcia";
+            console.warn('Błąd ładowania zdjęcia:', target.src);
+        }
     };
 
     return (
@@ -111,7 +115,7 @@ const Lightbox: React.FC<LightboxProps> = ({images, currentIndex, onClose, onIma
 
             <div className="lightbox-content">
                 <img
-                    src={`${apiUrl}/images/${images[currentIndex]}`}
+                    src={`${apiUrl}${images[currentIndex]}`}
                     alt="Powiększony widok"
                     className="lightbox-image"
                     onError={handleImageError}
@@ -130,7 +134,7 @@ const Lightbox: React.FC<LightboxProps> = ({images, currentIndex, onClose, onIma
                                     onClick={() => onImageChange(idx)}
                                 >
                                     <img
-                                        src={`${apiUrl}/images/${image}`}
+                                        src={`${apiUrl}${image}`}
                                         alt={`Miniatura ${idx + 1}`}
                                         onError={handleImageError}
                                     />
@@ -304,7 +308,11 @@ const Offer: React.FC = () => {
 
     const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
         const target = event.target as HTMLImageElement;
-        target.src = "https://via.placeholder.com/400x300?text=Brak+zdjęcia";
+        if (!target.dataset.errorHandled) {
+            target.dataset.errorHandled = "true";
+            target.src = "https://via.placeholder.com/400x300?text=Brak+zdjęcia";
+            console.warn('Błąd ładowania zdjęcia - zastąpiono placeholder:', target.src);
+        }
     };
 
     const openLightbox = () => {
@@ -376,7 +384,7 @@ const Offer: React.FC = () => {
             <div className="offer-header">
                 <div className="main-image-container">
                     <img
-                        src={`${import.meta.env.VITE_API_URL}/images/${selectedImage}`}
+                        src={`${import.meta.env.VITE_API_URL}${selectedImage}`}
                         alt={offer.title}
                         className="main-image"
                         onError={handleImageError}
@@ -410,7 +418,7 @@ const Offer: React.FC = () => {
                                         onClick={() => handleThumbnailClick(idx)}
                                     >
                                         <img
-                                            src={`${import.meta.env.VITE_API_URL}/images/${image}`}
+                                            src={`${import.meta.env.VITE_API_URL}${image}`}
                                             alt={`Widok ${idx + 1}`}
                                             className="thumbnail-image"
                                             onError={handleImageError}

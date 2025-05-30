@@ -3,6 +3,7 @@ import {useNavigate} from 'react-router-dom';
 import {Form, Formik, FormikProps} from 'formik';
 import * as Yup from 'yup';
 import {
+    CarEquipment,
     CreateOfferCommand,
     OfferFormValues
 } from '../../types/offer/OfferTypes';
@@ -16,7 +17,6 @@ import ContactAndSummaryStep from '../../components/OfferCreation/ContactAndSumm
 import './OfferCreation.scss';
 
 const validationSchemas = [
-    // Krok 1: Podstawowe informacje + zdjęcia
     Yup.object({
         title: Yup.string()
             .required('Tytuł jest wymagany')
@@ -31,12 +31,11 @@ const validationSchemas = [
             .positive('Cena musi być większa od 0')
             .typeError('Cena musi być liczbą'),
         currency: Yup.string().required('Waluta jest wymagana'),
-        images: Yup.array()
+        imageFiles: Yup.array()
             .min(1, 'Dodaj co najmniej jedno zdjęcie')
             .max(10, 'Możesz dodać maksymalnie 10 zdjęć')
     }),
 
-    // Krok 2: Szczegóły pojazdu
     Yup.object({
         brand: Yup.string()
             .required('Marka jest wymagana')
@@ -68,11 +67,8 @@ const validationSchemas = [
             .required('Typ nadwozia jest wymagany'),
         driveType: Yup.string()
             .required('Napęd jest wymagany'),
-        displacement: Yup.number()
-            .required('Pojemność silnika jest wymagana')
-            .min(0, 'Pojemność silnika nie może być ujemna')
-            .max(20000, 'Pojemność silnika nie może być większa niż 20000 cm³')
-            .typeError('Pojemność silnika musi być liczbą'),
+        displacement: Yup.string()
+            .required('Pojemność silnika jest wymagana'),
         enginePower: Yup.number()
             .required('Moc silnika jest wymagana')
             .min(1, 'Moc silnika musi być większa od 0')
@@ -83,7 +79,7 @@ const validationSchemas = [
             .max(10, 'Liczba drzwi nie może być większa niż 10')
             .typeError('Liczba drzwi musi być liczbą'),
         seats: Yup.number()
-            .required('Liczba miejść jest wymagana')
+            .required('Liczba miejsc jest wymagana')
             .min(1, 'Liczba miejsc musi być większa od 0')
             .max(50, 'Liczba miejsc nie może być większa niż 50')
             .typeError('Liczba miejsc musi być liczbą'),
@@ -98,10 +94,8 @@ const validationSchemas = [
             .matches(/^[A-HJ-NPR-Z0-9]{17}$/, 'Niepoprawny format numeru VIN - musi składać się z 17 znaków')
     }),
 
-    // Krok 3: Wyposażenie - brak walidacji, wszystkie pola opcjonalne
     Yup.object({}),
 
-    // Krok 4: Lokalizacja i finalizacja
     Yup.object({
         location: Yup.string()
             .nullable()
@@ -144,10 +138,19 @@ const OfferCreation: React.FC = () => {
         accidentFree: false,
         serviceHistory: false,
         additionalFeatures: '',
-        equipment: {},
+        equipment: undefined, // Zmienione z {} na undefined
         termsAccepted: false,
-        imageFiles: [], // Pliki do uploadu
-        images: [] // ID zdjęć z serwera
+        imageFiles: [],
+        fuelType: undefined,
+        transmission: undefined,
+        bodyType: undefined,
+        driveType: undefined,
+        condition: undefined,
+        displacement: undefined,
+        contactPhone: undefined,
+        contactEmail: undefined,
+        location: undefined,
+        expirationDate: undefined
     };
 
     const handleNextStep = () => {
@@ -163,21 +166,6 @@ const OfferCreation: React.FC = () => {
     const normalizeFormValues = async (values: OfferFormValues): Promise<CreateOfferCommand> => {
         const {termsAccepted, imageFiles, ...offerData} = values;
 
-        // Jeśli mamy pliki do uploadu
-        if (imageFiles && imageFiles.length > 0) {
-            try {
-                setUploadProgress(10);
-                const uploadedImages = await uploadMultipleImages(imageFiles);
-                const imageIds = uploadedImages.map(img => img.id);
-                offerData.images = imageIds;
-                setUploadProgress(50);
-            } catch (error) {
-                console.error('Błąd podczas przesyłania zdjęć:', error);
-                throw new Error('Błąd podczas przesyłania zdjęć. Spróbuj ponownie.');
-            }
-        }
-
-        // Normalizacja daty wygaśnięcia
         if (offerData.expirationDate) {
             if (typeof offerData.expirationDate === 'string' && !offerData.expirationDate.includes('T')) {
                 const date = new Date(offerData.expirationDate);
@@ -186,18 +174,21 @@ const OfferCreation: React.FC = () => {
             }
         }
 
-        // Normalizacja wyposażenia
-        if (offerData.equipment) {
-            const normalizedEquipment: Record<string, boolean> = {};
+        // Poprawiona obsługa equipment
+        if (offerData.equipment && Object.keys(offerData.equipment).length > 0) {
+            const normalizedEquipment: CarEquipment = {};
             Object.entries(offerData.equipment).forEach(([key, value]) => {
-                normalizedEquipment[key] = Boolean(value);
+                (normalizedEquipment as any)[key] = Boolean(value);
             });
-            offerData.equipment = normalizedEquipment;
 
-            // Usuń equipment jeśli wszystkie wartości są false
+            // Sprawdź czy wszystkie wartości są false
             if (Object.values(normalizedEquipment).every(v => !v)) {
                 offerData.equipment = undefined;
+            } else {
+                offerData.equipment = normalizedEquipment;
             }
+        } else {
+            offerData.equipment = undefined;
         }
 
         return offerData;
@@ -215,11 +206,25 @@ const OfferCreation: React.FC = () => {
             setUploadProgress(0);
 
             const offerData = await normalizeFormValues(values);
-            setUploadProgress(75);
+            setUploadProgress(25);
 
             console.log('Wysyłanie danych:', offerData);
 
             const response = await createOffer(offerData);
+            const createdOfferId = response.id;
+            setUploadProgress(50);
+
+            if (values.imageFiles && values.imageFiles.length > 0) {
+                try {
+                    setUploadProgress(60);
+                    await uploadMultipleImages(createdOfferId, values.imageFiles);
+                    setUploadProgress(90);
+                } catch (error) {
+                    console.error('Błąd podczas przesyłania zdjęć:', error);
+                    throw new Error('Błąd podczas przesyłania zdjęć. Spróbuj ponownie.');
+                }
+            }
+
             setUploadProgress(100);
 
             console.log('Oferta utworzona pomyślnie:', response);
@@ -263,9 +268,9 @@ const OfferCreation: React.FC = () => {
                         ></div>
                     </div>
                     <span className="progress-text">
-                        {uploadProgress < 50 ? 'Przesyłanie zdjęć...' :
-                            uploadProgress < 75 ? 'Przetwarzanie zdjęć...' :
-                                uploadProgress < 100 ? 'Tworzenie oferty...' : 'Gotowe!'}
+                        {uploadProgress < 50 ? 'Tworzenie oferty...' :
+                            uploadProgress < 90 ? 'Przesyłanie zdjęć...' :
+                                uploadProgress < 100 ? 'Finalizowanie...' : 'Gotowe!'}
                     </span>
                 </div>
             )}

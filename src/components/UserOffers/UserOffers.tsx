@@ -3,7 +3,8 @@ import './UserOffers.scss';
 import { getUserOffers, deleteOffer } from '../../api/offerApi';
 import {ApiOffer, OfferData} from "../../types/offerTypes.ts";
 
-const DEFAULT_CAR_IMAGE = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYgMjU2Ij48cmVjdCB3aWR0aD0iMjU2IiBoZWlnaHQ9IjI1NiIgZmlsbD0iI2U5ZWNlZiIvPjxwYXRoIGQ9Ik0xNzUuMTIsMTI4LjVINzQuODhhMTIsMTIsMCwwLDAtMTIsOUw1NywxNzFhNiw2LDAsMCwwLDYsNmgxMzBhNiw2LDAsMCwwLDYtNmwtNS44OC0zMy41QTEyLDEyLDAsMCwwLDE3NS4xMiwxMjguNVoiIGZpbGw9IiM2Yzc1N2QiLz48Y2lyY2xlIGN4PSI4NCIgY3k9IjE2MSIgcj0iMTIiIGZpbGw9IiNlOWVjZWYiLz48Y2lyY2xlIGN4PSIxNzIiIGN5PSIxNjEiIHI9IjEyIiBmaWxsPSIjZTllY2VmIi8+PHBhdGggZD0iTTE5MywxMjIuMjRsLTI1LjI0LTI1LjI0QTIwLDIwLDAsMCwwLDE1My40LDkwaC01MC44YTIwLDIwLDAsMCwwLTE0LjE0LDUuODZMNjMuMjIsMTIwLjg2YTIwLDIwLDAsMCwwLTYsMTZsMS40OSwxMy4wN0EyMCwyMCwwLDAsMCw3OC4xOCwxNjhoOTkuNjVBMjAsMjAsMCwwLDAsMTk3LjM4LDE1MGwxLjQ5LTEzLjA3QTIwLDIwLDAsMCwwLDE5MywxMjIuMjRaIiBmaWxsPSIjNmM3NTdkIi8+PC9zdmc+";
+const API_URL = import.meta.env.VITE_API_URL;
+const DEFAULT_CAR_IMAGE = "https://via.placeholder.com/300x200?text=Brak+zdjęcia";
 
 const formatPrice = (price: number, currency: string = 'zł'): string => {
     return price.toLocaleString('pl-PL') + ' ' + currency;
@@ -71,6 +72,15 @@ const UserOffers: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [noUserIdError, setNoUserIdError] = useState<boolean>(false);
 
+    const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
+        const target = event.target as HTMLImageElement;
+        if (!target.dataset.errorHandled) {
+            target.dataset.errorHandled = "true";
+            target.src = DEFAULT_CAR_IMAGE;
+            console.warn('Błąd ładowania zdjęcia w ofercie użytkownika:', target.src);
+        }
+    };
+
     useEffect(() => {
         const fetchUserOffers = async () => {
             try {
@@ -108,10 +118,6 @@ const UserOffers: React.FC = () => {
         fetchUserOffers();
     }, []);
 
-    const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-        e.currentTarget.src = DEFAULT_CAR_IMAGE;
-    };
-
     const handleEditOffer = (offerId: string) => {
         window.location.href = `/offer/edit/${offerId}`;
     };
@@ -148,7 +154,7 @@ const UserOffers: React.FC = () => {
             <div className="offer-card">
                 <div className="offer-image">
                     <img
-                        src={offer.mainImage || DEFAULT_CAR_IMAGE}
+                        src={offer.mainImage ? `${API_URL}${offer.mainImage}` : DEFAULT_CAR_IMAGE}
                         alt={offer.title}
                         onError={handleImageError}
                     />

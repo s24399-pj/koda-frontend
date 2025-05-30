@@ -16,11 +16,11 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ formik, onNext }) => {
                 description: true,
                 price: true,
                 currency: true,
-                images: true,
-            });
+                imageFiles: true,
+            } as any);
 
             const stepErrors = Object.keys(errors).filter(key =>
-                ['title', 'description', 'price', 'currency', 'images'].includes(key)
+                ['title', 'description', 'price', 'currency', 'imageFiles'].includes(key)
             );
 
             if (stepErrors.length === 0) {
