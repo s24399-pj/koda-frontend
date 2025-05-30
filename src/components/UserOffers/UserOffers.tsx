@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import './UserOffers.scss';
-import { getUserOffers, deleteOffer } from '../../api/offerApi';
+import {getUserOffers, deleteOffer} from '../../api/offerApi';
 import {ApiOffer, OfferData} from "../../types/offerTypes.ts";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -71,6 +72,7 @@ const UserOffers: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [noUserIdError, setNoUserIdError] = useState<boolean>(false);
+    const navigate = useNavigate();
 
     const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
         const target = event.target as HTMLImageElement;
@@ -79,6 +81,10 @@ const UserOffers: React.FC = () => {
             target.src = DEFAULT_CAR_IMAGE;
             console.warn('Błąd ładowania zdjęcia w ofercie użytkownika:', target.src);
         }
+    };
+
+    const handleOfferClick = (offerId: string) => {
+        navigate(`/offer/${offerId}`);
     };
 
     useEffect(() => {
@@ -118,11 +124,14 @@ const UserOffers: React.FC = () => {
         fetchUserOffers();
     }, []);
 
-    const handleEditOffer = (offerId: string) => {
+    const handleEditOffer = (offerId: string, event: React.MouseEvent) => {
+        event.stopPropagation();
         window.location.href = `/offer/edit/${offerId}`;
     };
 
-    const handleDeleteOffer = async (offerId: string) => {
+    const handleDeleteOffer = async (offerId: string, event: React.MouseEvent) => {
+        event.stopPropagation();
+
         if (window.confirm('Czy na pewno chcesz usunąć to ogłoszenie?')) {
             try {
                 const success = await deleteOffer(offerId);
@@ -143,7 +152,7 @@ const UserOffers: React.FC = () => {
         window.location.href = '/user/panel';
     };
 
-    const OfferCard: React.FC<{ offer: OfferData }> = ({ offer }) => {
+    const OfferCard: React.FC<{ offer: OfferData }> = ({offer}) => {
         if (!offer || !offer.CarDetailsDto) {
             return null;
         }
@@ -151,7 +160,7 @@ const UserOffers: React.FC = () => {
         const translatedFuelType = fuelTypeTranslations[offer.CarDetailsDto.fuelType] || offer.CarDetailsDto.fuelType;
 
         return (
-            <div className="offer-card">
+            <div className="offer-card" onClick={() => handleOfferClick(offer.id)}>
                 <div className="offer-image">
                     <img
                         src={offer.mainImage ? `${API_URL}${offer.mainImage}` : DEFAULT_CAR_IMAGE}
@@ -173,13 +182,13 @@ const UserOffers: React.FC = () => {
                 <div className="offer-actions">
                     <button
                         className="edit-offer-btn"
-                        onClick={() => handleEditOffer(offer.id)}
+                        onClick={(e) => handleEditOffer(offer.id, e)}
                     >
                         Edytuj
                     </button>
                     <button
                         className="delete-offer-btn"
-                        onClick={() => handleDeleteOffer(offer.id)}
+                        onClick={(e) => handleDeleteOffer(offer.id, e)}
                     >
                         Usuń
                     </button>
@@ -227,7 +236,7 @@ const UserOffers: React.FC = () => {
         return (
             <div className="offers-list">
                 {offers.map(offer => (
-                    <OfferCard key={offer.id} offer={offer} />
+                    <OfferCard key={offer.id} offer={offer}/>
                 ))}
                 <div className="add-offer-container">
                     <button className="create-offer-btn" onClick={navigateToCreateOffer}>
