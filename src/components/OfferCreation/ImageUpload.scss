@@ -1,5 +1,3 @@
-// ImageUpload.scss
-// Import zmiennych z głównego pliku stylów
 $primary-color: #007be5;
 $primary-light: #eaf4ff;
 $primary-dark: #005bb5;
@@ -95,8 +93,12 @@ $mobile: 576px;
     }
 
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
     }
 
     @media (max-width: $mobile) {

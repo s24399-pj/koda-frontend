@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import axios from "axios";
 import "./OfferComparison.scss";
-import { OfferData } from "../../types/offerTypes";
-import { MiniOffer } from "../../types/miniOfferTypes";
+import {OfferData} from "../../types/offerTypes";
+import {MiniOffer} from "../../types/miniOfferTypes";
 import useTitle from "../../hooks/useTitle";
-import { useComparison } from "../../context/ComparisonContext";
+import {useComparison} from "../../context/ComparisonContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const PLACEHOLDER_IMAGE = "https://via.placeholder.com/300x200?text=Brak+zdjęcia";
@@ -35,7 +35,7 @@ const OfferComparison: React.FC = () => {
     const [focusA, setFocusA] = useState(false);
     const [focusB, setFocusB] = useState(false);
 
-    const { clearComparison } = useComparison();
+    const {clearComparison} = useComparison();
 
     const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
         const target = event.target as HTMLImageElement;
@@ -92,7 +92,7 @@ const OfferComparison: React.FC = () => {
             params.set("phrase", query);
             params.set("size", "5");
 
-            const response = await axios.get(`${API_URL}/api/v1/offers`, { params });
+            const response = await axios.get(`${API_URL}/api/v1/offers`, {params});
             setSuggestions(response.data.content || []);
         } catch (error) {
             console.error("Błąd podczas wyszukiwania ofert:", error);
@@ -224,21 +224,21 @@ const OfferComparison: React.FC = () => {
     };
 
     const features: Feature[] = [
-        { label: "Tytuł", key: "title" },
-        { label: "Cena", key: "price", unit: "PLN", highlightBetter: 'lower' },
-        { label: "Rok produkcji", key: "year", highlightBetter: 'higher', carDetails: true },
-        { label: "Przebieg", key: "mileage", unit: "km", highlightBetter: 'lower', carDetails: true },
-        { label: "Typ paliwa", key: "fuelType", carDetails: true },
-        { label: "Moc silnika", key: "enginePower", unit: "KM", highlightBetter: 'higher', carDetails: true },
-        { label: "Pojemność silnika", key: "displacement", carDetails: true },
-        { label: "Skrzynia biegów", key: "transmission", carDetails: true },
-        { label: "Liczba drzwi", key: "doors", carDetails: true },
-        { label: "Liczba miejsc", key: "seats", carDetails: true },
-        { label: "Marka", key: "brand", carDetails: true },
-        { label: "Model", key: "model", carDetails: true },
-        { label: "Lokalizacja", key: "location" },
-        { label: "Telefon kontaktowy", key: "contactPhone" },
-        { label: "Email kontaktowy", key: "contactEmail" }
+        {label: "Tytuł", key: "title"},
+        {label: "Cena", key: "price", unit: "PLN", highlightBetter: 'lower'},
+        {label: "Rok produkcji", key: "year", highlightBetter: 'higher', carDetails: true},
+        {label: "Przebieg", key: "mileage", unit: "km", highlightBetter: 'lower', carDetails: true},
+        {label: "Typ paliwa", key: "fuelType", carDetails: true},
+        {label: "Moc silnika", key: "enginePower", unit: "KM", highlightBetter: 'higher', carDetails: true},
+        {label: "Pojemność silnika", key: "displacement", carDetails: true},
+        {label: "Skrzynia biegów", key: "transmission", carDetails: true},
+        {label: "Liczba drzwi", key: "doors", carDetails: true},
+        {label: "Liczba miejsc", key: "seats", carDetails: true},
+        {label: "Marka", key: "brand", carDetails: true},
+        {label: "Model", key: "model", carDetails: true},
+        {label: "Lokalizacja", key: "location"},
+        {label: "Telefon kontaktowy", key: "contactPhone"},
+        {label: "Email kontaktowy", key: "contactEmail"}
     ];
 
     const getValue = (offer: OfferData | null, feature: Feature): any => {
@@ -270,7 +270,8 @@ const OfferComparison: React.FC = () => {
                     {suggestionsA.length > 0 && focusA && (
                         <ul className="suggestions">
                             {suggestionsA.map((offer) => (
-                                <li key={offer.id} onClick={() => selectOffer(offer, setOfferA, setInputA, setSuggestionsA)}>
+                                <li key={offer.id}
+                                    onClick={() => selectOffer(offer, setOfferA, setInputA, setSuggestionsA)}>
                                     <div className="suggestion-item">
                                         <img
                                             src={getMainImageUrl(offer) || PLACEHOLDER_IMAGE}
@@ -304,7 +305,8 @@ const OfferComparison: React.FC = () => {
                     {suggestionsB.length > 0 && focusB && (
                         <ul className="suggestions">
                             {suggestionsB.map((offer) => (
-                                <li key={offer.id} onClick={() => selectOffer(offer, setOfferB, setInputB, setSuggestionsB)}>
+                                <li key={offer.id}
+                                    onClick={() => selectOffer(offer, setOfferB, setInputB, setSuggestionsB)}>
                                     <div className="suggestion-item">
                                         <img
                                             src={getMainImageUrl(offer) || PLACEHOLDER_IMAGE}

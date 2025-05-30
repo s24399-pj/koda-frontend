@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {useNavigate, Link} from "react-router-dom";
 import "./LikedOffers.scss";
 import useTitle from "../../hooks/useTitle";
 import LikeButton from "../../components/LikeButton/LikeButton";
 import CompareCheckbox from "../../components/CompareCheckbox/CompareCheckbox";
 import ComparisonBar from "../../components/ComparisonBar/ComparisonBar";
-import { useComparison } from "../../context/ComparisonContext";
-import { useAuth } from "../../context/AuthContext";
+import {useComparison} from "../../context/ComparisonContext";
+import {useAuth} from "../../context/AuthContext";
 import AuthRequired from "../AuthRequired/AuthRequired";
-import { likedOfferApi } from "../../api/likedOfferApi";
-import { MiniOffer } from "../../types/miniOfferTypes";
-import { RawOfferData } from "../../types/offer/RawOfferData"
+import {likedOfferApi} from "../../api/likedOfferApi";
+import {MiniOffer} from "../../types/miniOfferTypes";
+import {RawOfferData} from "../../types/offer/RawOfferData"
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -20,7 +20,7 @@ const LikedOffersList: React.FC = () => {
     const [likedOffers, setLikedOffers] = useState<MiniOffer[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
-    const { isAuthenticated } = useAuth();
+    const {isAuthenticated} = useAuth();
 
     const {
         selectedOffers,
@@ -163,7 +163,8 @@ const LikedOffersList: React.FC = () => {
                                     <h2>{truncateText(offer.title, 50)}</h2>
                                     <div className="price-actions">
                                         <span className="offer-price">{offer.price.toLocaleString()} PLN</span>
-                                        <LikeButton offerId={offer.id} initialLiked={true} onLikeToggle={(isLiked) => handleLikeToggle(offer.id, isLiked)} />
+                                        <LikeButton offerId={offer.id} initialLiked={true}
+                                                    onLikeToggle={(isLiked) => handleLikeToggle(offer.id, isLiked)}/>
                                     </div>
                                 </div>
                                 <div className="offer-info">

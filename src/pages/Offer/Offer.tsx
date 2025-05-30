@@ -344,7 +344,7 @@ const Offer: React.FC = () => {
                 isNewConversation: true
             };
 
-            navigate(`/chat/${offer.seller.id}`, { state: { sellerInfo } });
+            navigate(`/chat/${offer.seller.id}`, {state: {sellerInfo}});
         } else {
             console.error('Brak ID sprzedającego');
         }

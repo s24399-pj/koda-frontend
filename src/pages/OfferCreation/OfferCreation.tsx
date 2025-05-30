@@ -8,7 +8,7 @@ import {
     OfferFormValues
 } from '../../types/offer/OfferTypes';
 import {createOffer} from '../../api/offerApi';
-import { uploadMultipleImages } from '../../api/imageApi';
+import {uploadMultipleImages} from '../../api/imageApi';
 import StepsIndicator from '../../components/OfferCreation/StepsIndicator';
 import BasicInfoStep from '../../components/OfferCreation/BasicInfoStep';
 import VehicleDetailsStep from '../../components/OfferCreation/VehicleDetailsStep';
@@ -264,7 +264,7 @@ const OfferCreation: React.FC = () => {
                     <div className="progress-bar">
                         <div
                             className="progress-fill"
-                            style={{ width: `${uploadProgress}%` }}
+                            style={{width: `${uploadProgress}%`}}
                         ></div>
                     </div>
                     <span className="progress-text">

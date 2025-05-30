@@ -1,14 +1,14 @@
-import React, { useState, useCallback } from 'react';
-import { FormikProps } from 'formik';
-import { OfferFormValues } from '../../types/offer/OfferTypes';
-import { validateImageFile, compressImage } from '../../api/imageApi';
+import React, {useState, useCallback} from 'react';
+import {FormikProps} from 'formik';
+import {OfferFormValues} from '../../types/offer/OfferTypes';
+import {validateImageFile, compressImage} from '../../api/imageApi';
 import './ImageUpload.scss';
 
 interface ImageUploadProps {
     formik: FormikProps<OfferFormValues>;
 }
 
-const ImageUpload: React.FC<ImageUploadProps> = ({ formik }) => {
+const ImageUpload: React.FC<ImageUploadProps> = ({formik}) => {
     const [dragActive, setDragActive] = useState(false);
     const [uploading, setUploading] = useState(false);
 
@@ -104,7 +104,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ formik }) => {
                     multiple
                     accept="image/jpeg,image/png,image/webp"
                     onChange={handleInputChange}
-                    style={{ display: 'none' }}
+                    style={{display: 'none'}}
                     disabled={uploading}
                 />
 
