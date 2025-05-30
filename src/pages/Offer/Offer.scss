@@ -406,6 +406,100 @@
     }
   }
 
+  // DODANE STYLE DLA SEKCJI WYPOSAŻENIA
+  .equipment-section {
+    margin-top: 30px;
+    margin-bottom: 30px;
+
+    h2 {
+      font-size: 22px;
+      margin-bottom: 20px;
+      color: #333;
+
+      @media (max-width: 768px) {
+        font-size: 20px;
+      }
+    }
+
+    .equipment-category {
+      margin-bottom: 25px;
+      background-color: #f9f9f9;
+      border-radius: 10px;
+      padding: 20px;
+      border-left: 4px solid #007be5;
+
+      h3 {
+        display: flex;
+        align-items: center;
+        font-size: 18px;
+        margin-bottom: 15px;
+        color: #333;
+        font-weight: 600;
+
+        .category-icon {
+          margin-right: 10px;
+          font-size: 20px;
+        }
+
+        @media (max-width: 768px) {
+          font-size: 16px;
+        }
+      }
+
+      .equipment-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 12px;
+
+        @media (max-width: 768px) {
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+
+        .equipment-item {
+          display: flex;
+          align-items: center;
+          background-color: white;
+          padding: 12px 15px;
+          border-radius: 8px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+          border: 1px solid #e0e0e0;
+          transition: all 0.2s ease;
+
+          &:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+          }
+
+          .equipment-check {
+            margin-right: 10px;
+            font-size: 16px;
+          }
+
+          .equipment-label {
+            font-size: 14px;
+            color: #555;
+            font-weight: 500;
+
+            @media (max-width: 768px) {
+              font-size: 13px;
+            }
+          }
+        }
+      }
+    }
+
+    // Jeśli brak wyposażenia
+    .no-equipment {
+      text-align: center;
+      color: #666;
+      font-style: italic;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+    }
+  }
+
   .seller-info-section {
     margin-top: 30px;
     margin-bottom: 30px;
@@ -461,7 +555,6 @@
 
         .seller-details {
           margin-left: 15px;
-          // Zaktualizowana sekcja seller-details
           display: flex;
           flex-direction: column;
 
@@ -478,7 +571,6 @@
             font-size: 14px;
           }
 
-          // Nowy przycisk czatu
           .start-chat-button {
             margin-top: 8px;
             padding: 8px 16px;

@@ -3,12 +3,13 @@ import {useNavigate, useParams} from "react-router-dom";
 import useTitle from "../../hooks/useTitle";
 import axios from "axios";
 import L from "leaflet";
-import {OfferData} from "../../types/offerTypes";
+import {OfferData,} from "../../types/offerTypes";
 import "leaflet/dist/leaflet.css";
 import "./Offer.scss";
 import LikeButton from "../../components/LikeButton/LikeButton";
 import {useAuth} from "../../context/AuthContext";
 import {DEFAULT_PROFILE_IMAGE} from "../../assets/defaultProfilePicture.ts";
+import {CarEquipment} from "../../types/offer/OfferTypes.ts";
 
 interface LightboxProps {
     images: string[];
@@ -358,6 +359,108 @@ const Offer: React.FC = () => {
         }
     };
 
+    const renderEquipmentSection = (equipment?: CarEquipment) => {
+        if (!equipment) return null;
+
+        const equipmentCategories = [
+            {
+                title: "Komfort",
+                icon: "🛋️",
+                items: [
+                    { key: 'airConditioning', label: 'Klimatyzacja' },
+                    { key: 'automaticClimate', label: 'Automatyczna klimatyzacja' },
+                    { key: 'heatedSeats', label: 'Podgrzewane fotele' },
+                    { key: 'electricSeats', label: 'Fotele elektryczne' },
+                    { key: 'leatherSeats', label: 'Fotele skórzane' },
+                    { key: 'panoramicRoof', label: 'Dach panoramiczny' },
+                    { key: 'electricWindows', label: 'Elektryczne szyby' },
+                    { key: 'electricMirrors', label: 'Elektryczne lusterka' },
+                    { key: 'keylessEntry', label: 'Bezkluczykowy dostęp' },
+                    { key: 'wheelHeating', label: 'Podgrzewane koło kierownicy' },
+                    { key: 'heatedSteeringWheel', label: 'Podgrzewana kierownica' }
+                ]
+            },
+            {
+                title: "Multimedia",
+                icon: "📱",
+                items: [
+                    { key: 'navigationSystem', label: 'System nawigacji' },
+                    { key: 'bluetooth', label: 'Bluetooth' },
+                    { key: 'usbPort', label: 'Port USB' },
+                    { key: 'multifunction', label: 'Kierownica wielofunkcyjna' },
+                    { key: 'androidAuto', label: 'Android Auto' },
+                    { key: 'appleCarPlay', label: 'Apple CarPlay' },
+                    { key: 'soundSystem', label: 'System audio' }
+                ]
+            },
+            {
+                title: "Systemy wspomagające",
+                icon: "🛡️",
+                items: [
+                    { key: 'parkingSensors', label: 'Czujniki parkowania' },
+                    { key: 'rearCamera', label: 'Kamera cofania' },
+                    { key: 'cruiseControl', label: 'Tempomat' },
+                    { key: 'adaptiveCruiseControl', label: 'Adaptacyjny tempomat' },
+                    { key: 'laneAssist', label: 'Asystent pasa ruchu' },
+                    { key: 'blindSpotDetection', label: 'Monitoring martwego pola' },
+                    { key: 'emergencyBraking', label: 'Automatyczne hamowanie awaryjne' },
+                    { key: 'startStop', label: 'System Start-Stop' }
+                ]
+            },
+            {
+                title: "Oświetlenie",
+                icon: "💡",
+                items: [
+                    { key: 'xenonLights', label: 'Światła xenonowe' },
+                    { key: 'ledLights', label: 'Światła LED' },
+                    { key: 'ambientLighting', label: 'Oświetlenie nastrojowe' },
+                    { key: 'automaticLights', label: 'Automatyczne światła' },
+                    { key: 'adaptiveLights', label: 'Adaptacyjne światła' }
+                ]
+            },
+            {
+                title: "Dodatkowe funkcje",
+                icon: "⭐",
+                items: [
+                    { key: 'electricTrunk', label: 'Elektryczny bagażnik' },
+                    { key: 'electricSunBlind', label: 'Elektryczna roleta' },
+                    { key: 'headUpDisplay', label: 'Wyświetlacz HUD' },
+                    { key: 'aromatherapy', label: 'Aromaterapia' }
+                ]
+            }
+        ];
+
+        return (
+            <div className="equipment-section">
+                <h2>Wyposażenie</h2>
+                {equipmentCategories.map((category) => {
+                    const availableItems = category.items.filter(item =>
+                        equipment[item.key as keyof CarEquipment] === true
+                    );
+
+                    if (availableItems.length === 0) return null;
+
+                    return (
+                        <div key={category.title} className="equipment-category">
+                            <h3>
+                                <span className="category-icon">{category.icon}</span>
+                                {category.title}
+                            </h3>
+                            <div className="equipment-grid">
+                                {availableItems.map((item) => (
+                                    <div key={item.key} className="equipment-item">
+                                        <span className="equipment-check">✅</span>
+                                        <span className="equipment-label">{item.label}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        );
+    };
+
     useEffect(() => {
         if (lightboxOpen) return;
 
@@ -479,6 +582,8 @@ const Offer: React.FC = () => {
                     <li>🚪 Liczba drzwi: {offer.CarDetailsDto.doors}</li>
                     <li>🛋️ Liczba miejsc: {offer.CarDetailsDto.seats}</li>
                 </ul>
+
+                {renderEquipmentSection(offer.CarDetailsDto.carEquipment)}
             </div>
 
             {offer.seller && (
