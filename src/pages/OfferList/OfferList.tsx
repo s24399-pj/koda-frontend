@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./OfferList.scss";
 import useTitle from "../../hooks/useTitle";
 import { MiniOffer } from "../../types/miniOfferTypes";
@@ -8,20 +7,45 @@ import LikeButton from "../../components/LikeButton/LikeButton";
 import CompareCheckbox from "../../components/CompareCheckbox/CompareCheckbox";
 import ComparisonBar from "../../components/ComparisonBar/ComparisonBar";
 import { useComparison } from "../../context/ComparisonContext";
-import AdvancedSearch from "../../components/AdvancedSearch/AdvancedSearch";
+import AdvancedFilter from "../../components/AdvancedFilter/AdvancedFilter";
 
 const API_URL = import.meta.env.VITE_API_URL;
-const PAGE_SIZE = 5;
+
+// Adapter function specifically for the actual data structure
+const adaptToMiniOffer = (item: any): MiniOffer => {
+  // Extract car details from the correct property
+  const carDetails = item.carDetails || {};
+  
+  // Get the main image from imageUrls array
+  let mainImage = '';
+  if (item.imageUrls && item.imageUrls.length > 0) {
+    mainImage = item.imageUrls[0];
+  }
+  
+  return {
+    id: item.id || '',
+    title: item.title || '',
+    price: typeof item.price === 'number' ? item.price : 
+           typeof item.price === 'string' ? parseFloat(item.price) : 0,
+    mainImage: mainImage,
+    mileage: carDetails.mileage || 0,
+    fuelType: carDetails.fuelType || 'UNKNOWN',
+    year: carDetails.year || 0,
+    enginePower: carDetails.enginePower || 0,
+    displacement: carDetails.displacement || ''
+  };
+};
 
 const OfferList: React.FC = () => {
   useTitle("Dostępne oferty");
 
   const [offers, setOffers] = useState<MiniOffer[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const location = useLocation();
 
   const {
     selectedOffers,
@@ -31,40 +55,38 @@ const OfferList: React.FC = () => {
     canAddMoreOffers
   } = useComparison();
 
-  useEffect(() => {
-    const fetchOffers = async () => {
-      setIsLoading(true);
-      try {
-        const params = new URLSearchParams(location.search);
-        
-        // Dodaj pagination (zawsze na końcu)
-        params.set("page", (currentPage - 1).toString());
-        params.set("size", PAGE_SIZE.toString());
+  // Handle search results from AdvancedFilter
+  const handleSearchResults = (results: any) => {
+    setError(null);
+    
+    if (!results || !results.content) {
+      console.warn('Invalid search results received:', results);
+      setOffers([]);
+      setTotalPages(0);
+      return;
+    }
 
-        // Logowanie parametrów dla debug
-        console.log('Fetching offers with params:', Object.fromEntries(params.entries()));
+    try {
+      // Process the results using the adapter for the actual data structure
+      const processedOffers = results.content.map(adaptToMiniOffer);
+      
+      // Log for debugging
+      console.log('Processed offers:', processedOffers);
+      
+      setOffers(processedOffers);
+      setTotalPages(results.totalPages || 1);
+      setCurrentPage(results.number ? results.number + 1 : 1);
+    } catch (err) {
+      console.error('Error processing search results:', err);
+      setError('An error occurred while processing the search results.');
+      setOffers([]);
+    }
+  };
 
-        const response = await axios.get(`${API_URL}/api/v1/offers`, { params });
-
-        setOffers(response.data.content || []);
-        setTotalPages(response.data.totalPages || 1);
-      } catch (error) {
-        console.error("Błąd podczas pobierania ofert:", error);
-        // Wyczyść oferty w przypadku błędu
-        setOffers([]);
-        setTotalPages(1);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchOffers();
-  }, [currentPage, location.search]);
-
-  // Reset strony na 1 gdy zmieniają się filtry wyszukiwania
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [location.search]);
+  // Handle loading state
+  const handleLoading = (loading: boolean) => {
+    setIsLoading(loading);
+  };
 
   const handleOfferClick = (id: string) => {
     navigate(`/offer/${id}`);
@@ -79,6 +101,10 @@ const OfferList: React.FC = () => {
     } else {
       removeFromComparison(id);
     }
+  };
+
+  const toggleFilters = () => {
+    setShowFilters(!showFilters);
   };
 
   const renderPaginationButtons = () => {
@@ -138,162 +164,153 @@ const OfferList: React.FC = () => {
         : text;
   };
 
-  // Funkcja do wyświetlania aktywnych filtrów (opcjonalna - dla UX)
-  const getActiveFiltersCount = (): number => {
-    const params = new URLSearchParams(location.search);
-    const excludeParams = ['page', 'size']; // Parametry które nie są filtrami
-    
-    let count = 0;
-    for (const [key, value] of params.entries()) {
-      if (!excludeParams.includes(key) && value.trim() !== '') {
-        count++;
-      }
+  // Helper function to format fuel type for display
+  const formatFuelType = (fuelType: string): string => {
+    switch (fuelType) {
+      case 'PETROL': return 'Benzyna';
+      case 'DIESEL': return 'Diesel';
+      case 'LPG': return 'LPG';
+      case 'HYBRID': return 'Hybryda';
+      case 'ELECTRIC': return 'Elektryczny';
+      case 'HYDROGEN': return 'Wodór';
+      case 'OTHER': return 'Inne';
+      default: return fuelType || 'Brak danych';
     }
-    return count;
-  };
-
-  const getSearchSummary = (): string => {
-    const params = new URLSearchParams(location.search);
-    const filters: string[] = [];
-
-    // Podstawowe filtry
-    if (params.get('phrase')) filters.push(`"${params.get('phrase')}"`);
-    if (params.get('brand')) filters.push(`Marka: ${params.get('brand')}`);
-    if (params.get('model')) filters.push(`Model: ${params.get('model')}`);
-    if (params.get('minPrice') || params.get('maxPrice')) {
-      const min = params.get('minPrice') ? `${parseInt(params.get('minPrice')!).toLocaleString()} zł` : '';
-      const max = params.get('maxPrice') ? `${parseInt(params.get('maxPrice')!).toLocaleString()} zł` : '';
-      if (min && max) filters.push(`Cena: ${min} - ${max}`);
-      else if (min) filters.push(`Cena od: ${min}`);
-      else if (max) filters.push(`Cena do: ${max}`);
-    }
-
-    return filters.length > 0 ? filters.join(', ') : '';
   };
 
   return (
       <div className="offer-list-container">
-        <AdvancedSearch />
-        
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h1>Dostępne oferty</h1>
-          
-          {/* Podsumowanie wyszukiwania - opcjonalne */}
-          {getActiveFiltersCount() > 0 && (
-            <div style={{ fontSize: '14px', color: '#666', textAlign: 'right' }}>
-              <div>Aktywne filtry: {getActiveFiltersCount()}</div>
-              {getSearchSummary() && (
-                <div style={{ marginTop: '4px', fontSize: '12px' }}>
-                  {getSearchSummary()}
-                </div>
-              )}
-            </div>
-          )}
+        {/* Filter Toggle Button - Mobile */}
+        <div className="filter-toggle-mobile">
+          <button onClick={toggleFilters}>
+            {showFilters ? 'Ukryj filtry' : 'Pokaż filtry'}
+          </button>
         </div>
+        
+        {/* Two-column layout for desktop */}
+        <div className="offer-list-layout">
+          {/* Filter Panel - Left column on desktop, toggleable on mobile */}
+          <div className={`filter-panel ${showFilters ? 'show' : ''}`}>
+            <AdvancedFilter onSearch={handleSearchResults} onLoading={handleLoading} />
+          </div>
+          
+          {/* Offers List - Right column */}
+          <div className="offers-panel">
+            <div className="offers-header">
+              <h1>Dostępne oferty</h1>
+            </div>
 
-        {isLoading ? (
-            <p>Ładowanie ofert...</p>
-        ) : (
-            <>
-              {/* Informacja o liczbie wyników */}
-              {offers.length > 0 && (
-                <div style={{ 
-                  marginBottom: '16px', 
-                  padding: '12px', 
-                  backgroundColor: '#f8f9fa', 
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  color: '#555'
-                }}>
-                  Znaleziono {offers.length} {offers.length === 1 ? 'ofertę' : 
-                    offers.length < 5 ? 'oferty' : 'ofert'} na stronie {currentPage} z {totalPages}
-                  {getSearchSummary() && (
-                    <span> dla: {getSearchSummary()}</span>
+            {error && (
+              <div className="error-message">
+                {error}
+              </div>
+            )}
+
+            {isLoading ? (
+                <p className="loading-indicator">Ładowanie ofert...</p>
+            ) : (
+                <>
+                  {/* Informacja o liczbie wyników */}
+                  {offers.length > 0 && (
+                    <div className="results-summary">
+                      Znaleziono {offers.length} {offers.length === 1 ? 'ofertę' : 
+                        offers.length < 5 ? 'oferty' : 'ofert'} na stronie {currentPage} z {totalPages}
+                    </div>
                   )}
-                </div>
-              )}
 
-              <div className="offer-list">
-                {offers.length > 0 ? (
-                    offers.map((offer) => (
-                        <div key={offer.id} className="offer-card">
-                          <div className="offer-clickable" onClick={() => handleOfferClick(offer.id)}>
-                            <div className="offer-image-container">
-                              <img
-                                  src={`${API_URL}/images/${offer.mainImage}`}
-                                  alt={offer.title}
-                                  loading="lazy"
-                              />
-                            </div>
-                            <div className="offer-details">
-                              <div className="offer-header">
-                                <h2>{truncateText(offer.title, 50)}</h2>
-                                <div className="price-actions">
-                                  <span className="offer-price">{offer.price.toLocaleString()} PLN</span>
-                                  <LikeButton offerId={offer.id} />
+                  <div className="offer-list">
+                    {offers.length > 0 ? (
+                        offers.map((offer) => (
+                            <div key={offer.id} className="offer-card">
+                              <div className="offer-clickable" onClick={() => handleOfferClick(offer.id)}>
+                                <div className="offer-image-container">
+                                  {offer.mainImage ? (
+                                    <img
+                                      src={offer.mainImage.startsWith('http') 
+                                        ? offer.mainImage 
+                                        : `${API_URL}/images/${offer.mainImage}`}
+                                      alt={offer.title}
+                                      loading="lazy"
+                                      onError={(e) => {
+                                        // Fallback for image errors
+                                        (e.target as HTMLImageElement).src = "https://via.placeholder.com/240x180?text=No+Image";
+                                      }}
+                                    />
+                                  ) : (
+                                    <div className="no-image">Brak zdjęcia</div>
+                                  )}
+                                </div>
+                                <div className="offer-details">
+                                  <div className="offer-header">
+                                    <h2>{truncateText(offer.title, 50)}</h2>
+                                    <div className="price-actions">
+                                      <span className="offer-price">
+                                        {typeof offer.price === 'number' 
+                                          ? offer.price.toLocaleString() 
+                                          : parseFloat(offer.price).toLocaleString()} PLN
+                                      </span>
+                                      <LikeButton offerId={offer.id} />
+                                    </div>
+                                  </div>
+                                  <div className="offer-info">
+                                    <p><strong>Rok:</strong> <span>{offer.year || 'Brak danych'}</span></p>
+                                    <p><strong>Przebieg:</strong> <span>
+                                      {offer.mileage ? `${offer.mileage.toLocaleString()} km` : 'Brak danych'}
+                                    </span></p>
+                                    <p><strong>Typ paliwa:</strong> <span>{formatFuelType(offer.fuelType)}</span></p>
+                                    <p><strong>Moc silnika:</strong> <span>
+                                      {offer.enginePower ? `${offer.enginePower} KM` : 'Brak danych'}
+                                    </span></p>
+                                    <p><strong>Pojemność silnika:</strong> <span>{offer.displacement || 'Brak danych'}</span></p>
+                                  </div>
+
+                                  <div className="offer-compare-bottom">
+                                    <CompareCheckbox
+                                        offerId={offer.id}
+                                        isSelected={isOfferSelected(offer.id)}
+                                        isDisabled={!canAddMoreOffers() && !isOfferSelected(offer.id)}
+                                        onToggle={handleToggleComparison}
+                                    />
+                                  </div>
                                 </div>
                               </div>
-                              <div className="offer-info">
-                                <p><strong>Rok:</strong> <span>{offer.year}</span></p>
-                                <p><strong>Przebieg:</strong> <span>{offer.mileage.toLocaleString()} km</span></p>
-                                <p><strong>Typ paliwa:</strong> <span>{offer.fuelType}</span></p>
-                                <p><strong>Moc silnika:</strong> <span>{offer.enginePower} KM</span></p>
-                                <p><strong>Pojemność silnika:</strong> <span>{offer.displacement}</span></p>
-                              </div>
-
-                              <div className="offer-compare-bottom">
-                                <CompareCheckbox
-                                    offerId={offer.id}
-                                    isSelected={isOfferSelected(offer.id)}
-                                    isDisabled={!canAddMoreOffers()}
-                                    onToggle={handleToggleComparison}
-                                />
-                              </div>
                             </div>
-                          </div>
+                        ))
+                    ) : (
+                        <div className="no-results">
+                          <p className="no-offers">
+                            Brak ofert spełniających kryteria wyszukiwania
+                          </p>
+                          <p className="no-offers-hint">
+                            Spróbuj zmienić filtry lub rozszerzyć kryteria wyszukiwania
+                          </p>
                         </div>
-                    ))
-                ) : (
-                    <div style={{ 
-                      textAlign: 'center', 
-                      padding: '40px', 
-                      backgroundColor: '#f8f9fa', 
-                      borderRadius: '8px',
-                      color: '#666'
-                    }}>
-                      <p className="no-offers" style={{ fontSize: '18px', marginBottom: '8px' }}>
-                        Brak ofert spełniających kryteria wyszukiwania
-                      </p>
-                      {getActiveFiltersCount() > 0 && (
-                        <p style={{ fontSize: '14px', margin: '0' }}>
-                          Spróbuj zmienić filtry lub rozszerzyć kryteria wyszukiwania
-                        </p>
-                      )}
-                    </div>
-                )}
-              </div>
-            </>
-        )}
+                    )}
+                  </div>
+                </>
+            )}
 
-        {totalPages > 1 && (
-            <div className="pagination">
-              <button
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage((p) => p - 1)}
-              >
-                {"<"}
-              </button>
+            {totalPages > 1 && (
+                <div className="pagination">
+                  <button
+                      disabled={currentPage === 1}
+                      onClick={() => setCurrentPage((p) => p - 1)}
+                  >
+                    {"<"}
+                  </button>
 
-              {renderPaginationButtons()}
+                  {renderPaginationButtons()}
 
-              <button
-                  disabled={currentPage === totalPages}
-                  onClick={() => setCurrentPage((p) => p + 1)}
-              >
-                {">"}
-              </button>
-            </div>
-        )}
+                  <button
+                      disabled={currentPage === totalPages}
+                      onClick={() => setCurrentPage((p) => p + 1)}
+                  >
+                    {">"}
+                  </button>
+                </div>
+            )}
+          </div>
+        </div>
 
         <ComparisonBar
             selectedOffers={selectedOffers}
