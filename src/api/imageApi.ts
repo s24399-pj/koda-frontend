@@ -1,31 +1,8 @@
-import axios from 'axios';
+import axiosAuthClient from '../api/axiosAuthClient';
+import { AxiosError } from 'axios';
+import {ImageUploadResponse} from "../types/image/ImageUploadResponse.ts";
 
-const API_BASE_URL = 'http://localhost:8137/api/v1';
-
-export interface ImageUploadResponse {
-    id: string;
-    url: string;
-    filename: string;
-    size: number;
-    contentType: string;
-    sortOrder: number;
-}
-
-const getAuthToken = (): string | null => {
-    if (typeof window !== 'undefined' && window.localStorage) {
-        const possibleKeys = ['accessToken', 'authToken', 'token', 'auth_token'];
-
-        for (const key of possibleKeys) {
-            const token = localStorage.getItem(key);
-            if (token) {
-                return token;
-            }
-        }
-
-        return null;
-    }
-    return null;
-};
+const API_URL = import.meta.env.VITE_API_URL + '/api/v1/images/';
 
 export const uploadMultipleImages = async (offerId: string, files: File[]): Promise<ImageUploadResponse[]> => {
     const formData = new FormData();
@@ -34,16 +11,7 @@ export const uploadMultipleImages = async (offerId: string, files: File[]): Prom
     });
 
     try {
-        const token = getAuthToken();
-
-        const headers: Record<string, string> = {};
-
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-        }
-
-        const response = await axios.post(`${API_BASE_URL}/images/${offerId}/upload`, formData, {
-            headers,
+        const response = await axiosAuthClient.post(`${API_URL}${offerId}/upload`, formData, {
             timeout: 30000,
             onUploadProgress: (progressEvent) => {
                 if (progressEvent.total) {
@@ -55,7 +23,7 @@ export const uploadMultipleImages = async (offerId: string, files: File[]): Prom
 
         return response.data;
     } catch (error) {
-        if (axios.isAxiosError(error)) {
+        if (error instanceof AxiosError) {
             if (error.response) {
                 const errorMessage = error.response.data?.message ||
                     error.response.data?.error ||
@@ -79,16 +47,7 @@ export const uploadMultipleImagesWithoutOffer = async (files: File[]): Promise<I
     });
 
     try {
-        const token = getAuthToken();
-
-        const headers: Record<string, string> = {};
-
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-        }
-
-        const response = await axios.post(`${API_BASE_URL}/images/upload`, formData, {
-            headers,
+        const response = await axiosAuthClient.post(`${API_URL}upload`, formData, {
             timeout: 30000,
             onUploadProgress: (progressEvent) => {
                 if (progressEvent.total) {
@@ -100,7 +59,7 @@ export const uploadMultipleImagesWithoutOffer = async (files: File[]): Promise<I
 
         return response.data;
     } catch (error) {
-        if (axios.isAxiosError(error)) {
+        if (error instanceof AxiosError) {
             if (error.response) {
                 const errorMessage = error.response.data?.message ||
                     error.response.data?.error ||
@@ -119,18 +78,9 @@ export const uploadMultipleImagesWithoutOffer = async (files: File[]): Promise<I
 
 export const deleteImage = async (imageId: string): Promise<void> => {
     try {
-        const token = getAuthToken();
-        const headers: Record<string, string> = {};
-
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-        }
-
-        await axios.delete(`${API_BASE_URL}/images/${imageId}`, {
-            headers
-        });
+        await axiosAuthClient.delete(`${API_URL}${imageId}`);
     } catch (error) {
-        if (axios.isAxiosError(error) && error.response) {
+        if (error instanceof AxiosError && error.response) {
             throw new Error(error.response.data.message || 'Błąd podczas usuwania zdjęcia');
         }
         throw new Error('Błąd sieci podczas usuwania zdjęcia');

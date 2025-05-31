@@ -45,7 +45,6 @@ export enum VehicleCondition {
 }
 
 export interface CarEquipment {
-    // Komfort
     airConditioning?: boolean;
     automaticClimate?: boolean;
     heatedSeats?: boolean;
@@ -57,7 +56,6 @@ export interface CarEquipment {
     keylessEntry?: boolean;
     wheelHeating?: boolean;
 
-    // Multimedia
     navigationSystem?: boolean;
     bluetooth?: boolean;
     usbPort?: boolean;
@@ -66,7 +64,6 @@ export interface CarEquipment {
     appleCarPlay?: boolean;
     soundSystem?: boolean;
 
-    // Systemy wspomagające
     parkingSensors?: boolean;
     rearCamera?: boolean;
     cruiseControl?: boolean;
@@ -76,14 +73,12 @@ export interface CarEquipment {
     emergencyBraking?: boolean;
     startStop?: boolean;
 
-    // Oświetlenie
     xenonLights?: boolean;
     ledLights?: boolean;
     ambientLighting?: boolean;
     automaticLights?: boolean;
     adaptiveLights?: boolean;
 
-    // Dodatkowe funkcje
     heatedSteeringWheel?: boolean;
     electricTrunk?: boolean;
     electricSunBlind?: boolean;
@@ -146,7 +141,7 @@ export interface OfferFormValues {
     accidentFree: boolean;
     serviceHistory: boolean;
     additionalFeatures: string;
-    equipment?: CarEquipment; // Zmienione na opcjonalne
+    equipment?: CarEquipment;
     location?: string;
     expirationDate?: string;
     termsAccepted: boolean;

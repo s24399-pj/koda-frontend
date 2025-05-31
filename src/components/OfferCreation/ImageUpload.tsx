@@ -1,14 +1,9 @@
-import React, {useState, useCallback} from 'react';
-import {FormikProps} from 'formik';
-import {OfferFormValues} from '../../types/offer/OfferTypes';
-import {validateImageFile, compressImage} from '../../api/imageApi';
+import React, { useState, useCallback } from 'react';
+import { validateImageFile, compressImage } from '../../api/imageApi';
 import './ImageUpload.scss';
+import {ImageUploadProps} from "../../types/image/ImageUploadProps.ts";
 
-interface ImageUploadProps {
-    formik: FormikProps<OfferFormValues>;
-}
-
-const ImageUpload: React.FC<ImageUploadProps> = ({formik}) => {
+const ImageUpload: React.FC<ImageUploadProps> = ({ formik }) => {
     const [dragActive, setDragActive] = useState(false);
     const [uploading, setUploading] = useState(false);
 
@@ -18,6 +13,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({formik}) => {
         const validFiles: File[] = [];
         const errors: string[] = [];
 
+        // Validate and compress each file
         for (const file of fileArray) {
             const error = validateImageFile(file);
             if (error) {
@@ -27,21 +23,24 @@ const ImageUpload: React.FC<ImageUploadProps> = ({formik}) => {
                     const compressedFile = await compressImage(file);
                     validFiles.push(compressedFile);
                 } catch (error) {
-                    errors.push(`${file.name}: Błąd kompresji`);
+                    errors.push(`${file.name}: Compression error`);
                 }
             }
         }
 
+        // Show validation errors if any
         if (errors.length > 0) {
-            alert('Błędy walidacji plików:\n' + errors.join('\n'));
+            alert('File validation errors:\n' + errors.join('\n'));
         }
 
+        // Add valid files to form
         if (validFiles.length > 0) {
             const currentFiles = formik.values.imageFiles || [];
             const newFiles = [...currentFiles, ...validFiles];
 
+            // Enforce 10 image limit
             if (newFiles.length > 10) {
-                alert('Możesz dodać maksymalnie 10 zdjęć');
+                alert('You can add maximum 10 images');
                 const limitedFiles = newFiles.slice(0, 10);
                 formik.setFieldValue('imageFiles', limitedFiles);
             } else {
@@ -104,20 +103,20 @@ const ImageUpload: React.FC<ImageUploadProps> = ({formik}) => {
                     multiple
                     accept="image/jpeg,image/png,image/webp"
                     onChange={handleInputChange}
-                    style={{display: 'none'}}
+                    style={{ display: 'none' }}
                     disabled={uploading}
                 />
 
                 {uploading ? (
                     <div className="upload-spinner">
                         <div className="spinner"></div>
-                        <p>Przetwarzanie zdjęć...</p>
+                        <p>Processing images...</p>
                     </div>
                 ) : (
                     <div className="upload-content">
                         <div className="upload-icon">📸</div>
-                        <p>Kliknij lub przeciągnij zdjęcia tutaj</p>
-                        <small>Obsługiwane formaty: JPG, PNG, WEBP (max 5MB każde)</small>
+                        <p>Click or drag images here</p>
+                        <small>Supported formats: JPG, PNG, WEBP (max 5MB each)</small>
                     </div>
                 )}
             </div>
@@ -151,7 +150,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({formik}) => {
             )}
 
             <small className="image-count">
-                {currentImages.length}/10 zdjęć
+                {currentImages.length}/10 images
             </small>
         </div>
     );

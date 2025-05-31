@@ -24,8 +24,8 @@ const OfferSlider: React.FC = () => {
         const target = event.target as HTMLImageElement;
         if (!target.dataset.errorHandled) {
             target.dataset.errorHandled = "true";
-            target.src = "https://via.placeholder.com/300x200?text=Brak+zdjęcia";
-            console.warn('Błąd ładowania zdjęcia w sliderze:', target.src);
+            target.src = "https://placehold.co/600x400";
+            console.warn('Image loading error in slider:', target.src);
         }
     };
 
@@ -33,13 +33,13 @@ const OfferSlider: React.FC = () => {
         setLoading(true);
         axios.get(`${API_URL}/api/v1/offers`)
             .then(response => {
-                console.log('Dane z API:', response.data);
+                console.log('Data from API:', response.data);
                 setOffers(response.data.content || []);
                 setLoading(false);
             })
             .catch(error => {
-                console.error('Błąd podczas pobierania danych:', error);
-                setError('Nie udało się pobrać ofert');
+                console.error('Error fetching data:', error);
+                setError('Failed to fetch offers');
                 setLoading(false);
             });
     }, []);
@@ -107,9 +107,9 @@ const OfferSlider: React.FC = () => {
         }
     };
 
-    if (loading) return <div className="offer-slider-loading">Ładowanie ofert...</div>;
-    if (error) return <div className="offer-slider-error">Błąd: {error}</div>;
-    if (offers.length === 0) return <div className="offer-slider-empty">Brak dostępnych ofert</div>;
+    if (loading) return <div className="offer-slider-loading">Loading offers...</div>;
+    if (error) return <div className="offer-slider-error">Error: {error}</div>;
+    if (offers.length === 0) return <div className="offer-slider-empty">No offers available</div>;
 
     return (
         <div className="offer-slider">
@@ -128,7 +128,7 @@ const OfferSlider: React.FC = () => {
                         <div className="vehicle-card">
                             <div className="vehicle-image-container">
                                 <img
-                                    src={offer.mainImage ? `${API_URL}${offer.mainImage}` : "https://via.placeholder.com/300x200?text=Brak+zdjęcia"}
+                                    src={offer.mainImage ? `${API_URL}${offer.mainImage}` : "https://placehold.co/600x400"}
                                     alt={offer.title}
                                     className="vehicle-image"
                                     onError={handleImageError}

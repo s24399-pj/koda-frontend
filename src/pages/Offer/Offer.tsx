@@ -3,13 +3,14 @@ import {useNavigate, useParams} from "react-router-dom";
 import useTitle from "../../hooks/useTitle";
 import axios from "axios";
 import L from "leaflet";
-import {OfferData,} from "../../types/offerTypes";
+import {OfferData} from "../../types/offerTypes";
 import "leaflet/dist/leaflet.css";
 import "./Offer.scss";
 import LikeButton from "../../components/LikeButton/LikeButton";
 import {useAuth} from "../../context/AuthContext";
 import {DEFAULT_PROFILE_IMAGE} from "../../assets/defaultProfilePicture.ts";
 import {CarEquipment} from "../../types/offer/OfferTypes.ts";
+import {equipmentCategories} from "../../types/offer/carEquipmentCategories.ts";
 
 interface LightboxProps {
     images: string[];
@@ -80,8 +81,8 @@ const Lightbox: React.FC<LightboxProps> = ({images, currentIndex, onClose, onIma
         const target = event.target as HTMLImageElement;
         if (!target.dataset.errorHandled) {
             target.dataset.errorHandled = "true";
-            target.src = "https://via.placeholder.com/400x300?text=Brak+zdjęcia";
-            console.warn('Błąd ładowania zdjęcia:', target.src);
+            target.src = "https://placehold.co/600x400";
+            console.warn('Image loading error:', target.src);
         }
     };
 
@@ -90,7 +91,7 @@ const Lightbox: React.FC<LightboxProps> = ({images, currentIndex, onClose, onIma
             <button
                 className="lightbox-close"
                 onClick={onClose}
-                aria-label="Zamknij podgląd"
+                aria-label="Close preview"
             >
                 ×
             </button>
@@ -100,14 +101,14 @@ const Lightbox: React.FC<LightboxProps> = ({images, currentIndex, onClose, onIma
                     <button
                         className="lightbox-nav prev"
                         onClick={handlePrevImage}
-                        aria-label="Poprzednie zdjęcie"
+                        aria-label="Previous image"
                     >
                         &lt;
                     </button>
                     <button
                         className="lightbox-nav next"
                         onClick={handleNextImage}
-                        aria-label="Następne zdjęcie"
+                        aria-label="Next image"
                     >
                         &gt;
                     </button>
@@ -117,7 +118,7 @@ const Lightbox: React.FC<LightboxProps> = ({images, currentIndex, onClose, onIma
             <div className="lightbox-content">
                 <img
                     src={`${apiUrl}${images[currentIndex]}`}
-                    alt="Powiększony widok"
+                    alt="Enlarged view"
                     className="lightbox-image"
                     onError={handleImageError}
                 />
@@ -136,7 +137,7 @@ const Lightbox: React.FC<LightboxProps> = ({images, currentIndex, onClose, onIma
                                 >
                                     <img
                                         src={`${apiUrl}${image}`}
-                                        alt={`Miniatura ${idx + 1}`}
+                                        alt={`Thumbnail ${idx + 1}`}
                                         onError={handleImageError}
                                     />
                                 </div>
@@ -225,17 +226,17 @@ const Offer: React.FC = () => {
                             setMapLat(parseFloat(lat));
                             setMapLng(parseFloat(lon));
                         } else {
-                            console.error("Nie znaleziono dokładnej miejscowości");
-                            setError("Nie udało się znaleźć dokładnej lokalizacji.");
+                            console.error("Exact location not found");
+                            setError("Failed to find exact location.");
                         }
                     } else {
-                        console.error("Brak wyników dla tej lokalizacji");
-                        setError("Nie udało się znaleźć lokalizacji.");
+                        console.error("No results for this location");
+                        setError("Failed to find location.");
                     }
                 }
             } catch (error) {
                 console.error("Error fetching offer:", error);
-                setError("Nie udało się załadować oferty.");
+                setError("Failed to load offer.");
             } finally {
                 setLoading(false);
             }
@@ -260,7 +261,7 @@ const Offer: React.FC = () => {
                 fillColor: "#007be5",
                 fillOpacity: 0.3,
                 weight: 2,
-            }).addTo(map).bindPopup("Lokalizacja oferty");
+            }).addTo(map).bindPopup("Offer location");
 
             return () => {
                 map.remove();
@@ -303,7 +304,7 @@ const Offer: React.FC = () => {
     };
 
     const handleProfileImageError = () => {
-        console.log("Wystąpił błąd ładowania zdjęcia profilowego");
+        console.log("Profile image loading error occurred");
         setProfileImage(DEFAULT_PROFILE_IMAGE);
     };
 
@@ -311,8 +312,8 @@ const Offer: React.FC = () => {
         const target = event.target as HTMLImageElement;
         if (!target.dataset.errorHandled) {
             target.dataset.errorHandled = "true";
-            target.src = "https://via.placeholder.com/400x300?text=Brak+zdjęcia";
-            console.warn('Błąd ładowania zdjęcia - zastąpiono placeholder:', target.src);
+            target.src = "https://placehold.co/600x400";
+            console.warn('Image loading error - replaced with placeholder:', target.src);
         }
     };
 
@@ -347,7 +348,7 @@ const Offer: React.FC = () => {
 
             navigate(`/chat/${offer.seller.id}`, {state: {sellerInfo}});
         } else {
-            console.error('Brak ID sprzedającego');
+            console.error('Missing seller ID');
         }
     };
 
@@ -362,77 +363,9 @@ const Offer: React.FC = () => {
     const renderEquipmentSection = (equipment?: CarEquipment) => {
         if (!equipment) return null;
 
-        const equipmentCategories = [
-            {
-                title: "Komfort",
-                icon: "🛋️",
-                items: [
-                    { key: 'airConditioning', label: 'Klimatyzacja' },
-                    { key: 'automaticClimate', label: 'Automatyczna klimatyzacja' },
-                    { key: 'heatedSeats', label: 'Podgrzewane fotele' },
-                    { key: 'electricSeats', label: 'Fotele elektryczne' },
-                    { key: 'leatherSeats', label: 'Fotele skórzane' },
-                    { key: 'panoramicRoof', label: 'Dach panoramiczny' },
-                    { key: 'electricWindows', label: 'Elektryczne szyby' },
-                    { key: 'electricMirrors', label: 'Elektryczne lusterka' },
-                    { key: 'keylessEntry', label: 'Bezkluczykowy dostęp' },
-                    { key: 'wheelHeating', label: 'Podgrzewane koło kierownicy' },
-                    { key: 'heatedSteeringWheel', label: 'Podgrzewana kierownica' }
-                ]
-            },
-            {
-                title: "Multimedia",
-                icon: "📱",
-                items: [
-                    { key: 'navigationSystem', label: 'System nawigacji' },
-                    { key: 'bluetooth', label: 'Bluetooth' },
-                    { key: 'usbPort', label: 'Port USB' },
-                    { key: 'multifunction', label: 'Kierownica wielofunkcyjna' },
-                    { key: 'androidAuto', label: 'Android Auto' },
-                    { key: 'appleCarPlay', label: 'Apple CarPlay' },
-                    { key: 'soundSystem', label: 'System audio' }
-                ]
-            },
-            {
-                title: "Systemy wspomagające",
-                icon: "🛡️",
-                items: [
-                    { key: 'parkingSensors', label: 'Czujniki parkowania' },
-                    { key: 'rearCamera', label: 'Kamera cofania' },
-                    { key: 'cruiseControl', label: 'Tempomat' },
-                    { key: 'adaptiveCruiseControl', label: 'Adaptacyjny tempomat' },
-                    { key: 'laneAssist', label: 'Asystent pasa ruchu' },
-                    { key: 'blindSpotDetection', label: 'Monitoring martwego pola' },
-                    { key: 'emergencyBraking', label: 'Automatyczne hamowanie awaryjne' },
-                    { key: 'startStop', label: 'System Start-Stop' }
-                ]
-            },
-            {
-                title: "Oświetlenie",
-                icon: "💡",
-                items: [
-                    { key: 'xenonLights', label: 'Światła xenonowe' },
-                    { key: 'ledLights', label: 'Światła LED' },
-                    { key: 'ambientLighting', label: 'Oświetlenie nastrojowe' },
-                    { key: 'automaticLights', label: 'Automatyczne światła' },
-                    { key: 'adaptiveLights', label: 'Adaptacyjne światła' }
-                ]
-            },
-            {
-                title: "Dodatkowe funkcje",
-                icon: "⭐",
-                items: [
-                    { key: 'electricTrunk', label: 'Elektryczny bagażnik' },
-                    { key: 'electricSunBlind', label: 'Elektryczna roleta' },
-                    { key: 'headUpDisplay', label: 'Wyświetlacz HUD' },
-                    { key: 'aromatherapy', label: 'Aromaterapia' }
-                ]
-            }
-        ];
-
         return (
             <div className="equipment-section">
-                <h2>Wyposażenie</h2>
+                <h2>Equipment</h2>
                 {equipmentCategories.map((category) => {
                     const availableItems = category.items.filter(item =>
                         equipment[item.key as keyof CarEquipment] === true
@@ -478,9 +411,9 @@ const Offer: React.FC = () => {
         };
     }, [imageIndex, allImages.length, lightboxOpen]);
 
-    if (loading) return <p>Ładowanie...</p>;
+    if (loading) return <p>Loading...</p>;
     if (error) return <p className="error">{error}</p>;
-    if (!offer || !offer.CarDetailsDto) return <p>Brak danych o ofercie.</p>;
+    if (!offer || !offer.CarDetailsDto) return <p>No offer data available.</p>;
 
     return (
         <div className="offer-container">
@@ -494,7 +427,7 @@ const Offer: React.FC = () => {
                         onClick={openLightbox}
                     />
                     <div className="zoom-hint">
-                        <span>🔍 Kliknij, aby powiększyć</span>
+                        <span>🔍 Click to enlarge</span>
                     </div>
                 </div>
 
@@ -504,7 +437,7 @@ const Offer: React.FC = () => {
                             <button
                                 className="nav-button prev"
                                 onClick={handlePrevImage}
-                                aria-label="Poprzednie zdjęcie"
+                                aria-label="Previous image"
                                 disabled={allImages.length <= 1}
                             >
                                 &lt;
@@ -522,7 +455,7 @@ const Offer: React.FC = () => {
                                     >
                                         <img
                                             src={`${import.meta.env.VITE_API_URL}${image}`}
-                                            alt={`Widok ${idx + 1}`}
+                                            alt={`View ${idx + 1}`}
                                             className="thumbnail-image"
                                             onError={handleImageError}
                                         />
@@ -533,7 +466,7 @@ const Offer: React.FC = () => {
                             <button
                                 className="nav-button next"
                                 onClick={handleNextImage}
-                                aria-label="Następne zdjęcie"
+                                aria-label="Next image"
                                 disabled={allImages.length <= 1}
                             >
                                 &gt;
@@ -562,25 +495,25 @@ const Offer: React.FC = () => {
                         <p>📧 <a href={`mailto:${offer.contactEmail}`}>{offer.contactEmail}</a></p>
                     </div>
 
-                    <button className="contact-button" onClick={handleContactButton}>Skontaktuj się</button>
+                    <button className="contact-button" onClick={handleContactButton}>Contact</button>
                 </div>
             </div>
 
             <div className="offer-details">
-                <h2>Opis</h2>
+                <h2>Description</h2>
                 <p>{offer.description}</p>
 
-                <h2>Szczegóły techniczne</h2>
+                <h2>Technical Details</h2>
                 <ul>
-                    <li>🚗 Marka: {offer.CarDetailsDto.brand}</li>
+                    <li>🚗 Brand: {offer.CarDetailsDto.brand}</li>
                     <li>🔧 Model: {offer.CarDetailsDto.model}</li>
-                    <li>📅 Rok: {offer.CarDetailsDto.year}</li>
-                    <li>⛽ Paliwo: {offer.CarDetailsDto.fuelType}</li>
-                    <li>⚙️ Skrzynia biegów: {offer.CarDetailsDto.transmission}</li>
-                    <li>🏎️ Moc: {offer.CarDetailsDto.enginePower} KM</li>
-                    <li>📏 Pojemność: {offer.CarDetailsDto.displacement}</li>
-                    <li>🚪 Liczba drzwi: {offer.CarDetailsDto.doors}</li>
-                    <li>🛋️ Liczba miejsc: {offer.CarDetailsDto.seats}</li>
+                    <li>📅 Year: {offer.CarDetailsDto.year}</li>
+                    <li>⛽ Fuel: {offer.CarDetailsDto.fuelType}</li>
+                    <li>⚙️ Transmission: {offer.CarDetailsDto.transmission}</li>
+                    <li>🏎️ Power: {offer.CarDetailsDto.enginePower} HP</li>
+                    <li>📏 Displacement: {offer.CarDetailsDto.displacement}</li>
+                    <li>🚪 Doors: {offer.CarDetailsDto.doors}</li>
+                    <li>🛋️ Seats: {offer.CarDetailsDto.seats}</li>
                 </ul>
 
                 {renderEquipmentSection(offer.CarDetailsDto.carEquipment)}
@@ -588,7 +521,7 @@ const Offer: React.FC = () => {
 
             {offer.seller && (
                 <div className="seller-info-section">
-                    <h2>Sprzedający</h2>
+                    <h2>Seller</h2>
                     <div className="seller-info">
                         <div className="seller-profile">
                             <div className="profile-image-container">
@@ -609,12 +542,12 @@ const Offer: React.FC = () => {
                                     disabled={!isAuthenticated}
                                     title={!isAuthenticated ? "You need to be logged in!" : ""}
                                 >
-                                    <i className="fas fa-comments"></i> Rozpocznij czat
+                                    <i className="fas fa-comments"></i> Start Chat
                                 </button>
                             </div>
                         </div>
                         <button className="view-seller-offers">
-                            Zobacz inne oferty sprzedającego
+                            View Other Seller Offers
                         </button>
                     </div>
                 </div>
@@ -622,7 +555,7 @@ const Offer: React.FC = () => {
 
             {mapLat && mapLng && (
                 <div className="offer-map">
-                    <h2>Lokalizacja</h2>
+                    <h2>Location</h2>
                     <div
                         ref={mapRef}
                         style={{

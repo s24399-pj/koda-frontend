@@ -5,19 +5,10 @@ import {OfferData} from "../../types/offerTypes";
 import {MiniOffer} from "../../types/miniOfferTypes";
 import useTitle from "../../hooks/useTitle";
 import {useComparison} from "../../context/ComparisonContext";
+import {comparisonFeatures, ComparisonType, Feature} from "../../types/offer/comparisionFeatures.ts";
 
 const API_URL = import.meta.env.VITE_API_URL;
-const PLACEHOLDER_IMAGE = "https://via.placeholder.com/300x200?text=Brak+zdjęcia";
-
-type ComparisonType = 'higher' | 'lower';
-
-interface Feature {
-    label: string;
-    key: string;
-    unit?: string;
-    highlightBetter?: ComparisonType;
-    carDetails?: boolean;
-}
+const PLACEHOLDER_IMAGE = "https://placehold.co/600x400";
 
 const OfferComparison: React.FC = () => {
     useTitle("Porównaj");
@@ -42,7 +33,7 @@ const OfferComparison: React.FC = () => {
         if (!target.dataset.errorHandled) {
             target.dataset.errorHandled = "true";
             target.src = PLACEHOLDER_IMAGE;
-            console.warn('Błąd ładowania zdjęcia w porównywance:', target.src);
+            console.warn('Image loading error in comparison:', target.src);
         }
     };
 
@@ -95,7 +86,7 @@ const OfferComparison: React.FC = () => {
             const response = await axios.get(`${API_URL}/api/v1/offers`, {params});
             setSuggestions(response.data.content || []);
         } catch (error) {
-            console.error("Błąd podczas wyszukiwania ofert:", error);
+            console.error("Error searching offers:", error);
             setError("Wystąpił błąd podczas wyszukiwania ofert.");
             setSuggestions([]);
         } finally {
@@ -223,23 +214,7 @@ const OfferComparison: React.FC = () => {
         return null;
     };
 
-    const features: Feature[] = [
-        {label: "Tytuł", key: "title"},
-        {label: "Cena", key: "price", unit: "PLN", highlightBetter: 'lower'},
-        {label: "Rok produkcji", key: "year", highlightBetter: 'higher', carDetails: true},
-        {label: "Przebieg", key: "mileage", unit: "km", highlightBetter: 'lower', carDetails: true},
-        {label: "Typ paliwa", key: "fuelType", carDetails: true},
-        {label: "Moc silnika", key: "enginePower", unit: "KM", highlightBetter: 'higher', carDetails: true},
-        {label: "Pojemność silnika", key: "displacement", carDetails: true},
-        {label: "Skrzynia biegów", key: "transmission", carDetails: true},
-        {label: "Liczba drzwi", key: "doors", carDetails: true},
-        {label: "Liczba miejsc", key: "seats", carDetails: true},
-        {label: "Marka", key: "brand", carDetails: true},
-        {label: "Model", key: "model", carDetails: true},
-        {label: "Lokalizacja", key: "location"},
-        {label: "Telefon kontaktowy", key: "contactPhone"},
-        {label: "Email kontaktowy", key: "contactEmail"}
-    ];
+    const features: Feature[] = comparisonFeatures;
 
     const getValue = (offer: OfferData | null, feature: Feature): any => {
         if (!offer) return null;

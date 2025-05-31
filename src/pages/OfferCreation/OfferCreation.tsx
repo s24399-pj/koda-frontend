@@ -138,7 +138,7 @@ const OfferCreation: React.FC = () => {
         accidentFree: false,
         serviceHistory: false,
         additionalFeatures: '',
-        equipment: undefined, // Zmienione z {} na undefined
+        equipment: undefined,
         termsAccepted: false,
         imageFiles: [],
         fuelType: undefined,
@@ -174,14 +174,12 @@ const OfferCreation: React.FC = () => {
             }
         }
 
-        // Poprawiona obsługa equipment
         if (offerData.equipment && Object.keys(offerData.equipment).length > 0) {
             const normalizedEquipment: CarEquipment = {};
             Object.entries(offerData.equipment).forEach(([key, value]) => {
                 (normalizedEquipment as any)[key] = Boolean(value);
             });
 
-            // Sprawdź czy wszystkie wartości są false
             if (Object.values(normalizedEquipment).every(v => !v)) {
                 offerData.equipment = undefined;
             } else {
