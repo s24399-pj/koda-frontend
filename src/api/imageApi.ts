@@ -62,13 +62,13 @@ export const uploadMultipleImages = async (offerId: string, files: File[]): Prom
                     `HTTP ${error.response.status}: ${error.response.statusText}`;
                 throw new Error(errorMessage);
             } else if (error.request) {
-                throw new Error('Brak odpowiedzi z serwera. Sprawdź połączenie internetowe.');
+                throw new Error('No response from server. Check your internet connection.');
             } else {
-                throw new Error(`Błąd konfiguracji: ${error.message}`);
+                throw new Error(`Configuration error: ${error.message}`);
             }
         }
 
-        throw new Error('Nieznany błąd podczas przesyłania zdjęć');
+        throw new Error('Unknown error occurred while uploading images');
     }
 };
 
@@ -107,13 +107,13 @@ export const uploadMultipleImagesWithoutOffer = async (files: File[]): Promise<I
                     `HTTP ${error.response.status}: ${error.response.statusText}`;
                 throw new Error(errorMessage);
             } else if (error.request) {
-                throw new Error('Brak odpowiedzi z serwera. Sprawdź połączenie internetowe.');
+                throw new Error('No response from server. Check your internet connection.');
             } else {
-                throw new Error(`Błąd konfiguracji: ${error.message}`);
+                throw new Error(`Configuration error: ${error.message}`);
             }
         }
 
-        throw new Error('Nieznany błąd podczas przesyłania zdjęć');
+        throw new Error('Unknown error occurred while uploading images');
     }
 };
 
@@ -131,9 +131,9 @@ export const deleteImage = async (imageId: string): Promise<void> => {
         });
     } catch (error) {
         if (axios.isAxiosError(error) && error.response) {
-            throw new Error(error.response.data.message || 'Błąd podczas usuwania zdjęcia');
+            throw new Error(error.response.data.message || 'Error while deleting image');
         }
-        throw new Error('Błąd sieci podczas usuwania zdjęcia');
+        throw new Error('Network error while deleting image');
     }
 };
 
@@ -143,11 +143,11 @@ export const validateImageFile = (file: File): string | null => {
     const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
 
     if (!allowedTypes.includes(file.type)) {
-        return `Nieobsługiwany format pliku. Dozwolone formaty: ${allowedTypes.join(', ')}`;
+        return `Unsupported file format. Allowed formats: ${allowedTypes.join(', ')}`;
     }
 
     if (file.size > maxSizeInBytes) {
-        return `Plik jest za duży. Maksymalny rozmiar: ${maxSizeInMB}MB`;
+        return `File is too large. Maximum size: ${maxSizeInMB}MB`;
     }
 
     return null;
@@ -178,7 +178,7 @@ export const compressImage = (file: File, maxWidth: number = 1920, quality: numb
                         });
                         resolve(compressedFile);
                     } else {
-                        reject(new Error('Błąd kompresji obrazu'));
+                        reject(new Error('Image compression error'));
                     }
                 },
                 file.type,
@@ -186,7 +186,7 @@ export const compressImage = (file: File, maxWidth: number = 1920, quality: numb
             );
         };
 
-        img.onerror = () => reject(new Error('Błąd ładowania obrazu'));
+        img.onerror = () => reject(new Error('Image loading error'));
         img.src = URL.createObjectURL(file);
     });
 };
