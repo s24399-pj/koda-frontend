@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import './UserOffers.scss';
-import { getUserOffers, deleteOffer } from '../../api/offerApi';
+import {getUserOffers, deleteOffer} from '../../api/offerApi';
 import {ApiOffer, OfferData} from "../../types/offerTypes.ts";
 
-const DEFAULT_CAR_IMAGE = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYgMjU2Ij48cmVjdCB3aWR0aD0iMjU2IiBoZWlnaHQ9IjI1NiIgZmlsbD0iI2U5ZWNlZiIvPjxwYXRoIGQ9Ik0xNzUuMTIsMTI4LjVINzQuODhhMTIsMTIsMCwwLDAtMTIsOUw1NywxNzFhNiw2LDAsMCwwLDYsNmgxMzBhNiw2LDAsMCwwLDYtNmwtNS44OC0zMy41QTEyLDEyLDAsMCwwLDE3NS4xMiwxMjguNVoiIGZpbGw9IiM2Yzc1N2QiLz48Y2lyY2xlIGN4PSI4NCIgY3k9IjE2MSIgcj0iMTIiIGZpbGw9IiNlOWVjZWYiLz48Y2lyY2xlIGN4PSIxNzIiIGN5PSIxNjEiIHI9IjEyIiBmaWxsPSIjZTllY2VmIi8+PHBhdGggZD0iTTE5MywxMjIuMjRsLTI1LjI0LTI1LjI0QTIwLDIwLDAsMCwwLDE1My40LDkwaC01MC44YTIwLDIwLDAsMCwwLTE0LjE0LDUuODZMNjMuMjIsMTIwLjg2YTIwLDIwLDAsMCwwLTYsMTZsMS40OSwxMy4wN0EyMCwyMCwwLDAsMCw3OC4xOCwxNjhoOTkuNjVBMjAsMjAsMCwwLDAsMTk3LjM4LDE1MGwxLjQ5LTEzLjA3QTIwLDIwLDAsMCwwLDE5MywxMjIuMjRaIiBmaWxsPSIjNmM3NTdkIi8+PC9zdmc+";
+const API_URL = import.meta.env.VITE_API_URL;
+const DEFAULT_CAR_IMAGE = "https://placehold.co/600x400";
 
 const formatPrice = (price: number, currency: string = 'zł'): string => {
     return price.toLocaleString('pl-PL') + ' ' + currency;
@@ -70,6 +72,20 @@ const UserOffers: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [noUserIdError, setNoUserIdError] = useState<boolean>(false);
+    const navigate = useNavigate();
+
+    const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
+        const target = event.target as HTMLImageElement;
+        if (!target.dataset.errorHandled) {
+            target.dataset.errorHandled = "true";
+            target.src = DEFAULT_CAR_IMAGE;
+            console.warn('Błąd ładowania zdjęcia w ofercie użytkownika:', target.src);
+        }
+    };
+
+    const handleOfferClick = (offerId: string) => {
+        navigate(`/offer/${offerId}`);
+    };
 
     useEffect(() => {
         const fetchUserOffers = async () => {
@@ -108,15 +124,14 @@ const UserOffers: React.FC = () => {
         fetchUserOffers();
     }, []);
 
-    const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-        e.currentTarget.src = DEFAULT_CAR_IMAGE;
-    };
-
-    const handleEditOffer = (offerId: string) => {
+    const handleEditOffer = (offerId: string, event: React.MouseEvent) => {
+        event.stopPropagation();
         window.location.href = `/offer/edit/${offerId}`;
     };
 
-    const handleDeleteOffer = async (offerId: string) => {
+    const handleDeleteOffer = async (offerId: string, event: React.MouseEvent) => {
+        event.stopPropagation();
+
         if (window.confirm('Czy na pewno chcesz usunąć to ogłoszenie?')) {
             try {
                 const success = await deleteOffer(offerId);
@@ -137,7 +152,7 @@ const UserOffers: React.FC = () => {
         window.location.href = '/user/panel';
     };
 
-    const OfferCard: React.FC<{ offer: OfferData }> = ({ offer }) => {
+    const OfferCard: React.FC<{ offer: OfferData }> = ({offer}) => {
         if (!offer || !offer.CarDetailsDto) {
             return null;
         }
@@ -145,10 +160,10 @@ const UserOffers: React.FC = () => {
         const translatedFuelType = fuelTypeTranslations[offer.CarDetailsDto.fuelType] || offer.CarDetailsDto.fuelType;
 
         return (
-            <div className="offer-card">
+            <div className="offer-card" onClick={() => handleOfferClick(offer.id)}>
                 <div className="offer-image">
                     <img
-                        src={offer.mainImage || DEFAULT_CAR_IMAGE}
+                        src={offer.mainImage ? `${API_URL}${offer.mainImage}` : DEFAULT_CAR_IMAGE}
                         alt={offer.title}
                         onError={handleImageError}
                     />
@@ -167,13 +182,13 @@ const UserOffers: React.FC = () => {
                 <div className="offer-actions">
                     <button
                         className="edit-offer-btn"
-                        onClick={() => handleEditOffer(offer.id)}
+                        onClick={(e) => handleEditOffer(offer.id, e)}
                     >
                         Edytuj
                     </button>
                     <button
                         className="delete-offer-btn"
-                        onClick={() => handleDeleteOffer(offer.id)}
+                        onClick={(e) => handleDeleteOffer(offer.id, e)}
                     >
                         Usuń
                     </button>
@@ -221,7 +236,7 @@ const UserOffers: React.FC = () => {
         return (
             <div className="offers-list">
                 {offers.map(offer => (
-                    <OfferCard key={offer.id} offer={offer} />
+                    <OfferCard key={offer.id} offer={offer}/>
                 ))}
                 <div className="add-offer-container">
                     <button className="create-offer-btn" onClick={navigateToCreateOffer}>

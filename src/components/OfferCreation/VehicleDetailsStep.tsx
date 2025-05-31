@@ -1,15 +1,13 @@
 import React from 'react';
 import { FormikProps, Field, ErrorMessage, FieldInputProps } from 'formik';
 import {
-    CreateOfferCommand,
+    OfferFormValues,
     FuelType,
     TransmissionType,
     BodyType,
     DriveType,
     VehicleCondition
 } from '../../types/offer/OfferTypes';
-
-type OfferFormValues = CreateOfferCommand & { termsAccepted: boolean };
 
 interface VehicleDetailsStepProps {
     formik: FormikProps<OfferFormValues>;

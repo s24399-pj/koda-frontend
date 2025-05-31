@@ -1,5 +1,3 @@
-
-// Możemy użyć zmiennych z pliku paste-2.txt
 $primary-color: #007be5;
 $primary-light: #eaf4ff;
 $primary-dark: #005bb5;
@@ -70,11 +68,13 @@ $mobile: 576px;
   border: 1px solid $border-color;
   border-radius: 8px;
   overflow: hidden;
-  transition: box-shadow 0.3s ease;
+  transition: all 0.3s ease;
   background-color: white;
+  cursor: pointer;
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
   }
 
   .offer-image {
@@ -85,7 +85,12 @@ $mobile: 576px;
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transition: transform 0.3s ease;
     }
+  }
+
+  &:hover .offer-image img {
+    transform: scale(1.05);
   }
 
   .offer-details {
@@ -104,6 +109,7 @@ $mobile: 576px;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
+      transition: color 0.2s ease;
     }
 
     .offer-specs {
@@ -124,7 +130,16 @@ $mobile: 576px;
       font-weight: 600;
       color: $primary-color;
       margin-top: 10px;
+      transition: color 0.2s ease;
     }
+  }
+
+  &:hover .offer-details .offer-title {
+    color: $primary-color;
+  }
+
+  &:hover .offer-details .offer-price {
+    color: $primary-dark;
   }
 
   .offer-actions {
@@ -140,6 +155,8 @@ $mobile: 576px;
       font-size: 14px;
       cursor: pointer;
       transition: all 0.2s ease;
+      position: relative;
+      z-index: 2;
     }
 
     .edit-offer-btn {
@@ -149,6 +166,7 @@ $mobile: 576px;
 
       &:hover {
         background-color: $primary-dark;
+        transform: translateY(-1px);
       }
     }
 
@@ -160,6 +178,7 @@ $mobile: 576px;
       &:hover {
         background-color: $danger-color;
         color: white;
+        transform: translateY(-1px);
       }
     }
   }
@@ -180,10 +199,11 @@ $mobile: 576px;
     padding: 10px 20px;
     font-size: 14px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
 
     &:hover {
       background-color: $primary-dark;
+      transform: translateY(-1px);
     }
   }
 }

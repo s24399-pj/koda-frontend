@@ -1,5 +1,3 @@
-import {OfferData} from "../offerTypes.ts";
-
 export enum FuelType {
     PETROL = 'PETROL',
     DIESEL = 'DIESEL',
@@ -46,9 +44,7 @@ export enum VehicleCondition {
     CLASSIC = 'CLASSIC'
 }
 
-// Interface dla wyposażenia samochodu
 export interface CarEquipment {
-    // Komfort
     airConditioning?: boolean;
     automaticClimate?: boolean;
     heatedSeats?: boolean;
@@ -60,7 +56,6 @@ export interface CarEquipment {
     keylessEntry?: boolean;
     wheelHeating?: boolean;
 
-    // Multimedia
     navigationSystem?: boolean;
     bluetooth?: boolean;
     usbPort?: boolean;
@@ -69,7 +64,6 @@ export interface CarEquipment {
     appleCarPlay?: boolean;
     soundSystem?: boolean;
 
-    // Systemy wspomagające
     parkingSensors?: boolean;
     rearCamera?: boolean;
     cruiseControl?: boolean;
@@ -79,14 +73,12 @@ export interface CarEquipment {
     emergencyBraking?: boolean;
     startStop?: boolean;
 
-    // Oświetlenie
     xenonLights?: boolean;
     ledLights?: boolean;
     ambientLighting?: boolean;
     automaticLights?: boolean;
     adaptiveLights?: boolean;
 
-    // Dodatkowe funkcje
     heatedSteeringWheel?: boolean;
     electricTrunk?: boolean;
     electricSunBlind?: boolean;
@@ -94,22 +86,16 @@ export interface CarEquipment {
     aromatherapy?: boolean;
 }
 
-// Interface dla tworzenia oferty
 export interface CreateOfferCommand {
-    // Podstawowe informacje o ofercie
     title: string;
     description: string;
     price: number;
     currency: string;
     negotiable?: boolean;
-
-    // Informacje kontaktowe
     location?: string;
     contactPhone?: string;
     contactEmail?: string;
     expirationDate?: string;
-
-    // Szczegóły pojazdu
     brand: string;
     model: string;
     year: number;
@@ -134,7 +120,42 @@ export interface CreateOfferCommand {
     equipment?: CarEquipment;
 }
 
-// Interface dla odpowiedzi z API
+export interface OfferFormValues {
+    title: string;
+    description: string;
+    price: number;
+    currency: string;
+    negotiable: boolean;
+    brand: string;
+    model: string;
+    year: number;
+    mileage: number;
+    color: string;
+    enginePower: number;
+    doors: number;
+    seats: number;
+    vin: string;
+    registrationNumber: string;
+    registrationCountry: string;
+    firstOwner: boolean;
+    accidentFree: boolean;
+    serviceHistory: boolean;
+    additionalFeatures: string;
+    equipment?: CarEquipment;
+    location?: string;
+    expirationDate?: string;
+    termsAccepted: boolean;
+    imageFiles: File[];
+    fuelType?: FuelType;
+    transmission?: TransmissionType;
+    bodyType?: BodyType;
+    driveType?: DriveType;
+    condition?: VehicleCondition;
+    displacement?: string;
+    contactPhone?: string;
+    contactEmail?: string;
+}
+
 export interface OfferResponse {
     id: string;
     title: string;
@@ -144,7 +165,6 @@ export interface OfferResponse {
     createdAt: string;
 }
 
-// Nowy interfejs dla odpowiedzi z API zawierającej listę ofert
 export interface OffersResponse {
     content: OfferData[];
     pageable: {
@@ -164,4 +184,70 @@ export interface OffersResponse {
     number?: number;
     numberOfElements?: number;
     size?: number;
+}
+
+export interface CarDetails {
+    brand: string;
+    model: string;
+    year: number;
+    color: string;
+    displacement: string;
+    mileage: number;
+    fuelType: string;
+    transmission: string;
+    bodyType: string;
+    driveType: string;
+    enginePower: number;
+    doors: number;
+    seats: number;
+    carEquipment?: CarEquipment;
+}
+
+export interface SellerData {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    profilePictureBase64?: string;
+}
+
+export interface OfferData {
+    id: string;
+    title: string;
+    description: string;
+    price: number;
+    currency: string;
+    seller: SellerData;
+    location: string;
+    contactPhone: string;
+    contactEmail: string;
+    mainImage: string;
+    imageUrls?: string[];
+    CarDetailsDto: CarDetails;
+}
+
+export interface ApiOffer {
+    id: string;
+    title: string;
+    price: number;
+    mainImage: string | null;
+    mileage: number;
+    fuelType: string;
+    year: number;
+    enginePower: number;
+    displacement: string;
+    brand?: string;
+    model?: string;
+    description?: string;
+    currency?: string;
+    seller?: SellerData;
+    location?: string;
+    contactPhone?: string;
+    contactEmail?: string;
+    color?: string;
+    transmission?: string;
+    bodyType?: string;
+    driveType?: string;
+    doors?: number;
+    seats?: number;
 }

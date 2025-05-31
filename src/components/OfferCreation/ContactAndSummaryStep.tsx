@@ -1,9 +1,9 @@
 import React from 'react';
 import { FormikProps, Field, ErrorMessage, FieldInputProps } from 'formik';
-import { CreateOfferCommand } from '../../types/offer/OfferTypes';
+import {CreateOfferCommand, OfferFormValues} from '../../types/offer/OfferTypes';
 
 interface ContactAndSummaryStepProps {
-    formik: FormikProps<CreateOfferCommand & { termsAccepted: boolean }>;
+    formik: FormikProps<OfferFormValues>;
     onPrevious: () => void;
     isSubmitting: boolean;
 }
