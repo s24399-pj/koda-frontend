@@ -180,12 +180,6 @@ const OfferList: React.FC = () => {
 
   return (
       <div className="offer-list-container">
-        {/* Filter Toggle Button - Mobile */}
-        <div className="filter-toggle-mobile">
-          <button onClick={toggleFilters}>
-            {showFilters ? 'Ukryj filtry' : 'Pokaż filtry'}
-          </button>
-        </div>
         
         {/* Two-column layout for desktop */}
         <div className="offer-list-layout">
