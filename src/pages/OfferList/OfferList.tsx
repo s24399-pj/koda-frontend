@@ -1,6 +1,5 @@
-import React, {useEffect, useState} from "react";
-import {useNavigate, useLocation} from "react-router-dom";
-import axios from "axios";
+import React, {useState} from "react";
+import {useNavigate} from "react-router-dom";
 import "./OfferList.scss";
 import useTitle from "../../hooks/useTitle";
 import {MiniOffer} from "../../types/miniOfferTypes";
@@ -13,8 +12,7 @@ import AdvancedFilter from "../../components/AdvancedFilter/AdvancedFilter";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const adaptToMiniOffer = (item: any): MiniOffer => {
-  // Extract car details from the correct property
-  const carDetails = item.carDetails || {};
+  const carDetails = item.carDetailsDto || item.carDetails || {};
   
   // Get the main image from imageUrls array
   let mainImage = '';
@@ -46,7 +44,6 @@ const OfferList: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const location = useLocation();
 
   const {
     selectedOffers,
@@ -228,9 +225,7 @@ const OfferList: React.FC = () => {
                         <div className="offer-image-container">
                           {offer.mainImage ? (
                             <img
-                              src={offer.mainImage.startsWith('http') 
-                                ? offer.mainImage 
-                                : `${API_URL}/images/${offer.mainImage}`}
+                              src={`${API_URL}${offer.mainImage}`}
                               alt={offer.title}
                               loading="lazy"
                               onError={handleImageError}
