@@ -77,33 +77,28 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
   const driveTypeOptions = enumToOptions(DriveType);
   const conditionOptions = enumToOptions(VehicleCondition);
 
-  // A list of popular car brands for fallback
   const popularBrands = [
-    "Audi", "BMW", "Chevrolet", "Citroën", "Dacia", "Fiat", "Ford", 
+    "Audi", "BMW", "Chevrolet", "Dacia", "Fiat", "Ford", 
     "Honda", "Hyundai", "Jaguar", "Jeep", "Kia", "Land Rover", 
     "Lexus", "Mazda", "Mercedes-Benz", "Mitsubishi", "Nissan", 
-    "Opel", "Peugeot", "Porsche", "Renault", "Seat", "Škoda", 
+    "Opel", "Peugeot", "Porsche", "Renault", "Seat", "Skoda", 
     "Subaru", "Suzuki", "Toyota", "Volkswagen", "Volvo"
   ].sort();
 
-  // Fetch all offers when component mounts
   useEffect(() => {
     console.log('AdvancedFilter mounted, fetching initial offers...');
     fetchAllOffers();
   }, []);
 
-  // Fetch brands on component mount
   useEffect(() => {
     const fetchBrands = async () => {
       try {
-        // Use the correct endpoint
         const response = await axios.get(`${API_URL}/api/offers/search/brands`);
         if (response.data && response.data.content && Array.isArray(response.data.content)) {
           setBrands(response.data.content);
         }
       } catch (error) {
         console.error("Error fetching brands:", error);
-        // Fallback to popular brands list if API fails
         setBrands(popularBrands);
       }
     };
@@ -111,7 +106,6 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
     fetchBrands();
   }, []);
 
-  // Fetch models when brand changes (placeholder - you need to implement this endpoint)
   useEffect(() => {
     const fetchModels = async () => {
       if (!filters.brand) {
@@ -121,7 +115,6 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
 
       try {
         setLoading(true);
-        // This is a placeholder - you would need to implement a proper endpoint
         const response = await axios.get(`${API_URL}/api/offers/search/brands/search`, {
           params: { phrase: filters.brand }
         });
@@ -140,13 +133,11 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
     fetchModels();
   }, [filters.brand]);
 
-  // Function to fetch all offers without filters
   const fetchAllOffers = async () => {
     console.log('Fetching all offers...');
     onLoading(true);
     
     try {
-      // Make the POST request with an empty body to get all offers
       const response = await axios.post(
         `${API_URL}/api/offers/search/advanced`, 
         {},
@@ -160,11 +151,9 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
       
       console.log('Initial offers response:', response.data);
       
-      // Pass results to parent component
       onSearch(response.data);
     } catch (error) {
       console.error('Error fetching initial offers:', error);
-      // In case of error, pass empty results
       onSearch({
         content: [],
         totalElements: 0,
@@ -178,21 +167,18 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     
-    // Handle numeric inputs
     if (type === 'number') {
       setFilters(prev => ({ 
         ...prev, 
         [name]: value === '' ? null : Number(value)
       }));
     } 
-    // Handle select inputs (for enums)
     else if (type === 'select-one') {
       setFilters(prev => ({ 
         ...prev, 
         [name]: value === '' ? null : value 
       }));
     }
-    // Handle text inputs
     else {
       setFilters(prev => ({ ...prev, [name]: value }));
     }
@@ -203,7 +189,6 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
     setFilters(prev => ({ ...prev, [name]: checked ? true : null }));
   };
 
-  // Prepare data for API request - remove null/empty values
   const prepareRequestData = () => {
     const cleanedFilters: Record<string, any> = {};
     
@@ -222,13 +207,11 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
     
     const requestData = prepareRequestData();
     
-    // Show loading state
     onLoading(true);
     
     try {
       console.log('Sending search request with data:', requestData);
       
-      // Make the POST request to the advanced search endpoint
       const response = await axios.post(
         `${API_URL}/api/offers/search/advanced`, 
         requestData,
@@ -242,18 +225,15 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
       
       console.log('Search results:', response.data);
       
-      // Pass results to parent component
       onSearch(response.data);
     } catch (error) {
       console.error('Error performing advanced search:', error);
-      // In case of error, pass empty results
       onSearch({
         content: [],
         totalElements: 0,
         totalPages: 0
       });
     } finally {
-      // Hide loading state
       onLoading(false);
     }
   };
@@ -292,7 +272,6 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
       ledLights: null,
     });
     
-    // Fetch all offers after reset
     fetchAllOffers();
   };
 
@@ -300,10 +279,8 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
     setShowAdvanced(!showAdvanced);
   };
 
-  // Check if any filter is active
   const hasActiveFilters = Object.values(filters).some(value => value !== null && value !== '');
 
-  // Current year for year filter
   const currentYear = new Date().getFullYear();
 
   return (
