@@ -93,7 +93,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
   useEffect(() => {
     const fetchBrands = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/offers/search/brands`);
+        const response = await axios.get(`${API_URL}/api/v1/offers/search/brands`);
         if (response.data && response.data.content && Array.isArray(response.data.content)) {
           setBrands(response.data.content);
         }
@@ -115,7 +115,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
 
       try {
         setLoading(true);
-        const response = await axios.get(`${API_URL}/api/offers/search/brands/search`, {
+        const response = await axios.get(`${API_URL}/api/v1/offers/search/brands/search`, {
           params: { phrase: filters.brand }
         });
         
@@ -139,7 +139,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
     
     try {
       const response = await axios.post(
-        `${API_URL}/api/offers/search/advanced`, 
+        `${API_URL}/api/v1/offers/search/advanced`, 
         {},
         {
           params: {
@@ -213,7 +213,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
       console.log('Sending search request with data:', requestData);
       
       const response = await axios.post(
-        `${API_URL}/api/offers/search/advanced`, 
+        `${API_URL}/api/v1/offers/search/advanced`, 
         requestData,
         {
           params: {
