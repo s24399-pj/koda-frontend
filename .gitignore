@@ -44,3 +44,6 @@ coverage/
 
 # Local debug files
 debug.log*
+
+# Package-lock
+package-lock.json

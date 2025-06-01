@@ -1,23 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import axios from "axios";
 import "./OfferComparison.scss";
-import { OfferData } from "../../types/offerTypes";
-import { MiniOffer } from "../../types/miniOfferTypes";
+import {OfferData} from "../../types/offerTypes";
+import {MiniOffer} from "../../types/miniOfferTypes";
 import useTitle from "../../hooks/useTitle";
-import { useComparison } from "../../context/ComparisonContext";
+import {useComparison} from "../../context/ComparisonContext";
+import {comparisonFeatures, ComparisonType, Feature} from "../../types/offer/comparisionFeatures.ts";
 
 const API_URL = import.meta.env.VITE_API_URL;
-const PLACEHOLDER_IMAGE = "/assets/placeholder.jpg";
-
-type ComparisonType = 'higher' | 'lower';
-
-interface Feature {
-    label: string;
-    key: string;
-    unit?: string;
-    highlightBetter?: ComparisonType;
-    carDetails?: boolean;
-}
+const PLACEHOLDER_IMAGE = "https://placehold.co/600x400";
 
 const OfferComparison: React.FC = () => {
     useTitle("Porównaj");
@@ -35,7 +26,16 @@ const OfferComparison: React.FC = () => {
     const [focusA, setFocusA] = useState(false);
     const [focusB, setFocusB] = useState(false);
 
-    const { clearComparison } = useComparison();
+    const {clearComparison} = useComparison();
+
+    const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
+        const target = event.target as HTMLImageElement;
+        if (!target.dataset.errorHandled) {
+            target.dataset.errorHandled = "true";
+            target.src = PLACEHOLDER_IMAGE;
+            console.warn('Image loading error in comparison:', target.src);
+        }
+    };
 
     useEffect(() => {
         const loadOffersFromSession = async () => {
@@ -83,10 +83,10 @@ const OfferComparison: React.FC = () => {
             params.set("phrase", query);
             params.set("size", "5");
 
-            const response = await axios.get(`${API_URL}/api/v1/offers`, { params });
+            const response = await axios.get(`${API_URL}/api/v1/offers`, {params});
             setSuggestions(response.data.content || []);
         } catch (error) {
-            console.error("Błąd podczas wyszukiwania ofert:", error);
+            console.error("Error searching offers:", error);
             setError("Wystąpił błąd podczas wyszukiwania ofert.");
             setSuggestions([]);
         } finally {
@@ -199,43 +199,22 @@ const OfferComparison: React.FC = () => {
         if (!offer) return null;
 
         if (offer.imageUrls && offer.imageUrls.length > 0) {
-            return `${API_URL}/images/${offer.imageUrls[0]}`;
+            return `${API_URL}${offer.imageUrls[0]}`;
         }
 
         if (offer.mainImage) {
-            return `${API_URL}/images/${offer.mainImage}`;
+            return `${API_URL}${offer.mainImage}`;
         }
 
         const imagesField = (offer as any)['images'];
         if (imagesField && Array.isArray(imagesField) && imagesField.length > 0) {
-            return `${API_URL}/images/${imagesField[0]}`;
+            return `${API_URL}${imagesField[0]}`;
         }
 
         return null;
     };
 
-    const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
-        const target = event.target as HTMLImageElement;
-        target.src = PLACEHOLDER_IMAGE;
-    };
-
-    const features: Feature[] = [
-        { label: "Tytuł", key: "title" },
-        { label: "Cena", key: "price", unit: "PLN", highlightBetter: 'lower' },
-        { label: "Rok produkcji", key: "year", highlightBetter: 'higher', carDetails: true },
-        { label: "Przebieg", key: "mileage", unit: "km", highlightBetter: 'lower', carDetails: true },
-        { label: "Typ paliwa", key: "fuelType", carDetails: true },
-        { label: "Moc silnika", key: "enginePower", unit: "KM", highlightBetter: 'higher', carDetails: true },
-        { label: "Pojemność silnika", key: "displacement", carDetails: true },
-        { label: "Skrzynia biegów", key: "transmission", carDetails: true },
-        { label: "Liczba drzwi", key: "doors", carDetails: true },
-        { label: "Liczba miejsc", key: "seats", carDetails: true },
-        { label: "Marka", key: "brand", carDetails: true },
-        { label: "Model", key: "model", carDetails: true },
-        { label: "Lokalizacja", key: "location" },
-        { label: "Telefon kontaktowy", key: "contactPhone" },
-        { label: "Email kontaktowy", key: "contactEmail" }
-    ];
+    const features: Feature[] = comparisonFeatures;
 
     const getValue = (offer: OfferData | null, feature: Feature): any => {
         if (!offer) return null;
@@ -266,7 +245,8 @@ const OfferComparison: React.FC = () => {
                     {suggestionsA.length > 0 && focusA && (
                         <ul className="suggestions">
                             {suggestionsA.map((offer) => (
-                                <li key={offer.id} onClick={() => selectOffer(offer, setOfferA, setInputA, setSuggestionsA)}>
+                                <li key={offer.id}
+                                    onClick={() => selectOffer(offer, setOfferA, setInputA, setSuggestionsA)}>
                                     <div className="suggestion-item">
                                         <img
                                             src={getMainImageUrl(offer) || PLACEHOLDER_IMAGE}
@@ -300,7 +280,8 @@ const OfferComparison: React.FC = () => {
                     {suggestionsB.length > 0 && focusB && (
                         <ul className="suggestions">
                             {suggestionsB.map((offer) => (
-                                <li key={offer.id} onClick={() => selectOffer(offer, setOfferB, setInputB, setSuggestionsB)}>
+                                <li key={offer.id}
+                                    onClick={() => selectOffer(offer, setOfferB, setInputB, setSuggestionsB)}>
                                     <div className="suggestion-item">
                                         <img
                                             src={getMainImageUrl(offer) || PLACEHOLDER_IMAGE}

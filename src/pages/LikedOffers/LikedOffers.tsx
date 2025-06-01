@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {useNavigate, Link} from "react-router-dom";
 import "./LikedOffers.scss";
 import useTitle from "../../hooks/useTitle";
 import LikeButton from "../../components/LikeButton/LikeButton";
 import CompareCheckbox from "../../components/CompareCheckbox/CompareCheckbox";
 import ComparisonBar from "../../components/ComparisonBar/ComparisonBar";
-import { useComparison } from "../../context/ComparisonContext";
-import { useAuth } from "../../context/AuthContext";
+import {useComparison} from "../../context/ComparisonContext";
+import {useAuth} from "../../context/AuthContext";
 import AuthRequired from "../AuthRequired/AuthRequired";
-import { likedOfferApi } from "../../api/likedOfferApi";
-import { MiniOffer } from "../../types/miniOfferTypes";
-import { RawOfferData } from "../../types/offer/RawOfferData"
+import {likedOfferApi} from "../../api/likedOfferApi";
+import {MiniOffer} from "../../types/miniOfferTypes";
+import {RawOfferData} from "../../types/offer/RawOfferData"
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -20,7 +20,7 @@ const LikedOffersList: React.FC = () => {
     const [likedOffers, setLikedOffers] = useState<MiniOffer[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
-    const { isAuthenticated } = useAuth();
+    const {isAuthenticated} = useAuth();
 
     const {
         selectedOffers,
@@ -29,6 +29,15 @@ const LikedOffersList: React.FC = () => {
         isOfferSelected,
         canAddMoreOffers
     } = useComparison();
+
+    const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
+        const target = event.target as HTMLImageElement;
+        if (!target.dataset.errorHandled) {
+            target.dataset.errorHandled = "true";
+            target.src = "https://via.placeholder.com/300x200?text=Brak+zdjęcia";
+            console.warn('Błąd ładowania zdjęcia w ulubionych:', target.src);
+        }
+    };
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -143,16 +152,10 @@ const LikedOffersList: React.FC = () => {
                         <div className="offer-clickable" onClick={() => handleOfferClick(offer.id)}>
                             <div className="offer-image-container">
                                 <img
-                                    src={offer.mainImage ? `${API_URL}/images/${offer.mainImage}` : "/assets/placeholder.jpg"}
+                                    src={offer.mainImage ? `${API_URL}${offer.mainImage}` : "https://via.placeholder.com/300x200?text=Brak+zdjęcia"}
                                     alt={offer.title}
                                     loading="lazy"
-                                    onError={(e) => {
-                                        const target = e.target as HTMLImageElement;
-                                        if (target.src.indexOf('placeholder.jpg') === -1) {
-                                            target.src = "/assets/placeholder.jpg";
-                                        }
-                                        target.onerror = null;
-                                    }}
+                                    onError={handleImageError}
                                 />
                             </div>
                             <div className="offer-details">
@@ -160,7 +163,8 @@ const LikedOffersList: React.FC = () => {
                                     <h2>{truncateText(offer.title, 50)}</h2>
                                     <div className="price-actions">
                                         <span className="offer-price">{offer.price.toLocaleString()} PLN</span>
-                                        <LikeButton offerId={offer.id} initialLiked={true} onLikeToggle={(isLiked) => handleLikeToggle(offer.id, isLiked)} />
+                                        <LikeButton offerId={offer.id} initialLiked={true}
+                                                    onLikeToggle={(isLiked) => handleLikeToggle(offer.id, isLiked)}/>
                                     </div>
                                 </div>
                                 <div className="offer-info">
@@ -188,8 +192,8 @@ const LikedOffersList: React.FC = () => {
     };
 
     if (!isAuthenticated) {
-        return <AuthRequired 
-            pageTitle="Ulubione oferty" 
+        return <AuthRequired
+            pageTitle="Ulubione oferty"
             message="Dodawaj interesujące Cię oferty do ulubionych i miej do nich szybki dostęp."
         />;
     }

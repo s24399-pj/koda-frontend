@@ -1,51 +1,70 @@
 import React from "react";
 import "./WhyChooseUs.scss";
-import { FaLock, FaUserCheck, FaClock, FaInfoCircle } from "react-icons/fa";
+import { FaLock, FaInfoCircle, FaSearch, FaComments, FaShieldAlt, FaMobile } from "react-icons/fa";
 
 const WhyChooseUs: React.FC = () => {
   return (
-    <section className="why-choose-us">
+      <section className="why-choose-us">
+        <div className="content">
+          <div className="cta-button">DLACZEGO WARTO WYBRAĆ NAS</div>
+          <h2>Nowoczesna platforma z pełną transparentością i bezpieczeństwem</h2>
 
-      <div className="content">
-        <button className="cta-button">DLACZEGO WARTO WYBRAĆ NAS</button>
-        <h2>Jakość usług i pełna transparentność idą u nas w parze</h2>
+          <div className="features">
+            <div className="feature-item">
+              <FaSearch className="icon" />
+              <div>
+                <h3>Zaawansowana porównywarka samochodów</h3>
+                <p>Rozbudowane narzędzia do porównywania ofert, parametrów technicznych i historii pojazdów. Intuicyjne filtry pomogą znaleźć dokładnie to, czego szukasz.</p>
+              </div>
+            </div>
 
-        {/* Feature List */}
-        <div className="features">
-          <div className="feature-item">
-            <FaLock className="icon" />
-            <div>
-              <h3>Najniższa cena</h3>
-              <p>Wystaw ogłoszenie i wypromuj je za najniższą cenę na rynku</p>
+            <div className="feature-item">
+              <FaComments className="icon" />
+              <div>
+                <h3>Bezpośredni kontakt przez wbudowany czat</h3>
+                <p>Szybka i bezpieczna komunikacja bezpośrednio na platformie. Bez dzwonienia czy udostępniania prywatnych danych.</p>
+              </div>
+            </div>
+
+            <div className="feature-item">
+              <FaShieldAlt className="icon" />
+              <div>
+                <h3>System ocen i weryfikacja ogłoszeń</h3>
+                <p>Każdy sprzedawca ma profil z ocenami. Moderacja treści i wymagane dane pojazdu (VIN, przebieg) zapewniają wiarygodność ofert.</p>
+              </div>
+            </div>
+
+            <div className="feature-item">
+              <FaLock className="icon" />
+              <div>
+                <h3>Ochrona danych i szyfrowana komunikacja</h3>
+                <p>HTTPS i zgodność z RODO gwarantują bezpieczeństwo Twoich danych. Wszystko przez bezpieczny czat.</p>
+              </div>
+            </div>
+
+            <div className="feature-item">
+              <FaMobile className="icon" />
+              <div>
+                <h3>Szybkość i responsywność</h3>
+                <p>Platforma działa płynnie na wszystkich urządzeniach. Strony ładują się w mniej niż 3 sekundy, wyniki wyszukiwania w czasie rzeczywistym.</p>
+              </div>
+            </div>
+
+            <div className="feature-item">
+              <FaInfoCircle className="icon" />
+              <div>
+                <h3>Najniższa cena i pełna transparentność</h3>
+                <p>Wypromuj ogłoszenie za najniższą cenę na rynku. Wszystkie kluczowe informacje o samochodzie w każdym ogłoszeniu.</p>
+              </div>
             </div>
           </div>
 
-          <div className="feature-item">
-            <FaUserCheck className="icon" />
-            <div>
-              <h3>Wyłącznie zweryfikowani sprzedawcy</h3>
-              <p>Weryfikujemy sprzedawców korzystających z naszych usług</p>
-            </div>
-          </div>
-
-          <div className="feature-item">
-            <FaClock className="icon" />
-            <div>
-              <h3>Wsparcie techniczne 24/7</h3>
-              <p>Wspieramy cię w każdej chwili</p>
-            </div>
-          </div>
-
-          <div className="feature-item">
-            <FaInfoCircle className="icon" />
-            <div>
-              <h3>Pełna transparentność</h3>
-              <p>Wszystkie najważniejsze informacje na temat samochodu są zawarte w ogłoszeniach</p>
-            </div>
+          <div className="mission-statement">
+            <h3>Nasza misja</h3>
+            <p>Demokratyzujemy rynek motoryzacyjny w Polsce. Kupno i sprzedaż samochodu powinny być prostymi, bezpiecznymi i przejrzystymi procesami dla wszystkich uczestników.</p>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
   );
 };
 

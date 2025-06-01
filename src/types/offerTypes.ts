@@ -1,3 +1,5 @@
+import {CarEquipment} from "./offer/OfferTypes.ts";
+
 export interface CarDetails {
     brand: string;
     model: string;
@@ -12,6 +14,7 @@ export interface CarDetails {
     enginePower: number;
     doors: number;
     seats: number;
+    carEquipment?: CarEquipment;
 }
 
 export interface SellerData {
