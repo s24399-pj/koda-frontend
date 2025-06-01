@@ -1,8 +1,7 @@
 import React from 'react';
 import { FormikProps, Field, ErrorMessage } from 'formik';
-import { CreateOfferCommand } from '../../types/offer/OfferTypes';
-
-type OfferFormValues = CreateOfferCommand & { termsAccepted: boolean };
+import { OfferFormValues } from '../../types/offer/OfferTypes';
+import ImageUpload from './ImageUpload';
 
 interface BasicInfoStepProps {
     formik: FormikProps<OfferFormValues>;
@@ -16,11 +15,12 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ formik, onNext }) => {
                 title: true,
                 description: true,
                 price: true,
-                currency: true
-            });
+                currency: true,
+                imageFiles: true,
+            } as any);
 
             const stepErrors = Object.keys(errors).filter(key =>
-                ['title', 'description', 'price', 'currency'].includes(key)
+                ['title', 'description', 'price', 'currency', 'imageFiles'].includes(key)
             );
 
             if (stepErrors.length === 0) {
@@ -35,17 +35,14 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ formik, onNext }) => {
         });
     };
 
-    const calculateTitleChars = () => {
-        return formik.values.title?.length || 0;
-    };
-
-    const calculateDescriptionChars = () => {
-        return formik.values.description?.length || 0;
-    };
+    const calculateTitleChars = () => formik.values.title?.length || 0;
+    const calculateDescriptionChars = () => formik.values.description?.length || 0;
 
     return (
         <div className="form-step">
             <h2>Podstawowe informacje o ofercie</h2>
+
+            <ImageUpload formik={formik} />
 
             <div className="form-group">
                 <label htmlFor="title">Tytuł ogłoszenia *</label>
@@ -55,7 +52,7 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ formik, onNext }) => {
                     name="title"
                     placeholder="Np. BMW Seria 3 318i, 2020, Salon Polska"
                     className={formik.touched.title && formik.errors.title ? 'error' : ''}
-                    maxLength="100"
+                    maxLength={100}
                 />
                 <ErrorMessage name="title" component="div" className="error-text" />
                 <small className={calculateTitleChars() >= 90 ? 'char-count warning' : 'char-count'}>
@@ -72,7 +69,7 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ formik, onNext }) => {
                     placeholder="Opisz dokładnie swój samochód. Wymień jego zalety, historię, stan techniczny i wszystko co może zainteresować potencjalnych kupujących."
                     rows={10}
                     className={formik.touched.description && formik.errors.description ? 'error' : ''}
-                    maxLength="2000"
+                    maxLength={2000}
                 />
                 <ErrorMessage name="description" component="div" className="error-text" />
                 <small className={calculateDescriptionChars() >= 1900 ? 'char-count warning' : 'char-count'}>
@@ -112,11 +109,7 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ formik, onNext }) => {
             </div>
 
             <div className="form-group checkbox-group">
-                <Field
-                    type="checkbox"
-                    id="negotiable"
-                    name="negotiable"
-                />
+                <Field type="checkbox" id="negotiable" name="negotiable" />
                 <label htmlFor="negotiable">Cena do negocjacji</label>
             </div>
 
