@@ -1,0 +1,306 @@
+.advanced-filter {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'San Francisco', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  padding: 20px;
+  
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  
+  .filter-section {
+    border-radius: 12px;
+    overflow: hidden;
+    
+    &.basic-filters {
+      margin-bottom: 16px;
+    }
+    
+    &.advanced-filters {
+      margin-top: 15px;
+      display: block !important;
+      
+      h3 {
+        margin: 0 0 15px;
+        font-size: 16px;
+        font-weight: 600;
+        color: #1d1d1f;
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+      
+      h4 {
+        margin: 0 0 8px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #6e6e73;
+      }
+    }
+  }
+  
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1d1d1f;
+    margin-bottom: 15px;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+  
+  .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 12px;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    .filter-field {
+      flex: 1;
+      min-width: 180px;
+      
+      &.range-field {
+        min-width: 220px;
+      }
+      
+      label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #6e6e73;
+        
+        &.group-label {
+          margin-bottom: 10px;
+        }
+      }
+      
+      input[type="text"],
+      input[type="number"],
+      select {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid #d2d2d7;
+        font-size: 14px;
+        color: #1d1d1f;
+        background-color: #fff;
+        transition: all 0.2s ease;
+        
+        &:focus {
+          outline: none;
+          border-color: #0066cc;
+          box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
+        }
+        
+        &:disabled {
+          background-color: #f5f5f7;
+          cursor: not-allowed;
+        }
+        
+        &::placeholder {
+          color: #86868b;
+        }
+      }
+      
+      select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 35px;
+      }
+      
+      .range-inputs {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        
+        input {
+          flex: 1;
+        }
+        
+        .range-separator {
+          color: #86868b;
+          font-weight: 500;
+        }
+      }
+      
+      .checkbox-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      &.checkbox-group {
+        min-width: 250px;
+      }
+    }
+    
+    &.equipment-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 20px;
+      
+      .checkbox-column {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  }
+  
+  .checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 0;
+    
+    input[type="checkbox"] {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 1px solid #d2d2d7;
+      border-radius: 4px;
+      margin: 0;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      
+      &:checked {
+        background-color: #0066cc;
+        border-color: #0066cc;
+        
+        &:after {
+          content: '';
+          position: absolute;
+          left: 6px;
+          top: 2px;
+          width: 5px;
+          height: 10px;
+          border: solid white;
+          border-width: 0 2px 2px 0;
+          transform: rotate(45deg);
+        }
+      }
+    }
+    
+    label {
+      font-size: 14px;
+      color: #1d1d1f;
+      cursor: pointer;
+      margin: 0;
+      
+      &:hover {
+        color: #0066cc;
+      }
+    }
+  }
+  
+  .toggle-advanced {
+    margin: 10px 0;
+    
+    .toggle-button {
+      width: 100%;
+      padding: 10px 0;
+      background: none;
+      border: none;
+      color: #0066cc;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: all 0.2s ease;
+      
+      &:before, &:after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        width: calc(50% - 100px);
+        height: 1px;
+        background-color: #d2d2d7;
+      }
+      
+      &:before {
+        left: 0;
+      }
+      
+      &:after {
+        right: 0;
+      }
+      
+      &:hover {
+        color: #0055b3;
+      }
+    }
+  }
+  
+  .filter-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 20px;
+    
+    button {
+      padding: 10px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      
+      &.reset-button {
+        background-color: #f5f5f7;
+        color: #6e6e73;
+        
+        &:hover:not(:disabled) {
+          background-color: #e8e8ed;
+          color: #1d1d1f;
+        }
+        
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+      
+      &.apply-button {
+        background-color: #0066cc;
+        color: white;
+        flex: 1;
+        max-width: 150px;
+        
+        &:hover {
+          background-color: #0055b3;
+        }
+      }
+    }
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      
+      button {
+        width: 100%;
+        max-width: none;
+      }
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .filter-row {
+      flex-direction: column;
+      
+      .filter-field {
+        width: 100%;
+      }
+    }
+  }
+}

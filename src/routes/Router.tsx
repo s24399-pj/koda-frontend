@@ -26,7 +26,6 @@ const AppRouter = () => {
             <Route path="/user/login" element={<LoginPage/>}/>
             <Route path="/user/register" element={<RegisterPage/>}/>
             <Route path="/liked" element={<LikedOffers/>}/>
-
             {/* Protected */}
             <Route path="/user/panel" element={
                 <RequireAuth>
@@ -38,7 +37,6 @@ const AppRouter = () => {
                     <OfferCreation/>
                 </RequireAuth>
             }/>
-
             <Route path="/chat" element={<ChatPage/>}/>
             <Route path="/chat/:recipientId" element={<ChatPage/>}/>
         </Routes>
