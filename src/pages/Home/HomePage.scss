@@ -1,6 +1,6 @@
 .homepage-container {
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath d='M0,0 C20,40 50,20 80,50 C100,80 50,100 0,100 Z' fill='%23f0f6fc' /%3E%3C/svg%3E")
-  no-repeat center center fixed;
+    no-repeat center center fixed;
   background-size: cover;
   min-height: 100vh;
   display: flex;
@@ -93,10 +93,9 @@
     }
   }
 
-  // Zwiększona szerokość dla wyszukiwarki
   .simple-search-wrapper {
     width: 100%;
-    max-width: 1200px; // Dodana maksymalna szerokość odpowiadająca innym sekcjom
+    max-width: 1200px;
     display: flex;
     justify-content: center;
     padding: 20px 0;

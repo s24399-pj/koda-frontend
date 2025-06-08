@@ -309,7 +309,8 @@
         font-size: 14px;
       }
 
-      th, td {
+      th,
+      td {
         padding: 16px 12px;
         text-align: left;
         border-bottom: 1px solid #e2e8f0;
@@ -352,7 +353,8 @@
       }
 
       tr:last-child {
-        th, td {
+        th,
+        td {
           border-bottom: none;
         }
       }

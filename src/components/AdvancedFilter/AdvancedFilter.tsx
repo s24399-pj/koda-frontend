@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { 
-  FuelType, 
-  TransmissionType, 
-  BodyType, 
-  DriveType, 
-  VehicleCondition 
+import {
+  FuelType,
+  TransmissionType,
+  BodyType,
+  DriveType,
+  VehicleCondition,
 } from '../../types/offer/OfferTypes';
 import './AdvancedFilter.scss';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import offerApiService, { AdvancedSearchParams } from '../../api/offerApi';
 
 // Convert enum to array of options for select inputs
 const enumToOptions = (enumObject: any) => {
@@ -17,10 +15,12 @@ const enumToOptions = (enumObject: any) => {
     .filter(key => isNaN(Number(key)))
     .map(key => ({
       value: enumObject[key],
-      label: key.replace(/_/g, ' ').toLowerCase()
+      label: key
+        .replace(/_/g, ' ')
+        .toLowerCase()
         .split(' ')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ')
+        .join(' '),
     }));
 };
 
@@ -35,39 +35,38 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
   const [models, setModels] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // State for filter values
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<AdvancedSearchParams>({
     phrase: '',
     brand: '',
     model: '',
-    minPrice: null as number | null,
-    maxPrice: null as number | null,
-    minYear: null as number | null,
-    maxYear: null as number | null,
-    minMileage: null as number | null,
-    maxMileage: null as number | null,
-    fuelType: '' as string | null,
-    transmission: '' as string | null,
-    bodyType: '' as string | null,
-    driveType: '' as string | null,
-    minEnginePower: null as number | null,
-    maxEnginePower: null as number | null,
-    condition: '' as string | null,
-    firstOwner: null as boolean | null,
-    accidentFree: null as boolean | null,
-    serviceHistory: null as boolean | null,
-    
+    minPrice: null,
+    maxPrice: null,
+    minYear: null,
+    maxYear: null,
+    minMileage: null,
+    maxMileage: null,
+    fuelType: null,
+    transmission: null,
+    bodyType: null,
+    driveType: null,
+    minEnginePower: null,
+    maxEnginePower: null,
+    condition: null,
+    firstOwner: null,
+    accidentFree: null,
+    serviceHistory: null,
+
     // Car equipment
-    airConditioning: null as boolean | null,
-    automaticClimate: null as boolean | null,
-    heatedSeats: null as boolean | null,
-    navigationSystem: null as boolean | null,
-    bluetooth: null as boolean | null,
-    parkingSensors: null as boolean | null,
-    rearCamera: null as boolean | null,
-    leatherSeats: null as boolean | null,
-    panoramicRoof: null as boolean | null,
-    ledLights: null as boolean | null,
+    airConditioning: null,
+    automaticClimate: null,
+    heatedSeats: null,
+    navigationSystem: null,
+    bluetooth: null,
+    parkingSensors: null,
+    rearCamera: null,
+    leatherSeats: null,
+    panoramicRoof: null,
+    ledLights: null,
   });
 
   // Create options arrays from enums
@@ -78,11 +77,34 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
   const conditionOptions = enumToOptions(VehicleCondition);
 
   const popularBrands = [
-    "Audi", "BMW", "Chevrolet", "Dacia", "Fiat", "Ford", 
-    "Honda", "Hyundai", "Jaguar", "Jeep", "Kia", "Land Rover", 
-    "Lexus", "Mazda", "Mercedes-Benz", "Mitsubishi", "Nissan", 
-    "Opel", "Peugeot", "Porsche", "Renault", "Seat", "Skoda", 
-    "Subaru", "Suzuki", "Toyota", "Volkswagen", "Volvo"
+    'Audi',
+    'BMW',
+    'Chevrolet',
+    'Dacia',
+    'Fiat',
+    'Ford',
+    'Honda',
+    'Hyundai',
+    'Jaguar',
+    'Jeep',
+    'Kia',
+    'Land Rover',
+    'Lexus',
+    'Mazda',
+    'Mercedes-Benz',
+    'Mitsubishi',
+    'Nissan',
+    'Opel',
+    'Peugeot',
+    'Porsche',
+    'Renault',
+    'Seat',
+    'Skoda',
+    'Subaru',
+    'Suzuki',
+    'Toyota',
+    'Volkswagen',
+    'Volvo',
   ].sort();
 
   useEffect(() => {
@@ -92,15 +114,19 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
 
   useEffect(() => {
     const fetchBrands = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/api/v1/offers/search/brands`);
-        if (response.data && response.data.content && Array.isArray(response.data.content)) {
-          setBrands(response.data.content);
-        }
-      } catch (error) {
-        console.error("Error fetching brands:", error);
-        setBrands(popularBrands);
-      }
+      offerApiService
+        .getBrands()
+        .then(brandsList => {
+          if (brandsList.length > 0) {
+            setBrands(brandsList);
+          } else {
+            setBrands(popularBrands);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching brands:', error);
+          setBrands(popularBrands);
+        });
     };
 
     fetchBrands();
@@ -113,73 +139,57 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
         return;
       }
 
-      try {
-        setLoading(true);
-        const response = await axios.get(`${API_URL}/api/v1/offers/search/brands/search`, {
-          params: { phrase: filters.brand }
+      setLoading(true);
+
+      offerApiService
+        .searchBrands(filters.brand)
+        .then(modelsList => {
+          setModels(modelsList);
+        })
+        .catch(error => {
+          console.error('Error fetching models:', error);
+          setModels([]);
+        })
+        .finally(() => {
+          setLoading(false);
         });
-        
-        if (response.data && response.data.content && Array.isArray(response.data.content)) {
-          setModels(response.data.content);
-        }
-      } catch (error) {
-        console.error("Error fetching models:", error);
-        setModels([]);
-      } finally {
-        setLoading(false);
-      }
     };
 
     fetchModels();
   }, [filters.brand]);
 
-  const fetchAllOffers = async () => {
+  const fetchAllOffers = () => {
     console.log('Fetching all offers...');
     onLoading(true);
-    
-    try {
-      const response = await axios.post(
-        `${API_URL}/api/v1/offers/search/advanced`, 
-        {},
-        {
-          params: {
-            page: 0,
-            size: 10
-          }
-        }
-      );
-      
-      console.log('Initial offers response:', response.data);
-      
-      onSearch(response.data);
-    } catch (error) {
-      console.error('Error fetching initial offers:', error);
-      onSearch({
-        content: [],
-        totalElements: 0,
-        totalPages: 0
+
+    offerApiService
+      .searchOffers()
+      .then(response => {
+        console.log('Initial offers response received');
+        onSearch(response);
+      })
+      .catch(error => {
+        console.error('Error fetching initial offers:', error);
+      })
+      .finally(() => {
+        onLoading(false);
       });
-    } finally {
-      onLoading(false);
-    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    
+
     if (type === 'number') {
-      setFilters(prev => ({ 
-        ...prev, 
-        [name]: value === '' ? null : Number(value)
+      setFilters(prev => ({
+        ...prev,
+        [name]: value === '' ? null : Number(value),
       }));
-    } 
-    else if (type === 'select-one') {
-      setFilters(prev => ({ 
-        ...prev, 
-        [name]: value === '' ? null : value 
+    } else if (type === 'select-one') {
+      setFilters(prev => ({
+        ...prev,
+        [name]: value === '' ? null : value,
       }));
-    }
-    else {
+    } else {
       setFilters(prev => ({ ...prev, [name]: value }));
     }
   };
@@ -189,53 +199,18 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
     setFilters(prev => ({ ...prev, [name]: checked ? true : null }));
   };
 
-  const prepareRequestData = () => {
-    const cleanedFilters: Record<string, any> = {};
-    
-    // Only include non-null, non-empty values
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== null && value !== '') {
-        cleanedFilters[key] = value;
-      }
-    });
-    
-    return cleanedFilters;
-  };
-
-  const searchOffers = async (e: React.FormEvent) => {
+  const searchOffers = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const requestData = prepareRequestData();
-    
     onLoading(true);
-    
-    try {
-      console.log('Sending search request with data:', requestData);
-      
-      const response = await axios.post(
-        `${API_URL}/api/v1/offers/search/advanced`, 
-        requestData,
-        {
-          params: {
-            page: 0,
-            size: 10
-          }
-        }
-      );
-      
-      console.log('Search results:', response.data);
-      
-      onSearch(response.data);
-    } catch (error) {
-      console.error('Error performing advanced search:', error);
-      onSearch({
-        content: [],
-        totalElements: 0,
-        totalPages: 0
+
+    offerApiService
+      .searchOffers(filters)
+      .then(response => {
+        onSearch(response);
+      })
+      .finally(() => {
+        onLoading(false);
       });
-    } finally {
-      onLoading(false);
-    }
   };
 
   const resetFilters = () => {
@@ -259,7 +234,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
       firstOwner: null,
       accidentFree: null,
       serviceHistory: null,
-      
+
       airConditioning: null,
       automaticClimate: null,
       heatedSeats: null,
@@ -271,7 +246,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
       panoramicRoof: null,
       ledLights: null,
     });
-    
+
     fetchAllOffers();
   };
 
@@ -300,45 +275,49 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
                 onChange={handleInputChange}
               />
             </div>
-            
+
             <div className="filter-field">
               <label htmlFor="brand">Marka</label>
-              <select 
-                id="brand" 
+              <select
+                id="brand"
                 name="brand"
-                value={filters.brand}
+                value={filters.brand || ''}
                 onChange={handleInputChange}
               >
                 <option value="">Wszystkie marki</option>
                 {brands.map(brand => (
-                  <option key={brand} value={brand}>{brand}</option>
+                  <option key={brand} value={brand}>
+                    {brand}
+                  </option>
                 ))}
               </select>
             </div>
-            
+
             <div className="filter-field">
               <label htmlFor="model">Model</label>
-              <select 
-                id="model" 
+              <select
+                id="model"
                 name="model"
-                value={filters.model}
+                value={filters.model || ''}
                 onChange={handleInputChange}
                 disabled={!filters.brand || loading}
               >
                 <option value="">Wszystkie modele</option>
                 {models.map(model => (
-                  <option key={model} value={model}>{model}</option>
+                  <option key={model} value={model}>
+                    {model}
+                  </option>
                 ))}
               </select>
             </div>
           </div>
-          
+
           <div className="filter-row">
             <div className="filter-field range-field">
               <label>Cena (PLN)</label>
               <div className="range-inputs">
-                <input 
-                  type="number" 
+                <input
+                  type="number"
                   name="minPrice"
                   placeholder="Od"
                   min="0"
@@ -346,8 +325,8 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
                   onChange={handleInputChange}
                 />
                 <span className="range-separator">-</span>
-                <input 
-                  type="number" 
+                <input
+                  type="number"
                   name="maxPrice"
                   placeholder="Do"
                   min="0"
@@ -356,12 +335,12 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
                 />
               </div>
             </div>
-            
+
             <div className="filter-field range-field">
               <label>Rok produkcji</label>
               <div className="range-inputs">
-                <input 
-                  type="number" 
+                <input
+                  type="number"
                   name="minYear"
                   placeholder="Od"
                   min="1900"
@@ -370,8 +349,8 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
                   onChange={handleInputChange}
                 />
                 <span className="range-separator">-</span>
-                <input 
-                  type="number" 
+                <input
+                  type="number"
                   name="maxYear"
                   placeholder="Do"
                   min="1900"
@@ -383,28 +362,24 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
             </div>
           </div>
         </div>
-        
+
         {/* Toggle Advanced Filters Button */}
         <div className="toggle-advanced">
-          <button 
-            type="button" 
-            className="toggle-button"
-            onClick={toggleAdvancedFilters}
-          >
+          <button type="button" className="toggle-button" onClick={toggleAdvancedFilters}>
             {showAdvanced ? 'Ukryj filtry zaawansowane' : 'Pokaż filtry zaawansowane'}
           </button>
         </div>
-        
+
         {/* Advanced Filters - Toggleable */}
         {showAdvanced && (
           <div className="filter-section advanced-filters">
             <h3>Szczegóły pojazdu</h3>
-            
+
             <div className="filter-row">
               <div className="filter-field">
                 <label htmlFor="fuelType">Rodzaj paliwa</label>
-                <select 
-                  id="fuelType" 
+                <select
+                  id="fuelType"
                   name="fuelType"
                   value={filters.fuelType || ''}
                   onChange={handleInputChange}
@@ -417,11 +392,11 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
                   ))}
                 </select>
               </div>
-              
+
               <div className="filter-field">
                 <label htmlFor="transmission">Skrzynia biegów</label>
-                <select 
-                  id="transmission" 
+                <select
+                  id="transmission"
                   name="transmission"
                   value={filters.transmission || ''}
                   onChange={handleInputChange}
@@ -434,11 +409,11 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
                   ))}
                 </select>
               </div>
-              
+
               <div className="filter-field">
                 <label htmlFor="bodyType">Typ nadwozia</label>
-                <select 
-                  id="bodyType" 
+                <select
+                  id="bodyType"
                   name="bodyType"
                   value={filters.bodyType || ''}
                   onChange={handleInputChange}
@@ -452,12 +427,12 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
                 </select>
               </div>
             </div>
-            
+
             <div className="filter-row">
               <div className="filter-field">
                 <label htmlFor="driveType">Rodzaj napędu</label>
-                <select 
-                  id="driveType" 
+                <select
+                  id="driveType"
                   name="driveType"
                   value={filters.driveType || ''}
                   onChange={handleInputChange}
@@ -470,11 +445,11 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
                   ))}
                 </select>
               </div>
-              
+
               <div className="filter-field">
                 <label htmlFor="condition">Stan pojazdu</label>
-                <select 
-                  id="condition" 
+                <select
+                  id="condition"
                   name="condition"
                   value={filters.condition || ''}
                   onChange={handleInputChange}
@@ -487,12 +462,12 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
                   ))}
                 </select>
               </div>
-              
+
               <div className="filter-field range-field">
                 <label>Przebieg (km)</label>
                 <div className="range-inputs">
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     name="minMileage"
                     placeholder="Od"
                     min="0"
@@ -500,8 +475,8 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
                     onChange={handleInputChange}
                   />
                   <span className="range-separator">-</span>
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     name="maxMileage"
                     placeholder="Do"
                     min="0"
@@ -511,13 +486,13 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
                 </div>
               </div>
             </div>
-            
+
             <div className="filter-row">
               <div className="filter-field range-field">
                 <label>Moc silnika (KM)</label>
                 <div className="range-inputs">
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     name="minEnginePower"
                     placeholder="Od"
                     min="0"
@@ -525,8 +500,8 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
                     onChange={handleInputChange}
                   />
                   <span className="range-separator">-</span>
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     name="maxEnginePower"
                     placeholder="Do"
                     min="0"
@@ -535,36 +510,36 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
                   />
                 </div>
               </div>
-              
+
               <div className="filter-field checkbox-group">
                 <label className="group-label">Dodatkowe informacje</label>
                 <div className="checkbox-container">
                   <div className="checkbox-item">
-                    <input 
-                      type="checkbox" 
-                      id="firstOwner" 
+                    <input
+                      type="checkbox"
+                      id="firstOwner"
                       name="firstOwner"
                       checked={filters.firstOwner === true}
                       onChange={handleCheckboxChange}
                     />
                     <label htmlFor="firstOwner">Pierwszy właściciel</label>
                   </div>
-                  
+
                   <div className="checkbox-item">
-                    <input 
-                      type="checkbox" 
-                      id="accidentFree" 
+                    <input
+                      type="checkbox"
+                      id="accidentFree"
                       name="accidentFree"
                       checked={filters.accidentFree === true}
                       onChange={handleCheckboxChange}
                     />
                     <label htmlFor="accidentFree">Bezwypadkowy</label>
                   </div>
-                  
+
                   <div className="checkbox-item">
-                    <input 
-                      type="checkbox" 
-                      id="serviceHistory" 
+                    <input
+                      type="checkbox"
+                      id="serviceHistory"
                       name="serviceHistory"
                       checked={filters.serviceHistory === true}
                       onChange={handleCheckboxChange}
@@ -574,60 +549,60 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
                 </div>
               </div>
             </div>
-            
+
             <h3>Wyposażenie</h3>
-            
+
             <div className="filter-row equipment-section">
               <div className="checkbox-column">
                 <h4>Komfort</h4>
                 <div className="checkbox-item">
-                  <input 
-                    type="checkbox" 
-                    id="airConditioning" 
+                  <input
+                    type="checkbox"
+                    id="airConditioning"
                     name="airConditioning"
                     checked={filters.airConditioning === true}
                     onChange={handleCheckboxChange}
                   />
                   <label htmlFor="airConditioning">Klimatyzacja</label>
                 </div>
-                
+
                 <div className="checkbox-item">
-                  <input 
-                    type="checkbox" 
-                    id="automaticClimate" 
+                  <input
+                    type="checkbox"
+                    id="automaticClimate"
                     name="automaticClimate"
                     checked={filters.automaticClimate === true}
                     onChange={handleCheckboxChange}
                   />
                   <label htmlFor="automaticClimate">Klimatyzacja automatyczna</label>
                 </div>
-                
+
                 <div className="checkbox-item">
-                  <input 
-                    type="checkbox" 
-                    id="heatedSeats" 
+                  <input
+                    type="checkbox"
+                    id="heatedSeats"
                     name="heatedSeats"
                     checked={filters.heatedSeats === true}
                     onChange={handleCheckboxChange}
                   />
                   <label htmlFor="heatedSeats">Podgrzewane fotele</label>
                 </div>
-                
+
                 <div className="checkbox-item">
-                  <input 
-                    type="checkbox" 
-                    id="leatherSeats" 
+                  <input
+                    type="checkbox"
+                    id="leatherSeats"
                     name="leatherSeats"
                     checked={filters.leatherSeats === true}
                     onChange={handleCheckboxChange}
                   />
                   <label htmlFor="leatherSeats">Skórzane fotele</label>
                 </div>
-                
+
                 <div className="checkbox-item">
-                  <input 
-                    type="checkbox" 
-                    id="panoramicRoof" 
+                  <input
+                    type="checkbox"
+                    id="panoramicRoof"
                     name="panoramicRoof"
                     checked={filters.panoramicRoof === true}
                     onChange={handleCheckboxChange}
@@ -635,24 +610,24 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
                   <label htmlFor="panoramicRoof">Dach panoramiczny</label>
                 </div>
               </div>
-              
+
               <div className="checkbox-column">
                 <h4>Multimedia</h4>
                 <div className="checkbox-item">
-                  <input 
-                    type="checkbox" 
-                    id="navigationSystem" 
+                  <input
+                    type="checkbox"
+                    id="navigationSystem"
                     name="navigationSystem"
                     checked={filters.navigationSystem === true}
                     onChange={handleCheckboxChange}
                   />
                   <label htmlFor="navigationSystem">Nawigacja</label>
                 </div>
-                
+
                 <div className="checkbox-item">
-                  <input 
-                    type="checkbox" 
-                    id="bluetooth" 
+                  <input
+                    type="checkbox"
+                    id="bluetooth"
                     name="bluetooth"
                     checked={filters.bluetooth === true}
                     onChange={handleCheckboxChange}
@@ -660,24 +635,24 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
                   <label htmlFor="bluetooth">Bluetooth</label>
                 </div>
               </div>
-              
+
               <div className="checkbox-column">
                 <h4>Bezpieczeństwo i pomoc</h4>
                 <div className="checkbox-item">
-                  <input 
-                    type="checkbox" 
-                    id="parkingSensors" 
+                  <input
+                    type="checkbox"
+                    id="parkingSensors"
                     name="parkingSensors"
                     checked={filters.parkingSensors === true}
                     onChange={handleCheckboxChange}
                   />
                   <label htmlFor="parkingSensors">Czujniki parkowania</label>
                 </div>
-                
+
                 <div className="checkbox-item">
-                  <input 
-                    type="checkbox" 
-                    id="rearCamera" 
+                  <input
+                    type="checkbox"
+                    id="rearCamera"
                     name="rearCamera"
                     checked={filters.rearCamera === true}
                     onChange={handleCheckboxChange}
@@ -685,13 +660,13 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
                   <label htmlFor="rearCamera">Kamera cofania</label>
                 </div>
               </div>
-              
+
               <div className="checkbox-column">
                 <h4>Oświetlenie</h4>
                 <div className="checkbox-item">
-                  <input 
-                    type="checkbox" 
-                    id="ledLights" 
+                  <input
+                    type="checkbox"
+                    id="ledLights"
                     name="ledLights"
                     checked={filters.ledLights === true}
                     onChange={handleCheckboxChange}
@@ -702,18 +677,18 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
             </div>
           </div>
         )}
-        
+
         {/* Filter Action Buttons */}
         <div className="filter-actions">
-          <button 
-            type="button" 
+          <button
+            type="button"
             className="reset-button"
             onClick={resetFilters}
             disabled={!hasActiveFilters}
           >
             Wyczyść filtry
           </button>
-          
+
           <button type="submit" className="apply-button">
             Szukaj
           </button>

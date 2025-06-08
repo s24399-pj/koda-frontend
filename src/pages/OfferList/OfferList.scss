@@ -4,7 +4,6 @@
   padding: 20px;
   padding-bottom: 80px;
   padding-top: 80px;
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'San Francisco', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   color: #1d1d1f;
   background-color: #f5f5f7;
 
@@ -16,7 +15,7 @@
     font-weight: 600;
     letter-spacing: -0.02em;
   }
-  
+
   /* Layout structure - Top filter */
   .offer-list-layout {
     display: flex;
@@ -24,7 +23,7 @@
     gap: 25px;
     position: relative;
     z-index: 1;
-    
+
     /* Filter panel */
     .filter-panel {
       background-color: white;
@@ -33,17 +32,17 @@
       width: 100%;
       position: relative;
       z-index: 5;
-      
+
       &.show {
         display: block;
         margin-bottom: 20px;
       }
-      
+
       &.hide {
         display: none;
       }
     }
-    
+
     /* Filter toggle button - now visible for all screens */
     .filter-toggle {
       display: flex;
@@ -51,7 +50,7 @@
       margin-bottom: 5px;
       position: relative;
       z-index: 5;
-      
+
       button {
         padding: 10px 20px;
         background-color: white;
@@ -66,11 +65,11 @@
         display: flex;
         align-items: center;
         gap: 6px;
-        
+
         &:hover {
           background-color: #f5f5f7;
         }
-        
+
         &:after {
           content: '';
           display: inline-block;
@@ -81,34 +80,34 @@
           transform: rotate(45deg);
           transition: transform 0.2s ease;
         }
-        
+
         &.expanded:after {
           transform: rotate(225deg);
           margin-top: 4px;
         }
       }
     }
-    
+
     /* Offers panel */
     .offers-panel {
       width: 100%;
-      
+
       .offers-header {
         margin-bottom: 20px;
-        
+
         h1 {
           margin-top: 0;
           text-align: left;
         }
       }
-      
+
       /* Results summary */
       .results-summary {
         font-size: 15px;
         color: #6e6e73;
         margin-bottom: 15px;
       }
-      
+
       /* Error message */
       .error-message {
         background-color: #fff2f2;
@@ -119,7 +118,7 @@
         margin-bottom: 20px;
         font-size: 15px;
       }
-      
+
       /* Loading indicator */
       .loading-indicator {
         text-align: center;
@@ -140,7 +139,9 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
       border-radius: 12px;
       overflow: hidden;
-      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+      transition:
+        transform 0.2s ease-in-out,
+        box-shadow 0.2s ease-in-out;
       display: flex;
       flex-direction: column;
       position: relative;
@@ -184,7 +185,7 @@
           object-position: center;
           transition: transform 0.3s ease;
         }
-        
+
         .no-image {
           color: #86868b;
           font-size: 14px;
@@ -318,14 +319,14 @@
     padding: 40px 20px;
     text-align: center;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    
+
     .no-offers {
       font-size: 18px;
       font-weight: 500;
       color: #1d1d1f;
       margin-bottom: 10px;
     }
-    
+
     .no-offers-hint {
       font-size: 15px;
       color: #6e6e73;
@@ -333,7 +334,7 @@
   }
 
   /* Apple-style checkbox */
-  input[type="checkbox"] {
+  input[type='checkbox'] {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -350,7 +351,7 @@
     &:checked {
       background-color: #0066cc;
       border-color: #0066cc;
-      
+
       &:after {
         content: '';
         position: absolute;
@@ -383,13 +384,13 @@
   }
 
   /* Styling when checkbox is checked */
-  input[type="checkbox"]:checked + label {
+  input[type='checkbox']:checked + label {
     color: #0066cc;
     font-weight: 500;
   }
 
   /* Styling when checkbox is disabled */
-  input[type="checkbox"]:disabled + label {
+  input[type='checkbox']:disabled + label {
     color: #a1a1a6;
     cursor: not-allowed;
   }

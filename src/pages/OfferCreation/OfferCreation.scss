@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 $primary-color: #007be5;
 $primary-light: #eaf4ff;
 $primary-dark: #005bb5;
@@ -251,11 +253,11 @@ body {
     }
   }
 
-  input[type="text"],
-  input[type="email"],
-  input[type="tel"],
-  input[type="number"],
-  input[type="date"],
+  input[type='text'],
+  input[type='email'],
+  input[type='tel'],
+  input[type='number'],
+  input[type='date'],
   textarea,
   select {
     width: 100%;
@@ -264,7 +266,9 @@ body {
     border: 1px solid $border-color;
     border-radius: 4px;
     font-size: 14px;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
     box-sizing: border-box;
 
     &:focus {
@@ -274,7 +278,7 @@ body {
     }
 
     &:hover:not(:focus) {
-      border-color: darken($border-color, 10%);
+      border-color: color.scale($border-color, $lightness: -10%);
     }
 
     &.error {
@@ -318,11 +322,11 @@ body {
       font-size: 13px;
     }
 
-    input[type="text"],
-    input[type="email"],
-    input[type="tel"],
-    input[type="number"],
-    input[type="date"],
+    input[type='text'],
+    input[type='email'],
+    input[type='tel'],
+    input[type='number'],
+    input[type='date'],
     textarea,
     select {
       padding: 8px;
@@ -360,7 +364,7 @@ body {
   width: 100%;
   box-sizing: border-box;
 
-  input[type="checkbox"] {
+  input[type='checkbox'] {
     margin-right: 8px;
     cursor: pointer;
     width: 18px;
@@ -375,7 +379,7 @@ body {
   }
 
   @media (max-width: $mobile) {
-    input[type="checkbox"] {
+    input[type='checkbox'] {
       width: 20px;
       height: 20px;
       margin-right: 10px;
@@ -477,11 +481,12 @@ body {
     border: 1px solid $border-color;
 
     &:hover {
-      background-color: darken($background-light, 5%);
+      background-color: color.scale($background-light, $lightness: -5%);
     }
   }
 
-  .next-step-btn, .submit-offer-btn {
+  .next-step-btn,
+  .submit-offer-btn {
     background-color: $primary-color;
     color: white;
     border: none;
@@ -496,7 +501,7 @@ body {
     background-color: $success-color;
 
     &:hover {
-      background-color: darken($success-color, 5%);
+      background-color: color.scale($success-color, $lightness: -5%);
     }
   }
 
@@ -582,7 +587,7 @@ body {
     margin-bottom: 0;
     align-items: flex-start;
 
-    input[type="checkbox"] {
+    input[type='checkbox'] {
       margin-top: 3px;
     }
 

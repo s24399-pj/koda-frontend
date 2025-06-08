@@ -1,7 +1,7 @@
-import {Conversation} from "./Conversation.ts";
+import { Conversation } from './Conversation.ts';
 
 export interface ConversationListProps {
-    conversations: Conversation[];
-    activeRecipientId: string | null;
-    onSelectConversation: (userId: string) => void;
+  conversations: Conversation[];
+  activeRecipientId: string | null;
+  onSelectConversation: (userId: string) => void;
 }
