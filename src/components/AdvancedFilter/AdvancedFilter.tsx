@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { 
   FuelType, 
   TransmissionType, 
@@ -8,8 +7,7 @@ import {
   VehicleCondition 
 } from '../../types/offer/OfferTypes';
 import './AdvancedFilter.scss';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import offerApiService, { AdvancedSearchParams } from '../../api/offerApi';
 
 // Convert enum to array of options for select inputs
 const enumToOptions = (enumObject: any) => {
@@ -35,39 +33,38 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
   const [models, setModels] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // State for filter values
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<AdvancedSearchParams>({
     phrase: '',
     brand: '',
     model: '',
-    minPrice: null as number | null,
-    maxPrice: null as number | null,
-    minYear: null as number | null,
-    maxYear: null as number | null,
-    minMileage: null as number | null,
-    maxMileage: null as number | null,
-    fuelType: '' as string | null,
-    transmission: '' as string | null,
-    bodyType: '' as string | null,
-    driveType: '' as string | null,
-    minEnginePower: null as number | null,
-    maxEnginePower: null as number | null,
-    condition: '' as string | null,
-    firstOwner: null as boolean | null,
-    accidentFree: null as boolean | null,
-    serviceHistory: null as boolean | null,
+    minPrice: null,
+    maxPrice: null,
+    minYear: null,
+    maxYear: null,
+    minMileage: null,
+    maxMileage: null,
+    fuelType: null,
+    transmission: null,
+    bodyType: null,
+    driveType: null,
+    minEnginePower: null,
+    maxEnginePower: null,
+    condition: null,
+    firstOwner: null,
+    accidentFree: null,
+    serviceHistory: null,
     
     // Car equipment
-    airConditioning: null as boolean | null,
-    automaticClimate: null as boolean | null,
-    heatedSeats: null as boolean | null,
-    navigationSystem: null as boolean | null,
-    bluetooth: null as boolean | null,
-    parkingSensors: null as boolean | null,
-    rearCamera: null as boolean | null,
-    leatherSeats: null as boolean | null,
-    panoramicRoof: null as boolean | null,
-    ledLights: null as boolean | null,
+    airConditioning: null,
+    automaticClimate: null,
+    heatedSeats: null,
+    navigationSystem: null,
+    bluetooth: null,
+    parkingSensors: null,
+    rearCamera: null,
+    leatherSeats: null,
+    panoramicRoof: null,
+    ledLights: null,
   });
 
   // Create options arrays from enums
@@ -92,15 +89,18 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
 
   useEffect(() => {
     const fetchBrands = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/api/v1/offers/search/brands`);
-        if (response.data && response.data.content && Array.isArray(response.data.content)) {
-          setBrands(response.data.content);
-        }
-      } catch (error) {
-        console.error("Error fetching brands:", error);
-        setBrands(popularBrands);
-      }
+      offerApiService.getBrands()
+        .then(brandsList => {
+          if (brandsList.length > 0) {
+            setBrands(brandsList);
+          } else {
+            setBrands(popularBrands);
+          }
+        })
+        .catch(error => {
+          console.error("Error fetching brands:", error);
+          setBrands(popularBrands);
+        });
     };
 
     fetchBrands();
@@ -113,55 +113,39 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
         return;
       }
 
-      try {
-        setLoading(true);
-        const response = await axios.get(`${API_URL}/api/v1/offers/search/brands/search`, {
-          params: { phrase: filters.brand }
+      setLoading(true);
+      
+      offerApiService.searchBrands(filters.brand)
+        .then(modelsList => {
+          setModels(modelsList);
+        })
+        .catch(error => {
+          console.error("Error fetching models:", error);
+          setModels([]);
+        })
+        .finally(() => {
+          setLoading(false);
         });
-        
-        if (response.data && response.data.content && Array.isArray(response.data.content)) {
-          setModels(response.data.content);
-        }
-      } catch (error) {
-        console.error("Error fetching models:", error);
-        setModels([]);
-      } finally {
-        setLoading(false);
-      }
     };
 
     fetchModels();
   }, [filters.brand]);
 
-  const fetchAllOffers = async () => {
+  const fetchAllOffers = () => {
     console.log('Fetching all offers...');
     onLoading(true);
     
-    try {
-      const response = await axios.post(
-        `${API_URL}/api/v1/offers/search/advanced`, 
-        {},
-        {
-          params: {
-            page: 0,
-            size: 10
-          }
-        }
-      );
-      
-      console.log('Initial offers response:', response.data);
-      
-      onSearch(response.data);
-    } catch (error) {
-      console.error('Error fetching initial offers:', error);
-      onSearch({
-        content: [],
-        totalElements: 0,
-        totalPages: 0
+    offerApiService.searchOffers()
+      .then(response => {
+        console.log('Initial offers response received');
+        onSearch(response);
+      })
+      .catch(error => {
+        console.error('Error fetching initial offers:', error);
+      })
+      .finally(() => {
+        onLoading(false);
       });
-    } finally {
-      onLoading(false);
-    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -189,52 +173,17 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
     setFilters(prev => ({ ...prev, [name]: checked ? true : null }));
   };
 
-  const prepareRequestData = () => {
-    const cleanedFilters: Record<string, any> = {};
-    
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== null && value !== '') {
-        cleanedFilters[key] = value;
-      }
-    });
-    
-    return cleanedFilters;
-  };
-
-  const searchOffers = async (e: React.FormEvent) => {
+  const searchOffers = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const requestData = prepareRequestData();
-    
     onLoading(true);
     
-    try {
-      console.log('Sending search request with data:', requestData);
-      
-      const response = await axios.post(
-        `${API_URL}/api/v1/offers/search/advanced`, 
-        requestData,
-        {
-          params: {
-            page: 0,
-            size: 10
-          }
-        }
-      );
-      
-      console.log('Search results:', response.data);
-      
-      onSearch(response.data);
-    } catch (error) {
-      console.error('Error performing advanced search:', error);
-      onSearch({
-        content: [],
-        totalElements: 0,
-        totalPages: 0
+    offerApiService.searchOffers(filters)
+      .then(response => {
+        onSearch(response);
+      })
+      .finally(() => {
+        onLoading(false);
       });
-    } finally {
-      onLoading(false);
-    }
   };
 
   const resetFilters = () => {
@@ -305,7 +254,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
               <select 
                 id="brand" 
                 name="brand"
-                value={filters.brand}
+                value={filters.brand || ''}
                 onChange={handleInputChange}
               >
                 <option value="">Wszystkie marki</option>
@@ -320,7 +269,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
               <select 
                 id="model" 
                 name="model"
-                value={filters.model}
+                value={filters.model || ''}
                 onChange={handleInputChange}
                 disabled={!filters.brand || loading}
               >

@@ -1,6 +1,5 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
-import axios from 'axios';
 import "./OfferList.scss";
 import useTitle from "../../hooks/useTitle";
 import {MiniOffer} from "../../types/miniOfferTypes";
@@ -10,30 +9,9 @@ import ComparisonBar from "../../components/ComparisonBar/ComparisonBar";
 import { useComparison } from "../../context/ComparisonContext";
 import AdvancedFilter from "../../components/AdvancedFilter/AdvancedFilter";
 import { translations } from "../../translations/carEquipmentTranslations";
+import offerApiService, { SearchResponse } from "../../api/offerApi";
 
 const API_URL = import.meta.env.VITE_API_URL;
-
-const adaptToMiniOffer = (item: any): MiniOffer => {
-  const carDetails = item.carDetailsDto || item.carDetails || {};
-  
-  let mainImage = '';
-  if (item.imageUrls && item.imageUrls.length > 0) {
-    mainImage = item.imageUrls[0];
-  }
-  
-  return {
-    id: item.id || '',
-    title: item.title || '',
-    price: typeof item.price === 'number' ? item.price : 
-           typeof item.price === 'string' ? parseFloat(item.price) : 0,
-    mainImage: mainImage,
-    mileage: carDetails.mileage || 0,
-    fuelType: carDetails.fuelType || 'UNKNOWN',
-    year: carDetails.year || 0,
-    enginePower: carDetails.enginePower || 0,
-    displacement: carDetails.displacement || ''
-  };
-};
 
 const OfferList: React.FC = () => {
   useTitle("Dostępne oferty");
@@ -58,13 +36,13 @@ const OfferList: React.FC = () => {
     const target = event.target as HTMLImageElement;
     if (!target.dataset.errorHandled) {
       target.dataset.errorHandled = "true";
-      target.src = "https://via.placeholder.com/300x200?text=Brak+zdjęcia";
+      target.src = "https://via.placeholder.com/300x200?text=No+image";
       console.warn('Error loading image in offer list:', target.src);
     }
   };
 
   // Handle search results from AdvancedFilter
-  const handleSearchResults = (results: any) => {
+  const handleSearchResults = (results: SearchResponse<MiniOffer>) => {
     setError(null);
     
     if (!results || !results.content) {
@@ -75,11 +53,7 @@ const OfferList: React.FC = () => {
     }
 
     try {
-      const processedOffers = results.content.map(adaptToMiniOffer);
-      
-      console.log('Processed offers:', processedOffers);
-      
-      setOffers(processedOffers);
+      setOffers(results.content);
       setTotalPages(results.totalPages || 1);
       setCurrentPage(results.number ? results.number + 1 : 1);
     } catch (err) {
@@ -112,34 +86,22 @@ const OfferList: React.FC = () => {
     setIsLoading(true);
     setCurrentPage(newPage);
     
-    try {
-      const apiPage = newPage - 1;
-      
-      const response = await axios.post(
-        `${API_URL}/api/v1/offers/search/advanced`, 
-        {},
-        {
-          params: {
-            page: apiPage,
-            size: 10
-          }
-        }
-      );
-      
-      if (response.data && response.data.content) {
-        const processedOffers = response.data.content.map(adaptToMiniOffer);
-        setOffers(processedOffers);
-        setTotalPages(response.data.totalPages || 1);
-      } else {
+    const apiPage = newPage - 1;
+    
+    offerApiService.searchOffers({}, { page: apiPage, size: 10 })
+      .then(response => {
+        setOffers(response.content);
+        setTotalPages(response.totalPages || 1);
+        setError(null);
+      })
+      .catch(error => {
+        console.error('Error fetching page data:', error);
+        setError('Failed to fetch offers. Please try again.');
         setOffers([]);
-        setError('Otrzymano nieprawidłowe dane z serwera');
-      }
-    } catch (error) {
-      console.error('Error fetching page data:', error);
-      setError('Nie udało się pobrać ofert. Spróbuj ponownie.');
-    } finally {
-      setIsLoading(false);
-    }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const renderPaginationButtons = () => {
@@ -260,7 +222,7 @@ const OfferList: React.FC = () => {
                               <span className="offer-price">
                                 {typeof offer.price === 'number' 
                                   ? offer.price.toLocaleString() 
-                                  : parseFloat(offer.price).toLocaleString()} PLN
+                                  : parseFloat(String(offer.price)).toLocaleString()} PLN
                               </span>
                               <LikeButton offerId={offer.id} />
                             </div>
