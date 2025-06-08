@@ -192,7 +192,6 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
   const prepareRequestData = () => {
     const cleanedFilters: Record<string, any> = {};
     
-    // Only include non-null, non-empty values
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== null && value !== '') {
         cleanedFilters[key] = value;

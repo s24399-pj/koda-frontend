@@ -1,5 +1,6 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
+import axios from 'axios';
 import "./OfferList.scss";
 import useTitle from "../../hooks/useTitle";
 import {MiniOffer} from "../../types/miniOfferTypes";
@@ -8,9 +9,10 @@ import CompareCheckbox from "../../components/CompareCheckbox/CompareCheckbox";
 import ComparisonBar from "../../components/ComparisonBar/ComparisonBar";
 import { useComparison } from "../../context/ComparisonContext";
 import AdvancedFilter from "../../components/AdvancedFilter/AdvancedFilter";
+import { translations } from "../../translations/carEquipmentTranslations";
 
 const API_URL = import.meta.env.VITE_API_URL;
-//dodanie podzialu stron do zaimplementowania
+
 const adaptToMiniOffer = (item: any): MiniOffer => {
   const carDetails = item.carDetailsDto || item.carDetails || {};
   
@@ -106,6 +108,44 @@ const OfferList: React.FC = () => {
     }
   };
 
+  const handlePageChange = async (newPage: number) => {
+    setIsLoading(true);
+    setCurrentPage(newPage);
+    
+    try {
+      const apiPage = newPage - 1;
+      
+      console.log(`Pobieranie strony ${newPage} (API page ${apiPage})`);
+      
+      const response = await axios.post(
+        `${API_URL}/api/v1/offers/search/advanced`, 
+        {},
+        {
+          params: {
+            page: apiPage,
+            size: 10
+          }
+        }
+      );
+      
+      console.log('Odpowiedź strony:', response.data);
+      
+      if (response.data && response.data.content) {
+        const processedOffers = response.data.content.map(adaptToMiniOffer);
+        setOffers(processedOffers);
+        setTotalPages(response.data.totalPages || 1);
+      } else {
+        setOffers([]);
+        setError('Otrzymano nieprawidłowe dane z serwera');
+      }
+    } catch (error) {
+      console.error('Błąd podczas pobierania danych strony:', error);
+      setError('Nie udało się pobrać ofert. Spróbuj ponownie.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const renderPaginationButtons = () => {
     const isMobile = window.innerWidth <= 768;
     const maxButtonsToShow = isMobile ? 3 : 5;
@@ -121,7 +161,7 @@ const OfferList: React.FC = () => {
 
     if (startPage > 1) {
       pages.push(
-        <button key="first" onClick={() => setCurrentPage(1)}>1</button>
+        <button key="first" onClick={() => handlePageChange(1)}>1</button>
       );
       if (startPage > 2) {
         pages.push(<span key="ellipsis1" className="pagination-ellipsis">...</span>);
@@ -133,7 +173,7 @@ const OfferList: React.FC = () => {
         <button
           key={i}
           className={currentPage === i ? "active" : ""}
-          onClick={() => setCurrentPage(i)}
+          onClick={() => handlePageChange(i)}
         >
           {i}
         </button>
@@ -145,7 +185,7 @@ const OfferList: React.FC = () => {
         pages.push(<span key="ellipsis2" className="pagination-ellipsis">...</span>);
       }
       pages.push(
-        <button key="last" onClick={() => setCurrentPage(totalPages)}>
+        <button key="last" onClick={() => handlePageChange(totalPages)}>
           {totalPages}
         </button>
       );
@@ -163,18 +203,8 @@ const OfferList: React.FC = () => {
       : text;
   };
 
-  // Helper function to format fuel type for display
   const formatFuelType = (fuelType: string): string => {
-    switch (fuelType) {
-      case 'PETROL': return 'Benzyna';
-      case 'DIESEL': return 'Diesel';
-      case 'LPG': return 'LPG';
-      case 'HYBRID': return 'Hybryda';
-      case 'ELECTRIC': return 'Elektryczny';
-      case 'HYDROGEN': return 'Wodór';
-      case 'OTHER': return 'Inne';
-      default: return fuelType || 'Brak danych';
-    }
+    return translations.fuelType[fuelType as keyof typeof translations.fuelType] || fuelType || 'Brak danych';
   };
 
   return (
@@ -283,7 +313,7 @@ const OfferList: React.FC = () => {
             <div className="pagination">
               <button
                 disabled={currentPage === 1}
-                onClick={() => setCurrentPage((p) => p - 1)}
+                onClick={() => handlePageChange(currentPage - 1)}
               >
                 {"<"}
               </button>
@@ -292,7 +322,7 @@ const OfferList: React.FC = () => {
 
               <button
                 disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage((p) => p + 1)}
+                onClick={() => handlePageChange(currentPage + 1)}
               >
                 {">"}
               </button>
