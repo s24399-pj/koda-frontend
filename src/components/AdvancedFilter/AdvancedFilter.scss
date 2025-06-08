@@ -89,7 +89,6 @@
         background-clip: padding-box;
         transition: all 0.2s ease;
         box-sizing: border-box;
-        // Ensure proper isolation from parent containers
         isolation: isolate;
         
         &:focus {
