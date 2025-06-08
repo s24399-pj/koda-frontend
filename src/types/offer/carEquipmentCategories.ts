@@ -7,74 +7,68 @@ export interface EquipmentItem {
 
 export interface EquipmentCategory {
     title: string;
-    icon: string;
     items: EquipmentItem[];
 }
 
 export const equipmentCategories: EquipmentCategory[] = [
     {
-        title: "Comfort",
-        icon: "🛋️",
+        title: "Komfort",
         items: [
-            { key: 'airConditioning', label: 'Air Conditioning' },
-            { key: 'automaticClimate', label: 'Automatic Climate Control' },
-            { key: 'heatedSeats', label: 'Heated Seats' },
-            { key: 'electricSeats', label: 'Electric Seats' },
-            { key: 'leatherSeats', label: 'Leather Seats' },
-            { key: 'panoramicRoof', label: 'Panoramic Roof' },
-            { key: 'electricWindows', label: 'Electric Windows' },
-            { key: 'electricMirrors', label: 'Electric Mirrors' },
-            { key: 'keylessEntry', label: 'Keyless Entry' },
-            { key: 'wheelHeating', label: 'Heated Steering Wheel' },
-            { key: 'heatedSteeringWheel', label: 'Heated Steering Wheel' }
+            { key: 'airConditioning', label: 'Klimatyzacja' },
+            { key: 'automaticClimate', label: 'Klimatyzacja automatyczna' },
+            { key: 'heatedSeats', label: 'Podgrzewane fotele' },
+            { key: 'electricSeats', label: 'Elektryczne fotele' },
+            { key: 'leatherSeats', label: 'Skórzane fotele' },
+            { key: 'panoramicRoof', label: 'Dach panoramiczny' },
+            { key: 'electricWindows', label: 'Elektryczne szyby' },
+            { key: 'electricMirrors', label: 'Elektryczne lusterka' },
+            { key: 'keylessEntry', label: 'Wejście bezkluczykowe' },
+            { key: 'wheelHeating', label: 'Podgrzewana kierownica' },
+            { key: 'heatedSteeringWheel', label: 'Podgrzewana kierownica' }
         ]
     },
     {
         title: "Multimedia",
-        icon: "📱",
         items: [
-            { key: 'navigationSystem', label: 'Navigation System' },
+            { key: 'navigationSystem', label: 'System nawigacji' },
             { key: 'bluetooth', label: 'Bluetooth' },
-            { key: 'usbPort', label: 'USB Port' },
-            { key: 'multifunction', label: 'Multifunction Steering Wheel' },
+            { key: 'usbPort', label: 'Port USB' },
+            { key: 'multifunction', label: 'Kierownica wielofunkcyjna' },
             { key: 'androidAuto', label: 'Android Auto' },
             { key: 'appleCarPlay', label: 'Apple CarPlay' },
-            { key: 'soundSystem', label: 'Sound System' }
+            { key: 'soundSystem', label: 'System audio' }
         ]
     },
     {
-        title: "Driver Assistance",
-        icon: "🛡️",
+        title: "Wspomaganie kierowcy",
         items: [
-            { key: 'parkingSensors', label: 'Parking Sensors' },
-            { key: 'rearCamera', label: 'Rear Camera' },
-            { key: 'cruiseControl', label: 'Cruise Control' },
-            { key: 'adaptiveCruiseControl', label: 'Adaptive Cruise Control' },
-            { key: 'laneAssist', label: 'Lane Assist' },
-            { key: 'blindSpotDetection', label: 'Blind Spot Detection' },
-            { key: 'emergencyBraking', label: 'Emergency Braking' },
-            { key: 'startStop', label: 'Start-Stop System' }
+            { key: 'parkingSensors', label: 'Czujniki parkowania' },
+            { key: 'rearCamera', label: 'Kamera cofania' },
+            { key: 'cruiseControl', label: 'Tempomat' },
+            { key: 'adaptiveCruiseControl', label: 'Tempomat adaptacyjny' },
+            { key: 'laneAssist', label: 'Asystent pasa ruchu' },
+            { key: 'blindSpotDetection', label: 'Wykrywanie martwego pola' },
+            { key: 'emergencyBraking', label: 'Awaryjne hamowanie' },
+            { key: 'startStop', label: 'System start-stop' }
         ]
     },
     {
-        title: "Lighting",
-        icon: "💡",
+        title: "Oświetlenie",
         items: [
-            { key: 'xenonLights', label: 'Xenon Lights' },
-            { key: 'ledLights', label: 'LED Lights' },
-            { key: 'ambientLighting', label: 'Ambient Lighting' },
-            { key: 'automaticLights', label: 'Automatic Lights' },
-            { key: 'adaptiveLights', label: 'Adaptive Lights' }
+            { key: 'xenonLights', label: 'Światła ksenonowe' },
+            { key: 'ledLights', label: 'Światła LED' },
+            { key: 'ambientLighting', label: 'Oświetlenie nastrojowe' },
+            { key: 'automaticLights', label: 'Automatyczne światła' },
+            { key: 'adaptiveLights', label: 'Światła adaptacyjne' }
         ]
     },
     {
-        title: "Additional Features",
-        icon: "⭐",
+        title: "Dodatkowe funkcjonalności",
         items: [
-            { key: 'electricTrunk', label: 'Electric Trunk' },
-            { key: 'electricSunBlind', label: 'Electric Sun Blind' },
-            { key: 'headUpDisplay', label: 'Head-Up Display' },
-            { key: 'aromatherapy', label: 'Aromatherapy' }
+            { key: 'electricTrunk', label: 'Elektryczny bagażnik' },
+            { key: 'electricSunBlind', label: 'Elektryczna roleta' },
+            { key: 'headUpDisplay', label: 'Wyświetlacz HUD' },
+            { key: 'aromatherapy', label: 'Aromaterapia' }
         ]
     }
 ];

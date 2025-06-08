@@ -10,7 +10,8 @@ import {useAuth} from "../../context/AuthContext";
 import AuthRequired from "../AuthRequired/AuthRequired";
 import {likedOfferApi} from "../../api/likedOfferApi";
 import {MiniOffer} from "../../types/miniOfferTypes";
-import {RawOfferData} from "../../types/offer/RawOfferData"
+import {RawOfferData} from "../../types/offer/RawOfferData";
+import {translations} from "../../translations/carEquipmentTranslations";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -29,6 +30,10 @@ const LikedOffersList: React.FC = () => {
         isOfferSelected,
         canAddMoreOffers
     } = useComparison();
+
+    const getTranslation = (category: keyof typeof translations, key: string) => {
+        return (translations[category] as Record<string, string>)?.[key] || key;
+    };
 
     const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
         const target = event.target as HTMLImageElement;
@@ -123,11 +128,8 @@ const LikedOffersList: React.FC = () => {
     };
 
     const truncateText = (text: string, maxLength: number) => {
-        const isMobile = window.innerWidth <= 768;
-        const actualMaxLength = isMobile ? Math.min(maxLength, 30) : maxLength;
-
-        return text.length > actualMaxLength
-            ? `${text.substring(0, actualMaxLength)}...`
+        return text.length > maxLength
+            ? `${text.substring(0, maxLength)}...`
             : text;
     };
 
@@ -163,16 +165,20 @@ const LikedOffersList: React.FC = () => {
                                     <h2>{truncateText(offer.title, 50)}</h2>
                                     <div className="price-actions">
                                         <span className="offer-price">{offer.price.toLocaleString()} PLN</span>
-                                        <LikeButton offerId={offer.id} initialLiked={true}
-                                                    onLikeToggle={(isLiked) => handleLikeToggle(offer.id, isLiked)}/>
+                                        <LikeButton 
+                                            offerId={offer.id} 
+                                            initialLiked={true}
+                                            onLikeToggle={(isLiked) => handleLikeToggle(offer.id, isLiked)}
+                                        />
                                     </div>
                                 </div>
+                                
                                 <div className="offer-info">
                                     <p><strong>Rok:</strong> <span>{offer.year}</span></p>
                                     <p><strong>Przebieg:</strong> <span>{offer.mileage.toLocaleString()} km</span></p>
-                                    <p><strong>Typ paliwa:</strong> <span>{offer.fuelType}</span></p>
+                                    <p><strong>Typ paliwa:</strong> <span>{getTranslation('fuelType', offer.fuelType)}</span></p>
                                     <p><strong>Moc silnika:</strong> <span>{offer.enginePower} KM</span></p>
-                                    <p><strong>Pojemność silnika:</strong> <span>{offer.displacement} cm³</span></p>
+                                    <p><strong>Pojemność silnika:</strong> <span>{offer.displacement}</span></p>
                                 </div>
 
                                 <div className="offer-compare-bottom">

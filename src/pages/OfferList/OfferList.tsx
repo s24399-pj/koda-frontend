@@ -10,11 +10,10 @@ import { useComparison } from "../../context/ComparisonContext";
 import AdvancedFilter from "../../components/AdvancedFilter/AdvancedFilter";
 
 const API_URL = import.meta.env.VITE_API_URL;
-
+//dodanie podzialu stron do zaimplementowania
 const adaptToMiniOffer = (item: any): MiniOffer => {
   const carDetails = item.carDetailsDto || item.carDetails || {};
   
-  // Get the main image from imageUrls array
   let mainImage = '';
   if (item.imageUrls && item.imageUrls.length > 0) {
     mainImage = item.imageUrls[0];
@@ -41,7 +40,7 @@ const OfferList: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -74,7 +73,6 @@ const OfferList: React.FC = () => {
     }
 
     try {
-      // Process the results using the adapter for the actual data structure
       const processedOffers = results.content.map(adaptToMiniOffer);
       
       console.log('Processed offers:', processedOffers);
@@ -106,10 +104,6 @@ const OfferList: React.FC = () => {
     } else {
       removeFromComparison(id);
     }
-  };
-
-  const toggleFilters = () => {
-    setShowFilters(!showFilters);
   };
 
   const renderPaginationButtons = () => {
@@ -209,7 +203,6 @@ const OfferList: React.FC = () => {
             <p className="loading-indicator">Ładowanie ofert...</p>
           ) : (
             <>
-              {/* Informacja o liczbie wyników */}
               {offers.length > 0 && (
                 <div className="results-summary">
                   Znaleziono {offers.length} {offers.length === 1 ? 'ofertę' : 

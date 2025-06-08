@@ -11,6 +11,7 @@ import {useAuth} from "../../context/AuthContext";
 import {DEFAULT_PROFILE_IMAGE} from "../../assets/defaultProfilePicture.ts";
 import {CarEquipment} from "../../types/offer/OfferTypes.ts";
 import {equipmentCategories} from "../../types/offer/carEquipmentCategories.ts";
+import {translations} from "../../translations/carEquipmentTranslations.ts";
 
 interface LightboxProps {
     images: string[];
@@ -91,7 +92,7 @@ const Lightbox: React.FC<LightboxProps> = ({images, currentIndex, onClose, onIma
             <button
                 className="lightbox-close"
                 onClick={onClose}
-                aria-label="Close preview"
+                aria-label="Zamknij podgląd"
             >
                 ×
             </button>
@@ -101,16 +102,16 @@ const Lightbox: React.FC<LightboxProps> = ({images, currentIndex, onClose, onIma
                     <button
                         className="lightbox-nav prev"
                         onClick={handlePrevImage}
-                        aria-label="Previous image"
+                        aria-label="Poprzednie zdjęcie"
                     >
-                        &lt;
+                        ‹
                     </button>
                     <button
                         className="lightbox-nav next"
                         onClick={handleNextImage}
-                        aria-label="Next image"
+                        aria-label="Następne zdjęcie"
                     >
-                        &gt;
+                        ›
                     </button>
                 </>
             )}
@@ -118,7 +119,7 @@ const Lightbox: React.FC<LightboxProps> = ({images, currentIndex, onClose, onIma
             <div className="lightbox-content">
                 <img
                     src={`${apiUrl}${images[currentIndex]}`}
-                    alt="Enlarged view"
+                    alt="Powiększony widok"
                     className="lightbox-image"
                     onError={handleImageError}
                 />
@@ -137,7 +138,7 @@ const Lightbox: React.FC<LightboxProps> = ({images, currentIndex, onClose, onIma
                                 >
                                     <img
                                         src={`${apiUrl}${image}`}
-                                        alt={`Thumbnail ${idx + 1}`}
+                                        alt={`Miniatura ${idx + 1}`}
                                         onError={handleImageError}
                                     />
                                 </div>
@@ -151,7 +152,7 @@ const Lightbox: React.FC<LightboxProps> = ({images, currentIndex, onClose, onIma
 };
 
 const Offer: React.FC = () => {
-    useTitle("Offer");
+    useTitle("Oferta");
     const navigate = useNavigate();
     const {isAuthenticated} = useAuth();
 
@@ -169,6 +170,10 @@ const Offer: React.FC = () => {
     const [allImages, setAllImages] = useState<string[]>([]);
     const thumbnailsContainerRef = useRef<HTMLDivElement | null>(null);
     const [lightboxOpen, setLightboxOpen] = useState<boolean>(false);
+
+    const getTranslation = (category: keyof typeof translations, key: string) => {
+        return (translations[category] as Record<string, string>)?.[key] || key;
+    };
 
     useEffect(() => {
         const handleResize = () => {
@@ -227,16 +232,16 @@ const Offer: React.FC = () => {
                             setMapLng(parseFloat(lon));
                         } else {
                             console.error("Exact location not found");
-                            setError("Failed to find exact location.");
+                            setError("Nie udało się znaleźć dokładnej lokalizacji.");
                         }
                     } else {
                         console.error("No results for this location");
-                        setError("Failed to find location.");
+                        setError("Nie udało się znaleźć lokalizacji.");
                     }
                 }
             } catch (error) {
                 console.error("Error fetching offer:", error);
-                setError("Failed to load offer.");
+                setError("Nie udało się załadować oferty.");
             } finally {
                 setLoading(false);
             }
@@ -257,11 +262,11 @@ const Offer: React.FC = () => {
 
             L.circle([mapLat, mapLng], {
                 radius: radius,
-                color: "#007be5",
-                fillColor: "#007be5",
+                color: "#007aff",
+                fillColor: "#007aff",
                 fillOpacity: 0.3,
                 weight: 2,
-            }).addTo(map).bindPopup("Offer location");
+            }).addTo(map).bindPopup("Lokalizacja oferty");
 
             return () => {
                 map.remove();
@@ -365,31 +370,31 @@ const Offer: React.FC = () => {
 
         return (
             <div className="equipment-section">
-                <h2>Equipment</h2>
-                {equipmentCategories.map((category) => {
-                    const availableItems = category.items.filter(item =>
-                        equipment[item.key as keyof CarEquipment] === true
-                    );
+                <div className="section">
+                    <h2>Wyposażenie</h2>
+                    {equipmentCategories.map((category) => {
+                        const availableItems = category.items.filter(item =>
+                            equipment[item.key as keyof CarEquipment] === true
+                        );
 
-                    if (availableItems.length === 0) return null;
+                        if (availableItems.length === 0) return null;
 
-                    return (
-                        <div key={category.title} className="equipment-category">
-                            <h3>
-                                <span className="category-icon">{category.icon}</span>
-                                {category.title}
-                            </h3>
-                            <div className="equipment-grid">
-                                {availableItems.map((item) => (
-                                    <div key={item.key} className="equipment-item">
-                                        <span className="equipment-check">✅</span>
-                                        <span className="equipment-label">{item.label}</span>
-                                    </div>
-                                ))}
+                        return (
+                            <div key={category.title} className="equipment-category">
+                                <h3>{category.title}</h3>
+                                <div className="equipment-grid">
+                                    {availableItems.map((item) => (
+                                        <div key={item.key} className="equipment-item">
+                                            <span className="equipment-label">
+                                                {item.label}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    );
-                })}
+                        );
+                    })}
+                </div>
             </div>
         );
     };
@@ -411,69 +416,71 @@ const Offer: React.FC = () => {
         };
     }, [imageIndex, allImages.length, lightboxOpen]);
 
-    if (loading) return <p>Loading...</p>;
+    if (loading) return <p>Ładowanie...</p>;
     if (error) return <p className="error">{error}</p>;
-    if (!offer || !offer.CarDetailsDto) return <p>No offer data available.</p>;
+    if (!offer || !offer.CarDetailsDto) return <p>Brak danych oferty.</p>;
 
     return (
         <div className="offer-container">
             <div className="offer-header">
-                <div className="main-image-container">
-                    <img
-                        src={`${import.meta.env.VITE_API_URL}${selectedImage}`}
-                        alt={offer.title}
-                        className="main-image"
-                        onError={handleImageError}
-                        onClick={openLightbox}
-                    />
-                    <div className="zoom-hint">
-                        <span>🔍 Click to enlarge</span>
-                    </div>
-                </div>
-
-                {allImages.length > 0 && (
-                    <div className="offer-gallery">
-                        <div className="thumbnails-wrapper">
-                            <button
-                                className="nav-button prev"
-                                onClick={handlePrevImage}
-                                aria-label="Previous image"
-                                disabled={allImages.length <= 1}
-                            >
-                                &lt;
-                            </button>
-
-                            <div
-                                className="thumbnails-container"
-                                ref={thumbnailsContainerRef}
-                            >
-                                {allImages.map((image, idx) => (
-                                    <div
-                                        key={idx}
-                                        className={`thumbnail-container ${idx === imageIndex ? 'active' : ''}`}
-                                        onClick={() => handleThumbnailClick(idx)}
-                                    >
-                                        <img
-                                            src={`${import.meta.env.VITE_API_URL}${image}`}
-                                            alt={`View ${idx + 1}`}
-                                            className="thumbnail-image"
-                                            onError={handleImageError}
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-
-                            <button
-                                className="nav-button next"
-                                onClick={handleNextImage}
-                                aria-label="Next image"
-                                disabled={allImages.length <= 1}
-                            >
-                                &gt;
-                            </button>
+                <div className="images-section">
+                    <div className="main-image-container">
+                        <img
+                            src={`${import.meta.env.VITE_API_URL}${selectedImage}`}
+                            alt={offer.title}
+                            className="main-image"
+                            onError={handleImageError}
+                            onClick={openLightbox}
+                        />
+                        <div className="zoom-hint">
+                            <span>Kliknij aby powiększyć</span>
                         </div>
                     </div>
-                )}
+
+                    {allImages.length > 0 && (
+                        <div className="offer-gallery">
+                            <div className="thumbnails-wrapper">
+                                <button
+                                    className="nav-button prev"
+                                    onClick={handlePrevImage}
+                                    aria-label="Poprzednie zdjęcie"
+                                    disabled={allImages.length <= 1}
+                                >
+                                    ‹
+                                </button>
+
+                                <div
+                                    className="thumbnails-container"
+                                    ref={thumbnailsContainerRef}
+                                >
+                                    {allImages.map((image, idx) => (
+                                        <div
+                                            key={idx}
+                                            className={`thumbnail-container ${idx === imageIndex ? 'active' : ''}`}
+                                            onClick={() => handleThumbnailClick(idx)}
+                                        >
+                                            <img
+                                                src={`${import.meta.env.VITE_API_URL}${image}`}
+                                                alt={`Widok ${idx + 1}`}
+                                                className="thumbnail-image"
+                                                onError={handleImageError}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <button
+                                    className="nav-button next"
+                                    onClick={handleNextImage}
+                                    aria-label="Następne zdjęcie"
+                                    disabled={allImages.length <= 1}
+                                >
+                                    ›
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
 
                 <div className="offer-info">
                     <div className="offer-title-row">
@@ -485,84 +492,203 @@ const Offer: React.FC = () => {
                             }}
                         />
                     </div>
-                    <p className="price">
-                        {offer.price.toLocaleString()} {offer.currency}
-                    </p>
-                    <p className="location">📍 {offer.location}</p>
 
-                    <div className="contact-details">
-                        <p>📞 {offer.contactPhone}</p>
-                        <p>📧 <a href={`mailto:${offer.contactEmail}`}>{offer.contactEmail}</a></p>
+                    <div className="price-section">
+                        <div className="price">
+                            {offer.price.toLocaleString()} {offer.currency}
+                        </div>
+                        <div className="price-note">
+                            {offer.CarDetailsDto.mileage && `${offer.CarDetailsDto.mileage.toLocaleString()} km`}
+                        </div>
                     </div>
 
-                    <button className="contact-button" onClick={handleContactButton}>Contact</button>
+                    <div className="key-details">
+                        <div className="detail-item">
+                            <span className="label">Lokalizacja</span>
+                            <span className="value">{offer.location}</span>
+                        </div>
+                        <div className="detail-item">
+                            <span className="label">Rok</span>
+                            <span className="value">{offer.CarDetailsDto.year}</span>
+                        </div>
+                        <div className="detail-item">
+                            <span className="label">Paliwo</span>
+                            <span className="value">{getTranslation('fuelType', offer.CarDetailsDto.fuelType)}</span>
+                        </div>
+                        <div className="detail-item">
+                            <span className="label">Moc</span>
+                            <span className="value">{offer.CarDetailsDto.enginePower} KM</span>
+                        </div>
+                    </div>
+
+                    <div className="contact-section">
+                        <div className="contact-item">
+                            <span className="contact-label">Telefon</span>
+                            <span className="contact-value">
+                                <a href={`tel:${offer.contactPhone}`}>{offer.contactPhone}</a>
+                            </span>
+                        </div>
+                        <div className="contact-item">
+                            <span className="contact-label">Email</span>
+                            <span className="contact-value">
+                                <a href={`mailto:${offer.contactEmail}`}>{offer.contactEmail}</a>
+                            </span>
+                        </div>
+                    </div>
+
+                    <button className="contact-button" onClick={handleContactButton}>
+                        Kontakt
+                    </button>
                 </div>
             </div>
 
             <div className="offer-details">
-                <h2>Description</h2>
-                <p>{offer.description}</p>
+                <div className="section">
+                    <h2>Opis</h2>
+                    <p>{offer.description}</p>
+                </div>
 
-                <h2>Technical Details</h2>
-                <ul>
-                    <li>🚗 Brand: {offer.CarDetailsDto.brand}</li>
-                    <li>🔧 Model: {offer.CarDetailsDto.model}</li>
-                    <li>📅 Year: {offer.CarDetailsDto.year}</li>
-                    <li>⛽ Fuel: {offer.CarDetailsDto.fuelType}</li>
-                    <li>⚙️ Transmission: {offer.CarDetailsDto.transmission}</li>
-                    <li>🏎️ Power: {offer.CarDetailsDto.enginePower} HP</li>
-                    <li>📏 Displacement: {offer.CarDetailsDto.displacement}</li>
-                    <li>🚪 Doors: {offer.CarDetailsDto.doors}</li>
-                    <li>🛋️ Seats: {offer.CarDetailsDto.seats}</li>
-                </ul>
+                <div className="section">
+                    <h2>Dane techniczne</h2>
+                    <div className="tech-specs">
+                        <div className="spec-item">
+                            <span className="spec-label">Marka</span>
+                            <span className="spec-value">{offer.CarDetailsDto.brand}</span>
+                        </div>
+                        <div className="spec-item">
+                            <span className="spec-label">Model</span>
+                            <span className="spec-value">{offer.CarDetailsDto.model}</span>
+                        </div>
+                        <div className="spec-item">
+                            <span className="spec-label">Rok</span>
+                            <span className="spec-value">{offer.CarDetailsDto.year}</span>
+                        </div>
+                        <div className="spec-item">
+                            <span className="spec-label">Paliwo</span>
+                            <span className="spec-value">{getTranslation('fuelType', offer.CarDetailsDto.fuelType)}</span>
+                        </div>
+                        <div className="spec-item">
+                            <span className="spec-label">Skrzynia</span>
+                            <span className="spec-value">{getTranslation('transmissionType', offer.CarDetailsDto.transmission)}</span>
+                        </div>
+                        <div className="spec-item">
+                            <span className="spec-label">Moc</span>
+                            <span className="spec-value">{offer.CarDetailsDto.enginePower} KM</span>
+                        </div>
+                        <div className="spec-item">
+                            <span className="spec-label">Pojemność</span>
+                            <span className="spec-value">{offer.CarDetailsDto.displacement}</span>
+                        </div>
+                        <div className="spec-item">
+                            <span className="spec-label">Typ nadwozia</span>
+                            <span className="spec-value">{getTranslation('bodyType', offer.CarDetailsDto.bodyType)}</span>
+                        </div>
+                        <div className="spec-item">
+                            <span className="spec-label">Napęd</span>
+                            <span className="spec-value">{getTranslation('driveType', offer.CarDetailsDto.driveType)}</span>
+                        </div>
+                        {offer.CarDetailsDto.doors && (
+                            <div className="spec-item">
+                                <span className="spec-label">Drzwi</span>
+                                <span className="spec-value">{offer.CarDetailsDto.doors}</span>
+                            </div>
+                        )}
+                        {offer.CarDetailsDto.seats && (
+                            <div className="spec-item">
+                                <span className="spec-label">Miejsca</span>
+                                <span className="spec-value">{offer.CarDetailsDto.seats}</span>
+                            </div>
+                        )}
+                        {offer.CarDetailsDto.color && (
+                            <div className="spec-item">
+                                <span className="spec-label">Kolor</span>
+                                <span className="spec-value">{offer.CarDetailsDto.color}</span>
+                            </div>
+                        )}
+                        {offer.CarDetailsDto.condition && (
+                            <div className="spec-item">
+                                <span className="spec-label">Stan</span>
+                                <span className="spec-value">{getTranslation('vehicleCondition', offer.CarDetailsDto.condition)}</span>
+                            </div>
+                        )}
+                        {offer.CarDetailsDto.registrationNumber && (
+                            <div className="spec-item">
+                                <span className="spec-label">Nr rejestracji</span>
+                                <span className="spec-value">{offer.CarDetailsDto.registrationNumber}</span>
+                            </div>
+                        )}
+                        {offer.CarDetailsDto.firstOwner !== null && (
+                            <div className="spec-item">
+                                <span className="spec-label">Pierwszy właściciel</span>
+                                <span className="spec-value">{offer.CarDetailsDto.firstOwner ? 'Tak' : 'Nie'}</span>
+                            </div>
+                        )}
+                        {offer.CarDetailsDto.accidentFree !== null && (
+                            <div className="spec-item">
+                                <span className="spec-label">Bezwypadkowy</span>
+                                <span className="spec-value">{offer.CarDetailsDto.accidentFree ? 'Tak' : 'Nie'}</span>
+                            </div>
+                        )}
+                        {offer.CarDetailsDto.serviceHistory !== null && (
+                            <div className="spec-item">
+                                <span className="spec-label">Historia serwisowa</span>
+                                <span className="spec-value">{offer.CarDetailsDto.serviceHistory ? 'Tak' : 'Nie'}</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
 
                 {renderEquipmentSection(offer.CarDetailsDto.carEquipment)}
             </div>
 
             {offer.seller && (
                 <div className="seller-info-section">
-                    <h2>Seller</h2>
-                    <div className="seller-info">
-                        <div className="seller-profile">
-                            <div className="profile-image-container">
-                                <img
-                                    src={profileImage}
-                                    alt={`${offer.seller.firstName} ${offer.seller.lastName}`}
-                                    onError={handleProfileImageError}
-                                    className="profile-image"
-                                />
-                            </div>
-                            <div className="seller-details">
-                                <h3>{offer.seller.firstName} {offer.seller.lastName}</h3>
-                                <p className="seller-email">{offer.seller.email}</p>
+                    <div className="section">
+                        <h2>Sprzedający</h2>
+                        <div className="seller-info">
+                            <div className="seller-profile">
+                                <div className="profile-image-container">
+                                    <img
+                                        src={profileImage}
+                                        alt={`${offer.seller.firstName} ${offer.seller.lastName}`}
+                                        onError={handleProfileImageError}
+                                        className="profile-image"
+                                    />
+                                </div>
+                                <div className="seller-details">
+                                    <h3>{offer.seller.firstName} {offer.seller.lastName}</h3>
+                                    <p className="seller-email">{offer.seller.email}</p>
 
-                                <button
-                                    className="start-chat-button"
-                                    onClick={handleStartChat}
-                                    disabled={!isAuthenticated}
-                                    title={!isAuthenticated ? "You need to be logged in!" : ""}
-                                >
-                                    <i className="fas fa-comments"></i> Start Chat
-                                </button>
+                                    <button
+                                        className="start-chat-button"
+                                        onClick={handleStartChat}
+                                        disabled={!isAuthenticated}
+                                        title={!isAuthenticated ? "Musisz być zalogowany!" : ""}
+                                    >
+                                        <i className="fas fa-comments"></i> Rozpocznij czat
+                                    </button>
+                                </div>
                             </div>
+                            <button className="view-seller-offers">
+                                Zobacz inne oferty sprzedającego
+                            </button>
                         </div>
-                        <button className="view-seller-offers">
-                            View Other Seller Offers
-                        </button>
                     </div>
                 </div>
             )}
 
             {mapLat && mapLng && (
                 <div className="offer-map">
-                    <h2>Location</h2>
-                    <div
-                        ref={mapRef}
-                        style={{
-                            height: isMobile ? "250px" : "300px",
-                            width: "100%"
-                        }}
-                    ></div>
+                    <div className="section">
+                        <h2>Lokalizacja</h2>
+                        <div
+                            ref={mapRef}
+                            style={{
+                                height: isMobile ? "250px" : "300px",
+                                width: "100%"
+                            }}
+                        ></div>
+                    </div>
                 </div>
             )}
 

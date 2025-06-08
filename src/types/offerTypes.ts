@@ -1,4 +1,4 @@
-import {CarEquipment} from "./offer/OfferTypes.ts";
+import {CarEquipment, VehicleCondition} from "./offer/OfferTypes.ts";
 
 export interface CarDetails {
     brand: string;
@@ -6,6 +6,7 @@ export interface CarDetails {
     year: number;
     color: string;
     displacement: string;
+    vin?: string;
     mileage: number;
     fuelType: string;
     transmission: string;
@@ -14,6 +15,13 @@ export interface CarDetails {
     enginePower: number;
     doors: number;
     seats: number;
+    condition?: VehicleCondition;
+    registrationNumber?: string;
+    registrationCountry?: string;
+    firstOwner?: boolean;
+    accidentFree?: boolean;
+    serviceHistory?: boolean;
+    additionalFeatures?: string;
     carEquipment?: CarEquipment;
 }
 

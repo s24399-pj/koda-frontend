@@ -18,7 +18,7 @@ export const translations = {
     bodyType: {
       "SEDAN": "Sedan",
       "HATCHBACK": "Hatchback",
-      "ESTATE": "Kombi",
+      "STATION_WAGON": "Kombi",
       "SUV": "SUV",
       "COUPE": "Coupe",
       "CONVERTIBLE": "Kabriolet",
@@ -29,10 +29,10 @@ export const translations = {
     },
 
     driveType: {
-      "FRONT_WHEEL_DRIVE": "Napęd na przednią oś",
-      "REAR_WHEEL_DRIVE": "Napęd na tylną oś",
-      "ALL_WHEEL_DRIVE": "Napęd na wszystkie koła",
-      "FOUR_WHEEL_DRIVE": "Napęd 4x4",
+      "FRONT_WHEEL_DRIVE": "Na przednią oś",
+      "REAR_WHEEL_DRIVE": "Na tylną oś",
+      "ALL_WHEEL_DRIVE": "Na wszystkie koła",
+      "FOUR_WHEEL_DRIVE": "4x4",
       "OTHER": "Inny"
     },
   
