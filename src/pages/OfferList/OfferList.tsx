@@ -115,8 +115,6 @@ const OfferList: React.FC = () => {
     try {
       const apiPage = newPage - 1;
       
-      console.log(`Pobieranie strony ${newPage} (API page ${apiPage})`);
-      
       const response = await axios.post(
         `${API_URL}/api/v1/offers/search/advanced`, 
         {},
@@ -127,8 +125,6 @@ const OfferList: React.FC = () => {
           }
         }
       );
-      
-      console.log('Odpowiedź strony:', response.data);
       
       if (response.data && response.data.content) {
         const processedOffers = response.data.content.map(adaptToMiniOffer);

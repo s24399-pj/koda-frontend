@@ -1,12 +1,20 @@
+@use "sass:color";
+
 .offer-container {
   max-width: 1200px;
   margin: 120px auto 50px;
   padding: 20px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  overflow-x: hidden;
 
   @media (max-width: 768px) {
-    margin: 100px auto 30px;
-    padding: 16px;
+    margin: 150px auto 30px;
+    padding: 12px 8px;
+  }
+
+  @media (max-width: 480px) {
+    margin: 150px auto 30px;
+    padding: 8px 6px;
   }
 
   .offer-header {
@@ -20,15 +28,25 @@
       gap: 24px;
     }
 
+    @media (max-width: 480px) {
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
     .main-image-container {
       width: 100%;
       position: relative;
-      padding-top: 66.67%; // 3:2 aspect ratio
+      padding-top: 66.67%;
       overflow: hidden;
       border-radius: 16px;
       background: #f5f5f7;
       cursor: pointer;
       transition: transform 0.2s ease;
+
+      @media (max-width: 480px) {
+        border-radius: 8px;
+        padding-top: 56.25%;
+      }
 
       &:hover {
         transform: scale(1.02);
@@ -67,6 +85,14 @@
           font-size: 12px;
           padding: 6px 12px;
         }
+
+        @media (max-width: 480px) {
+          bottom: 8px;
+          right: 8px;
+          font-size: 10px;
+          padding: 4px 8px;
+          border-radius: 12px;
+        }
       }
     }
 
@@ -74,10 +100,18 @@
       margin-top: 16px;
       width: 100%;
 
+      @media (max-width: 480px) {
+        margin-top: 8px;
+      }
+
       .thumbnails-wrapper {
         display: flex;
         align-items: center;
         gap: 12px;
+
+        @media (max-width: 480px) {
+          gap: 6px;
+        }
 
         .nav-button {
           background: rgba(255, 255, 255, 0.95);
@@ -97,7 +131,7 @@
           transition: all 0.2s ease;
 
           &:hover {
-            background: rgba(245, 245, 247, 0.95);
+            background: color.scale(rgba(245, 245, 247, 0.95), $lightness: -3%);
             transform: scale(1.05);
           }
 
@@ -116,6 +150,13 @@
             height: 40px;
             font-size: 14px;
           }
+
+          @media (max-width: 480px) {
+            width: 28px;
+            height: 28px;
+            font-size: 11px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+          }
         }
 
         .thumbnails-container {
@@ -126,9 +167,15 @@
           scroll-behavior: smooth;
           scrollbar-width: none;
           flex-grow: 1;
+          -webkit-overflow-scrolling: touch;
 
           &::-webkit-scrollbar {
             display: none;
+          }
+
+          @media (max-width: 480px) {
+            gap: 4px;
+            padding: 4px 0;
           }
 
           .thumbnail-container {
@@ -163,6 +210,13 @@
               width: 100px;
               height: 66px;
             }
+
+            @media (max-width: 480px) {
+              width: 60px;
+              height: 40px;
+              border-radius: 6px;
+              border-width: 1px;
+            }
           }
         }
       }
@@ -184,12 +238,22 @@
         padding: 24px 0;
       }
 
+      @media (max-width: 480px) {
+        padding: 12px 0;
+      }
+
       .offer-title-row {
         display: flex;
         align-items: flex-start;
         justify-content: space-between;
         margin-bottom: 24px;
         gap: 16px;
+
+        @media (max-width: 480px) {
+          margin-bottom: 12px;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
 
         h1 {
           font-size: 32px;
@@ -198,9 +262,16 @@
           line-height: 1.2;
           margin: 0;
           letter-spacing: -0.5px;
+          word-break: break-word;
+          hyphens: auto;
 
           @media (max-width: 768px) {
             font-size: 28px;
+          }
+
+          @media (max-width: 480px) {
+            font-size: 20px;
+            width: 85%;
           }
         }
       }
@@ -209,6 +280,11 @@
         margin-bottom: 24px;
         padding-bottom: 24px;
         border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+
+        @media (max-width: 480px) {
+          margin-bottom: 12px;
+          padding-bottom: 12px;
+        }
 
         .price {
           font-size: 28px;
@@ -220,12 +296,20 @@
           @media (max-width: 768px) {
             font-size: 24px;
           }
+
+          @media (max-width: 480px) {
+            font-size: 20px;
+          }
         }
 
         .price-note {
           font-size: 14px;
           color: #86868b;
           font-weight: 400;
+
+          @media (max-width: 480px) {
+            font-size: 12px;
+          }
         }
       }
 
@@ -234,12 +318,22 @@
         padding-bottom: 24px;
         border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 
+        @media (max-width: 480px) {
+          margin-bottom: 12px;
+          padding-bottom: 12px;
+        }
+
         .detail-item {
           display: flex;
           align-items: center;
           justify-content: space-between;
           padding: 12px 0;
           font-size: 16px;
+
+          @media (max-width: 480px) {
+            padding: 8px 0;
+            font-size: 13px;
+          }
 
           &:not(:last-child) {
             border-bottom: 1px solid rgba(0, 0, 0, 0.04);
@@ -254,6 +348,8 @@
             color: #1d1d1f;
             font-weight: 600;
             text-align: right;
+            max-width: 50%;
+            word-break: break-word;
           }
         }
       }
@@ -266,6 +362,11 @@
           font-size: 16px;
           border-bottom: 1px solid rgba(0, 0, 0, 0.04);
 
+          @media (max-width: 480px) {
+            padding: 8px 0;
+            font-size: 13px;
+          }
+
           &:last-child {
             border-bottom: none;
           }
@@ -274,12 +375,21 @@
             color: #86868b;
             font-weight: 500;
             min-width: 80px;
+
+            @media (max-width: 480px) {
+              min-width: 60px;
+            }
           }
 
           .contact-value {
             color: #1d1d1f;
             font-weight: 600;
             margin-left: 16px;
+            word-break: break-word;
+
+            @media (max-width: 480px) {
+              margin-left: 8px;
+            }
 
             a {
               color: #007aff;
@@ -307,6 +417,13 @@
         margin-top: 24px;
         transition: all 0.2s ease;
         box-shadow: 0 4px 16px rgba(0, 122, 255, 0.24);
+
+        @media (max-width: 480px) {
+          padding: 12px 16px;
+          font-size: 14px;
+          margin-top: 12px;
+          border-radius: 8px;
+        }
 
         &:hover {
           background: #0056b3;
@@ -365,6 +482,14 @@
         height: 40px;
         font-size: 20px;
       }
+
+      @media (max-width: 480px) {
+        top: 8px;
+        right: 8px;
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+      }
     }
 
     .lightbox-nav {
@@ -403,8 +528,20 @@
         width: 48px;
         height: 48px;
         font-size: 16px;
-        left: 16px;
-        right: 16px;
+      }
+
+      @media (max-width: 480px) {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+
+        &.prev {
+          left: 8px;
+        }
+
+        &.next {
+          right: 8px;
+        }
       }
     }
 
@@ -416,6 +553,11 @@
       flex-direction: column;
       align-items: center;
 
+      @media (max-width: 480px) {
+        max-width: 95%;
+        max-height: 95%;
+      }
+
       .lightbox-image {
         max-width: 100%;
         max-height: 80vh;
@@ -423,6 +565,11 @@
         display: block;
         margin-bottom: 24px;
         border-radius: 8px;
+
+        @media (max-width: 480px) {
+          margin-bottom: 12px;
+          max-height: 70vh;
+        }
       }
 
       .lightbox-thumbnails-wrapper {
@@ -433,6 +580,12 @@
         border-radius: 12px;
         padding: 16px;
 
+        @media (max-width: 480px) {
+          padding: 8px;
+          margin-top: 8px;
+          border-radius: 6px;
+        }
+
         .lightbox-thumbnails {
           display: flex;
           gap: 8px;
@@ -441,9 +594,15 @@
           scroll-behavior: smooth;
           scrollbar-width: none;
           max-width: 100%;
+          -webkit-overflow-scrolling: touch;
 
           &::-webkit-scrollbar {
             display: none;
+          }
+
+          @media (max-width: 480px) {
+            gap: 4px;
+            padding: 4px 0;
           }
 
           .lightbox-thumbnail {
@@ -476,6 +635,13 @@
               width: 64px;
               height: 48px;
             }
+
+            @media (max-width: 480px) {
+              width: 50px;
+              height: 38px;
+              border-width: 1px;
+              border-radius: 4px;
+            }
           }
         }
       }
@@ -484,6 +650,10 @@
 
   .offer-details {
     margin-top: 48px;
+
+    @media (max-width: 480px) {
+      margin-top: 24px;
+    }
 
     .section {
       background: rgba(255, 255, 255, 0.8);
@@ -498,6 +668,13 @@
         padding: 24px;
       }
 
+      @media (max-width: 480px) {
+        padding: 16px;
+        border-radius: 12px;
+        margin-bottom: 12px;
+        background: rgba(255, 255, 255, 0.95);
+      }
+
       h2 {
         font-size: 28px;
         font-weight: 700;
@@ -509,6 +686,11 @@
           font-size: 24px;
           margin-bottom: 20px;
         }
+
+        @media (max-width: 480px) {
+          font-size: 18px;
+          margin-bottom: 12px;
+        }
       }
 
       p {
@@ -519,6 +701,11 @@
 
         @media (max-width: 768px) {
           font-size: 16px;
+        }
+
+        @media (max-width: 480px) {
+          font-size: 14px;
+          line-height: 1.4;
         }
       }
 
@@ -532,6 +719,10 @@
           gap: 12px;
         }
 
+        @media (max-width: 480px) {
+          gap: 6px;
+        }
+
         .spec-item {
           display: flex;
           align-items: center;
@@ -541,10 +732,19 @@
           border-radius: 12px;
           border: 1px solid rgba(0, 0, 0, 0.04);
 
+          @media (max-width: 480px) {
+            padding: 10px 12px;
+            border-radius: 8px;
+          }
+
           .spec-label {
             color: #86868b;
             font-weight: 500;
             font-size: 15px;
+
+            @media (max-width: 480px) {
+              font-size: 12px;
+            }
           }
 
           .spec-value {
@@ -552,6 +752,12 @@
             font-weight: 600;
             font-size: 15px;
             text-align: right;
+            max-width: 50%;
+            word-break: break-word;
+
+            @media (max-width: 480px) {
+              font-size: 12px;
+            }
           }
         }
       }
@@ -567,6 +773,10 @@
           margin-bottom: 0;
         }
 
+        @media (max-width: 480px) {
+          margin-bottom: 16px;
+        }
+
         h3 {
           font-size: 20px;
           margin-bottom: 16px;
@@ -576,6 +786,11 @@
 
           @media (max-width: 768px) {
             font-size: 18px;
+          }
+
+          @media (max-width: 480px) {
+            font-size: 15px;
+            margin-bottom: 8px;
           }
         }
 
@@ -589,6 +804,10 @@
             gap: 8px;
           }
 
+          @media (max-width: 480px) {
+            gap: 4px;
+          }
+
           .equipment-item {
             display: flex;
             align-items: center;
@@ -597,6 +816,11 @@
             border-radius: 12px;
             border: 1px solid rgba(0, 0, 0, 0.04);
             transition: all 0.2s ease;
+
+            @media (max-width: 480px) {
+              padding: 8px 12px;
+              border-radius: 6px;
+            }
 
             &:hover {
               background: #ebebf0;
@@ -607,9 +831,14 @@
               font-size: 15px;
               color: #1d1d1f;
               font-weight: 500;
+              word-break: break-word;
 
               @media (max-width: 768px) {
                 font-size: 14px;
+              }
+
+              @media (max-width: 480px) {
+                font-size: 12px;
               }
             }
 
@@ -619,6 +848,12 @@
               font-weight: 700;
               font-size: 16px;
               margin-right: 12px;
+              flex-shrink: 0;
+
+              @media (max-width: 480px) {
+                font-size: 12px;
+                margin-right: 8px;
+              }
             }
           }
         }
@@ -639,6 +874,10 @@
           gap: 20px;
         }
 
+        @media (max-width: 480px) {
+          gap: 12px;
+        }
+
         .seller-profile {
           display: flex;
           align-items: center;
@@ -650,10 +889,16 @@
             overflow: hidden;
             background: #f5f5f7;
             border: 2px solid rgba(0, 0, 0, 0.04);
+            flex-shrink: 0;
 
             @media (max-width: 768px) {
               width: 56px;
               height: 56px;
+            }
+
+            @media (max-width: 480px) {
+              width: 44px;
+              height: 44px;
             }
 
             .profile-image {
@@ -666,17 +911,33 @@
           .seller-details {
             margin-left: 16px;
 
+            @media (max-width: 480px) {
+              margin-left: 10px;
+            }
+
             h3 {
               margin: 0 0 4px 0;
               font-size: 20px;
               font-weight: 600;
               color: #1d1d1f;
+              word-break: break-word;
+
+              @media (max-width: 480px) {
+                font-size: 15px;
+                margin-bottom: 2px;
+              }
             }
 
             .seller-email {
               margin: 0 0 12px 0;
               color: #86868b;
               font-size: 15px;
+              word-break: break-word;
+
+              @media (max-width: 480px) {
+                font-size: 12px;
+                margin-bottom: 8px;
+              }
             }
 
             .start-chat-button {
@@ -693,6 +954,13 @@
               font-weight: 600;
               transition: all 0.2s ease;
 
+              @media (max-width: 480px) {
+                padding: 6px 12px;
+                font-size: 12px;
+                gap: 4px;
+                border-radius: 6px;
+              }
+
               &:hover {
                 background: #0056b3;
                 transform: translateY(-1px);
@@ -706,6 +974,10 @@
 
               i {
                 font-size: 16px;
+
+                @media (max-width: 480px) {
+                  font-size: 12px;
+                }
               }
             }
           }
@@ -727,6 +999,12 @@
             text-align: center;
           }
 
+          @media (max-width: 480px) {
+            padding: 8px 16px;
+            font-size: 12px;
+            border-radius: 6px;
+          }
+
           &:hover {
             background: #007aff;
             color: white;
@@ -741,6 +1019,10 @@
     .section {
       h2 {
         margin-bottom: 20px;
+
+        @media (max-width: 480px) {
+          margin-bottom: 12px;
+        }
       }
 
       div[ref] {
@@ -750,6 +1032,11 @@
 
         @media (max-width: 768px) {
           height: 250px !important;
+        }
+
+        @media (max-width: 480px) {
+          border-radius: 8px;
+          height: 180px !important;
         }
       }
     }
