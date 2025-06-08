@@ -59,7 +59,7 @@ const OfferList: React.FC = () => {
     if (!target.dataset.errorHandled) {
       target.dataset.errorHandled = "true";
       target.src = "https://via.placeholder.com/300x200?text=Brak+zdjęcia";
-      console.warn('Błąd ładowania zdjęcia w liście ofert:', target.src);
+      console.warn('Error loading image in offer list:', target.src);
     }
   };
 
@@ -135,7 +135,7 @@ const OfferList: React.FC = () => {
         setError('Otrzymano nieprawidłowe dane z serwera');
       }
     } catch (error) {
-      console.error('Błąd podczas pobierania danych strony:', error);
+      console.error('Error fetching page data:', error);
       setError('Nie udało się pobrać ofert. Spróbuj ponownie.');
     } finally {
       setIsLoading(false);
