@@ -12,23 +12,23 @@
   --success-color: #34c759;
   --danger-color: #ff3b30;
   --warning-color: #ff9500;
-  
+
   /* Shadows */
   --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 6px 12px rgba(0, 0, 0, 0.1);
-  
+
   /* Border radius */
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 20px;
   --radius-full: 50%;
-  
+
   /* Transitions */
   --transition-fast: 0.2s ease;
   --transition-medium: 0.3s ease;
-  
+
   /* Spacing */
   --space-xs: 4px;
   --space-sm: 8px;
@@ -36,7 +36,7 @@
   --space-lg: 24px;
   --space-xl: 32px;
   --space-xxl: 48px;
-  
+
   /* Breakpoints */
   --mobile: 480px;
   --tablet: 768px;
@@ -57,7 +57,9 @@ html {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'San Francisco', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'San Francisco', 'Helvetica Neue', Helvetica,
+    Arial, sans-serif;
   color: var(--text-color);
   background-color: var(--background-color);
   line-height: 1.5;
@@ -68,7 +70,12 @@ body {
 }
 
 /* Typography */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: 600;
   line-height: 1.2;
   margin-bottom: var(--space-md);
@@ -153,7 +160,8 @@ a:hover {
     font-size: 18px;
   }
 
-  h5, h6 {
+  h5,
+  h6 {
     font-size: 16px;
   }
 }
@@ -175,7 +183,9 @@ a:hover {
     font-size: 18px;
   }
 
-  h4, h5, h6 {
+  h4,
+  h5,
+  h6 {
     font-size: 16px;
   }
 
@@ -191,7 +201,9 @@ a:hover {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   overflow: hidden;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .card:hover {
@@ -232,16 +244,22 @@ a:hover {
 }
 
 /* Form elements */
-input, select, textarea {
+input,
+select,
+textarea {
   width: 100%;
   padding: 10px 12px;
   font-size: 16px;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
-input:focus, select:focus, textarea:focus {
+input:focus,
+select:focus,
+textarea:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
@@ -281,17 +299,35 @@ input:focus, select:focus, textarea:focus {
   gap: var(--space-md);
 }
 
-.mt-sm { margin-top: var(--space-sm); }
-.mt-md { margin-top: var(--space-md); }
-.mt-lg { margin-top: var(--space-lg); }
+.mt-sm {
+  margin-top: var(--space-sm);
+}
+.mt-md {
+  margin-top: var(--space-md);
+}
+.mt-lg {
+  margin-top: var(--space-lg);
+}
 
-.mb-sm { margin-bottom: var(--space-sm); }
-.mb-md { margin-bottom: var(--space-md); }
-.mb-lg { margin-bottom: var(--space-lg); }
+.mb-sm {
+  margin-bottom: var(--space-sm);
+}
+.mb-md {
+  margin-bottom: var(--space-md);
+}
+.mb-lg {
+  margin-bottom: var(--space-lg);
+}
 
-.p-sm { padding: var(--space-sm); }
-.p-md { padding: var(--space-md); }
-.p-lg { padding: var(--space-lg); }
+.p-sm {
+  padding: var(--space-sm);
+}
+.p-md {
+  padding: var(--space-md);
+}
+.p-lg {
+  padding: var(--space-lg);
+}
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {

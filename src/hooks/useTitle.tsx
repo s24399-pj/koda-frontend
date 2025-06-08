@@ -1,10 +1,10 @@
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
 const useTitle = (title: unknown) => {
-    useEffect(() => {
-        const prefix = "Koda | ";
-        document.title = `${prefix}${title}`;
-    }, [title]);
+  useEffect(() => {
+    const prefix = 'Koda | ';
+    document.title = `${prefix}${title}`;
+  }, [title]);
 };
 
 export default useTitle;

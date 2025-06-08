@@ -1,20 +1,20 @@
-import React, {useState} from "react";
-import {useNavigate} from "react-router-dom";
-import "./OfferList.scss";
-import useTitle from "../../hooks/useTitle";
-import {MiniOffer} from "../../types/miniOfferTypes";
-import LikeButton from "../../components/LikeButton/LikeButton";
-import CompareCheckbox from "../../components/CompareCheckbox/CompareCheckbox";
-import ComparisonBar from "../../components/ComparisonBar/ComparisonBar";
-import { useComparison } from "../../context/ComparisonContext";
-import AdvancedFilter from "../../components/AdvancedFilter/AdvancedFilter";
-import { translations } from "../../translations/carEquipmentTranslations";
-import offerApiService, { SearchResponse } from "../../api/offerApi";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './OfferList.scss';
+import useTitle from '../../hooks/useTitle';
+import { MiniOffer } from '../../types/miniOfferTypes';
+import LikeButton from '../../components/LikeButton/LikeButton';
+import CompareCheckbox from '../../components/CompareCheckbox/CompareCheckbox';
+import ComparisonBar from '../../components/ComparisonBar/ComparisonBar';
+import { useComparison } from '../../context/ComparisonContext';
+import AdvancedFilter from '../../components/AdvancedFilter/AdvancedFilter';
+import { translations } from '../../translations/carEquipmentTranslations';
+import offerApiService, { SearchResponse } from '../../api/offerApi';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const OfferList: React.FC = () => {
-  useTitle("Dostępne oferty");
+  useTitle('Dostępne oferty');
 
   const [offers, setOffers] = useState<MiniOffer[]>([]);
   const [totalPages, setTotalPages] = useState(1);
@@ -29,14 +29,14 @@ const OfferList: React.FC = () => {
     addToComparison,
     removeFromComparison,
     isOfferSelected,
-    canAddMoreOffers
+    canAddMoreOffers,
   } = useComparison();
 
   const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
     const target = event.target as HTMLImageElement;
     if (!target.dataset.errorHandled) {
-      target.dataset.errorHandled = "true";
-      target.src = "https://via.placeholder.com/300x200?text=No+image";
+      target.dataset.errorHandled = 'true';
+      target.src = 'https://via.placeholder.com/300x200?text=No+image';
       console.warn('Error loading image in offer list:', target.src);
     }
   };
@@ -44,7 +44,7 @@ const OfferList: React.FC = () => {
   // Handle search results from AdvancedFilter
   const handleSearchResults = (results: SearchResponse<MiniOffer>) => {
     setError(null);
-    
+
     if (!results || !results.content) {
       console.warn('Invalid search results received:', results);
       setOffers([]);
@@ -85,10 +85,11 @@ const OfferList: React.FC = () => {
   const handlePageChange = async (newPage: number) => {
     setIsLoading(true);
     setCurrentPage(newPage);
-    
+
     const apiPage = newPage - 1;
-    
-    offerApiService.searchOffers({}, { page: apiPage, size: 10 })
+
+    offerApiService
+      .searchOffers({}, { page: apiPage, size: 10 })
       .then(response => {
         setOffers(response.content);
         setTotalPages(response.totalPages || 1);
@@ -119,10 +120,16 @@ const OfferList: React.FC = () => {
 
     if (startPage > 1) {
       pages.push(
-        <button key="first" onClick={() => handlePageChange(1)}>1</button>
+        <button key="first" onClick={() => handlePageChange(1)}>
+          1
+        </button>
       );
       if (startPage > 2) {
-        pages.push(<span key="ellipsis1" className="pagination-ellipsis">...</span>);
+        pages.push(
+          <span key="ellipsis1" className="pagination-ellipsis">
+            ...
+          </span>
+        );
       }
     }
 
@@ -130,7 +137,7 @@ const OfferList: React.FC = () => {
       pages.push(
         <button
           key={i}
-          className={currentPage === i ? "active" : ""}
+          className={currentPage === i ? 'active' : ''}
           onClick={() => handlePageChange(i)}
         >
           {i}
@@ -140,7 +147,11 @@ const OfferList: React.FC = () => {
 
     if (endPage < totalPages) {
       if (endPage < totalPages - 1) {
-        pages.push(<span key="ellipsis2" className="pagination-ellipsis">...</span>);
+        pages.push(
+          <span key="ellipsis2" className="pagination-ellipsis">
+            ...
+          </span>
+        );
       }
       pages.push(
         <button key="last" onClick={() => handlePageChange(totalPages)}>
@@ -156,36 +167,33 @@ const OfferList: React.FC = () => {
     const isMobile = window.innerWidth <= 768;
     const actualMaxLength = isMobile ? Math.min(maxLength, 30) : maxLength;
 
-    return text.length > actualMaxLength
-      ? `${text.substring(0, actualMaxLength)}...`
-      : text;
+    return text.length > actualMaxLength ? `${text.substring(0, actualMaxLength)}...` : text;
   };
 
   const formatFuelType = (fuelType: string): string => {
-    return translations.fuelType[fuelType as keyof typeof translations.fuelType] || fuelType || 'Brak danych';
+    return (
+      translations.fuelType[fuelType as keyof typeof translations.fuelType] ||
+      fuelType ||
+      'Brak danych'
+    );
   };
 
   return (
     <div className="offer-list-container">
-      
       {/* Two-column layout for desktop */}
       <div className="offer-list-layout">
         {/* Filter Panel - Left column on desktop, toggleable on mobile */}
         <div className={`filter-panel ${showFilters ? 'show' : ''}`}>
           <AdvancedFilter onSearch={handleSearchResults} onLoading={handleLoading} />
         </div>
-        
+
         {/* Offers List - Right column */}
         <div className="offers-panel">
           <div className="offers-header">
             <h1>Dostępne oferty</h1>
           </div>
 
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
+          {error && <div className="error-message">{error}</div>}
 
           {isLoading ? (
             <p className="loading-indicator">Ładowanie ofert...</p>
@@ -193,14 +201,15 @@ const OfferList: React.FC = () => {
             <>
               {offers.length > 0 && (
                 <div className="results-summary">
-                  Znaleziono {offers.length} {offers.length === 1 ? 'ofertę' : 
-                    offers.length < 5 ? 'oferty' : 'ofert'} na stronie {currentPage} z {totalPages}
+                  Znaleziono {offers.length}{' '}
+                  {offers.length === 1 ? 'ofertę' : offers.length < 5 ? 'oferty' : 'ofert'} na
+                  stronie {currentPage} z {totalPages}
                 </div>
               )}
 
               <div className="offer-list">
                 {offers.length > 0 ? (
-                  offers.map((offer) => (
+                  offers.map(offer => (
                     <div key={offer.id} className="offer-card">
                       <div className="offer-clickable" onClick={() => handleOfferClick(offer.id)}>
                         <div className="offer-image-container">
@@ -220,25 +229,42 @@ const OfferList: React.FC = () => {
                             <h2>{truncateText(offer.title, 50)}</h2>
                             <div className="price-actions">
                               <span className="offer-price">
-                                {typeof offer.price === 'number' 
-                                  ? offer.price.toLocaleString() 
-                                  : parseFloat(String(offer.price)).toLocaleString()} PLN
+                                {typeof offer.price === 'number'
+                                  ? offer.price.toLocaleString()
+                                  : parseFloat(String(offer.price)).toLocaleString()}{' '}
+                                PLN
                               </span>
                               <LikeButton offerId={offer.id} />
                             </div>
                           </div>
                           <div className="offer-info">
-                            <p><strong>Rok:</strong> <span>{offer.year || 'Brak danych'}</span></p>
-                            <p><strong>Przebieg:</strong> <span>
-                              {offer.mileage ? `${offer.mileage.toLocaleString()} km` : 'Brak danych'}
-                            </span></p>
-                            <p><strong>Typ paliwa:</strong> <span>{formatFuelType(offer.fuelType)}</span></p>
-                            <p><strong>Moc silnika:</strong> <span>
-                              {offer.enginePower ? `${offer.enginePower} KM` : 'Brak danych'}
-                            </span></p>
-                            <p><strong>Pojemność silnika:</strong> <span>
-                              {offer.displacement ? `${offer.displacement}` : 'Brak danych'}
-                            </span></p>
+                            <p>
+                              <strong>Rok:</strong> <span>{offer.year || 'Brak danych'}</span>
+                            </p>
+                            <p>
+                              <strong>Przebieg:</strong>{' '}
+                              <span>
+                                {offer.mileage
+                                  ? `${offer.mileage.toLocaleString()} km`
+                                  : 'Brak danych'}
+                              </span>
+                            </p>
+                            <p>
+                              <strong>Typ paliwa:</strong>{' '}
+                              <span>{formatFuelType(offer.fuelType)}</span>
+                            </p>
+                            <p>
+                              <strong>Moc silnika:</strong>{' '}
+                              <span>
+                                {offer.enginePower ? `${offer.enginePower} KM` : 'Brak danych'}
+                              </span>
+                            </p>
+                            <p>
+                              <strong>Pojemność silnika:</strong>{' '}
+                              <span>
+                                {offer.displacement ? `${offer.displacement}` : 'Brak danych'}
+                              </span>
+                            </p>
                           </div>
 
                           <div className="offer-compare-bottom">
@@ -255,9 +281,7 @@ const OfferList: React.FC = () => {
                   ))
                 ) : (
                   <div className="no-results">
-                    <p className="no-offers">
-                      Brak ofert spełniających kryteria wyszukiwania
-                    </p>
+                    <p className="no-offers">Brak ofert spełniających kryteria wyszukiwania</p>
                     <p className="no-offers-hint">
                       Spróbuj zmienić filtry lub rozszerzyć kryteria wyszukiwania
                     </p>
@@ -273,7 +297,7 @@ const OfferList: React.FC = () => {
                 disabled={currentPage === 1}
                 onClick={() => handlePageChange(currentPage - 1)}
               >
-                {"<"}
+                {'<'}
               </button>
 
               {renderPaginationButtons()}
@@ -282,17 +306,14 @@ const OfferList: React.FC = () => {
                 disabled={currentPage === totalPages}
                 onClick={() => handlePageChange(currentPage + 1)}
               >
-                {">"}
+                {'>'}
               </button>
             </div>
           )}
         </div>
       </div>
 
-      <ComparisonBar
-        selectedOffers={selectedOffers}
-        removeFromComparison={removeFromComparison}
-      />
+      <ComparisonBar selectedOffers={selectedOffers} removeFromComparison={removeFromComparison} />
     </div>
   );
 };

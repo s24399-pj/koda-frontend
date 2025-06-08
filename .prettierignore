@@ -1,0 +1,14 @@
+# Folders to ignore
+node_modules/
+dist/
+build/
+.next/
+coverage/
+
+# Files to ignore
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Generated files
+*.d.ts

@@ -1,4 +1,4 @@
-@use "sass:color";
+@use 'sass:color';
 
 .offer-container {
   max-width: 1200px;
@@ -50,7 +50,7 @@
 
       &:hover {
         transform: scale(1.02);
-        
+
         .zoom-hint {
           opacity: 1;
         }
@@ -843,7 +843,7 @@
             }
 
             &::before {
-              content: "✓";
+              content: '✓';
               color: #34c759;
               font-weight: 700;
               font-size: 16px;

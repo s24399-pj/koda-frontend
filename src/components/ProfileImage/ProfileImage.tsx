@@ -8,22 +8,22 @@ interface ProfileImageProps {
   className?: string;
 }
 
-export const ProfileImage: React.FC<ProfileImageProps> = ({ 
-  imageData, 
-  alt, 
+export const ProfileImage: React.FC<ProfileImageProps> = ({
+  imageData,
+  alt,
   size = 'medium',
-  className = '' 
+  className = '',
 }) => {
   const [error, setError] = useState(false);
 
   let imageSrc = DEFAULT_PROFILE_IMAGE;
-  
+
   if (imageData && !error) {
     try {
       const binary = Array.from(imageData)
         .map(byte => String.fromCharCode(byte))
         .join('');
-      
+
       const base64 = btoa(binary);
       imageSrc = `data:image/jpeg;base64,${base64}`;
     } catch (e) {
