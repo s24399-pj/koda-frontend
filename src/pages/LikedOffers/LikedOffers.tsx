@@ -157,7 +157,7 @@ const LikedOffersList: React.FC = () => {
                   src={
                     offer.mainImage
                       ? `${API_URL}${offer.mainImage}`
-                      : 'https://via.placeholder.com/300x200?text=Brak+zdjęcia'
+                      : 'https://placehold.co/600x400'
                   }
                   alt={offer.title}
                   loading="lazy"
