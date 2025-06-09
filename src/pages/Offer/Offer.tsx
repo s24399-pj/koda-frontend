@@ -233,16 +233,16 @@ const Offer: React.FC = () => {
               setMapLng(parseFloat(lon));
             } else {
               console.error('Exact location not found');
-              setError('Nie udało się znaleźć dokładnej lokalizacji.');
+              setError('Failed to find exact location.');
             }
           } else {
             console.error('No results for this location');
-            setError('Nie udało się znaleźć lokalizacji.');
+            setError('Failed to find location.');
           }
         }
       } catch (error) {
         console.error('Error fetching offer:', error);
-        setError('Nie udało się załadować oferty.');
+        setError('Failed to load offer.');
       } finally {
         setLoading(false);
       }
@@ -366,6 +366,14 @@ const Offer: React.FC = () => {
       handleStartChat();
     } else {
       window.location.href = `mailto:${offer?.contactEmail}`;
+    }
+  };
+
+  const handleViewSellerOffers = () => {
+    if (offer?.seller?.id) {
+      navigate(`/seller/${offer.seller.id}/offers`);
+    } else {
+      console.error('Missing seller ID');
     }
   };
 
@@ -686,7 +694,13 @@ const Offer: React.FC = () => {
                   </button>
                 </div>
               </div>
-              <button className="view-seller-offers">Zobacz inne oferty sprzedającego</button>
+              <button
+                className="view-seller-offers"
+                onClick={handleViewSellerOffers}
+                disabled={!offer?.seller?.id}
+              >
+                Zobacz inne oferty sprzedającego
+              </button>
             </div>
           </div>
         </div>

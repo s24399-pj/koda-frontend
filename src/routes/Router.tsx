@@ -11,6 +11,7 @@ import WhyUs from '../pages/WhyUs/WhyUs.tsx';
 import OfferCreation from '../pages/OfferCreation/OfferCreation.tsx';
 import ChatPage from '../pages/Chat/ChatPage.tsx';
 import LikedOffers from '../pages/LikedOffers/LikedOffers.tsx';
+import SellerOffers from '../pages/SellerOffers/SellerOffers.tsx';
 import RequireAuth from '../components/RequireAuth/RequireAuth.tsx';
 
 const AppRouter = () => {
@@ -21,6 +22,7 @@ const AppRouter = () => {
       <Route path="*" element={<NotFound />} />
       <Route path="/offers" element={<OfferList />} />
       <Route path="/offer/:id" element={<Offer />} />
+      <Route path="/seller/:sellerId/offers" element={<SellerOffers />} />
       <Route path="comparison" element={<OfferComparison />} />
       <Route path="/whyus" element={<WhyUs />} />
       <Route path="/user/login" element={<LoginPage />} />

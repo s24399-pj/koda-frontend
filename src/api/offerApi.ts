@@ -64,7 +64,6 @@ export interface AdvancedSearchParams {
   accidentFree?: boolean | null;
   serviceHistory?: boolean | null;
 
-  // Car equipment
   airConditioning?: boolean | null;
   automaticClimate?: boolean | null;
   heatedSeats?: boolean | null;
@@ -174,6 +173,8 @@ export const getUserOffers = (userId: string) => {
     });
 };
 
+export const getOffersBySeller = getUserOffers;
+
 export const deleteOffer = (offerId: string) => {
   console.log(`Deleting offer with ID: ${offerId}`);
 
@@ -280,6 +281,7 @@ export const getOfferById = (id: string) => {
 const offerApi = {
   createOffer,
   getUserOffers,
+  getOffersBySeller,
   deleteOffer,
   updateOffer,
   searchOffers,

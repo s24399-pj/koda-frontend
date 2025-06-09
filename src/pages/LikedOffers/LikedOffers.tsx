@@ -39,8 +39,8 @@ const LikedOffersList: React.FC = () => {
     const target = event.target as HTMLImageElement;
     if (!target.dataset.errorHandled) {
       target.dataset.errorHandled = 'true';
-      target.src = 'https://via.placeholder.com/300x200?text=Brak+zdjęcia';
-      console.warn('Błąd ładowania zdjęcia w ulubionych:', target.src);
+      target.src = 'https://placehold.co/600x400';
+      console.warn('Image loading error in liked offers:', target.src);
     }
   };
 
@@ -55,7 +55,7 @@ const LikedOffersList: React.FC = () => {
   const mapToMiniOffer = (rawData: RawOfferData): MiniOffer | null => {
     try {
       if (!rawData.id || !rawData.title || rawData.price === undefined) {
-        console.warn('Brakujące wymagane pola w danych oferty:', rawData);
+        console.warn('Missing required fields in offer data:', rawData);
         return null;
       }
 
@@ -78,7 +78,7 @@ const LikedOffersList: React.FC = () => {
         displacement: carDetails.displacement || 'Nieznana',
       };
     } catch (error) {
-      console.error('Błąd podczas mapowania danych oferty:', error);
+      console.error('Error while mapping offer data:', error);
       return null;
     }
   };
@@ -95,11 +95,11 @@ const LikedOffersList: React.FC = () => {
 
         setLikedOffers(mappedOffers);
       } else {
-        console.error('Otrzymane dane nie są tablicą:', data);
+        console.error('Received data is not an array:', data);
         setLikedOffers([]);
       }
     } catch (error) {
-      console.error('Błąd podczas pobierania ulubionych ofert:', error);
+      console.error('Error while fetching liked offers:', error);
       setLikedOffers([]);
     } finally {
       setIsLoading(false);
@@ -157,7 +157,7 @@ const LikedOffersList: React.FC = () => {
                   src={
                     offer.mainImage
                       ? `${API_URL}${offer.mainImage}`
-                      : 'https://via.placeholder.com/300x200?text=Brak+zdjęcia'
+                      : 'https://placehold.co/600x400'
                   }
                   alt={offer.title}
                   loading="lazy"
