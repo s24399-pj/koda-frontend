@@ -9,6 +9,7 @@ import LikeButton from '../../components/LikeButton/LikeButton';
 import CompareCheckbox from '../../components/CompareCheckbox/CompareCheckbox';
 import ComparisonBar from '../../components/ComparisonBar/ComparisonBar';
 import { useComparison } from '../../context/ComparisonContext';
+import { translations } from '../../translations/carEquipmentTranslations';
 
 const API_URL = import.meta.env.VITE_API_URL;
 const DEFAULT_CAR_IMAGE = 'https://placehold.co/600x400';
@@ -21,19 +22,12 @@ const formatMileage = (mileage: number): string => {
   return mileage.toLocaleString('pl-PL') + ' km';
 };
 
-const fuelTypeTranslations: Record<string, string> = {
-  PETROL: 'Benzyna',
-  DIESEL: 'Diesel',
-  LPG: 'LPG',
-  HYBRID: 'Hybryda',
-  ELECTRIC: 'Elektryczny',
-  HYDROGEN: 'Wodór',
-  OTHER: 'Inny',
+const getTranslation = (category: keyof typeof translations, key: string) => {
+  return (translations[category] as Record<string, string>)?.[key] || key;
 };
 
 const mapApiResponseToComponentFormat = (apiOffers: ApiOffer[]): OfferData[] => {
   if (!apiOffers || !Array.isArray(apiOffers)) {
-    console.log('⚠️ Brak danych lub nieprawidłowy format');
     return [];
   }
 
@@ -102,7 +96,7 @@ const SellerOffers: React.FC = () => {
     if (!target.dataset.errorHandled) {
       target.dataset.errorHandled = 'true';
       target.src = DEFAULT_CAR_IMAGE;
-      console.warn('Błąd ładowania zdjęcia w ofercie sprzedającego:', target.src);
+      console.warn("Image loading error in seller's offer:", target.src);
     }
   };
 
@@ -152,18 +146,16 @@ const SellerOffers: React.FC = () => {
 
     const fetchSellerOffers = async () => {
       if (!sellerId) {
-        setError('Nie podano ID sprzedającego.');
+        setError('Seller ID not provided.');
         setLoading(false);
         return;
       }
 
       try {
         setLoading(true);
-        console.log('Pobieranie ofert dla sprzedającego ID:', sellerId);
         const data = await getOffersBySeller(sellerId);
 
         if (data && data.content && data.content.length > 0) {
-          console.log('Otrzymane dane:', data.content);
           const mappedOffers = mapApiResponseToComponentFormat(data.content);
           setOffers(mappedOffers);
 
@@ -180,16 +172,16 @@ const SellerOffers: React.FC = () => {
                 });
               }
             } catch (err) {
-              console.warn('Nie udało się pobrać danych sprzedającego:', err);
+              console.warn('Failed to fetch seller data:', err);
             }
           }
         } else {
-          console.warn('Otrzymano puste dane odpowiedzi');
+          console.warn('Received empty response data');
           setOffers([]);
         }
       } catch (err) {
-        console.error('Błąd podczas pobierania ofert sprzedającego:', err);
-        setError('Nie udało się pobrać ofert sprzedającego. Spróbuj ponownie później.');
+        console.error('Error while fetching seller offers:', err);
+        setError("Failed to fetch seller's offers. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -213,8 +205,7 @@ const SellerOffers: React.FC = () => {
       return null;
     }
 
-    const translatedFuelType =
-      fuelTypeTranslations[offer.CarDetailsDto.fuelType] || offer.CarDetailsDto.fuelType;
+    const translatedFuelType = getTranslation('fuelType', offer.CarDetailsDto.fuelType);
 
     return (
       <div className="offer-card">
