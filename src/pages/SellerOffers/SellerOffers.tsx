@@ -11,7 +11,7 @@ import ComparisonBar from '../../components/ComparisonBar/ComparisonBar';
 import { useComparison } from '../../context/ComparisonContext';
 
 const API_URL = import.meta.env.VITE_API_URL;
-const DEFAULT_CAR_IMAGE = 'https://via.placeholder.com/300x200?text=Brak+zdjęcia';
+const DEFAULT_CAR_IMAGE = 'https://placehold.co/600x400';
 
 const formatPrice = (price: number, currency: string = 'zł'): string => {
   return price.toLocaleString('pl-PL') + ' ' + currency;

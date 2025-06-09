@@ -39,8 +39,8 @@ const LikedOffersList: React.FC = () => {
     const target = event.target as HTMLImageElement;
     if (!target.dataset.errorHandled) {
       target.dataset.errorHandled = 'true';
-      target.src = 'https://via.placeholder.com/300x200?text=Brak+zdjęcia';
-      console.warn('Błąd ładowania zdjęcia w ulubionych:', target.src);
+      target.src = 'https://placehold.co/600x400';
+      console.warn('Image loading error in liked offers:', target.src);
     }
   };
 
@@ -55,7 +55,7 @@ const LikedOffersList: React.FC = () => {
   const mapToMiniOffer = (rawData: RawOfferData): MiniOffer | null => {
     try {
       if (!rawData.id || !rawData.title || rawData.price === undefined) {
-        console.warn('Brakujące wymagane pola w danych oferty:', rawData);
+        console.warn('Missing required fields in offer data:', rawData);
         return null;
       }
 
@@ -78,7 +78,7 @@ const LikedOffersList: React.FC = () => {
         displacement: carDetails.displacement || 'Nieznana',
       };
     } catch (error) {
-      console.error('Błąd podczas mapowania danych oferty:', error);
+      console.error('Error while mapping offer data:', error);
       return null;
     }
   };
@@ -90,16 +90,16 @@ const LikedOffersList: React.FC = () => {
 
       if (Array.isArray(data)) {
         const mappedOffers = data
-          .map(offer => mapToMiniOffer(offer))
-          .filter(offer => offer !== null) as MiniOffer[];
+            .map(offer => mapToMiniOffer(offer))
+            .filter(offer => offer !== null) as MiniOffer[];
 
         setLikedOffers(mappedOffers);
       } else {
-        console.error('Otrzymane dane nie są tablicą:', data);
+        console.error('Received data is not an array:', data);
         setLikedOffers([]);
       }
     } catch (error) {
-      console.error('Błąd podczas pobierania ulubionych ofert:', error);
+      console.error('Error while fetching liked offers:', error);
       setLikedOffers([]);
     } finally {
       setIsLoading(false);
@@ -138,96 +138,96 @@ const LikedOffersList: React.FC = () => {
 
     if (!likedOffers || likedOffers.length === 0) {
       return (
-        <div className="no-offers">
-          <p>Nie masz jeszcze ulubionych ofert.</p>
-          <Link to="/offers" className="browse-offers-button">
-            Przeglądaj dostępne oferty
-          </Link>
-        </div>
+          <div className="no-offers">
+            <p>Nie masz jeszcze ulubionych ofert.</p>
+            <Link to="/offers" className="browse-offers-button">
+              Przeglądaj dostępne oferty
+            </Link>
+          </div>
       );
     }
 
     return (
-      <div className="offer-list">
-        {likedOffers.map(offer => (
-          <div key={offer.id} className="offer-card">
-            <div className="offer-clickable" onClick={() => handleOfferClick(offer.id)}>
-              <div className="offer-image-container">
-                <img
-                  src={
-                    offer.mainImage
-                      ? `${API_URL}${offer.mainImage}`
-                      : 'https://via.placeholder.com/300x200?text=Brak+zdjęcia'
-                  }
-                  alt={offer.title}
-                  loading="lazy"
-                  onError={handleImageError}
-                />
-              </div>
-              <div className="offer-details">
-                <div className="offer-header">
-                  <h2>{truncateText(offer.title, 50)}</h2>
-                  <div className="price-actions">
-                    <span className="offer-price">{offer.price.toLocaleString()} PLN</span>
-                    <LikeButton
-                      offerId={offer.id}
-                      initialLiked={true}
-                      onLikeToggle={isLiked => handleLikeToggle(offer.id, isLiked)}
+        <div className="offer-list">
+          {likedOffers.map(offer => (
+              <div key={offer.id} className="offer-card">
+                <div className="offer-clickable" onClick={() => handleOfferClick(offer.id)}>
+                  <div className="offer-image-container">
+                    <img
+                        src={
+                          offer.mainImage
+                              ? `${API_URL}${offer.mainImage}`
+                              : 'https://via.placeholder.com/300x200?text=Brak+zdjęcia'
+                        }
+                        alt={offer.title}
+                        loading="lazy"
+                        onError={handleImageError}
                     />
                   </div>
-                </div>
+                  <div className="offer-details">
+                    <div className="offer-header">
+                      <h2>{truncateText(offer.title, 50)}</h2>
+                      <div className="price-actions">
+                        <span className="offer-price">{offer.price.toLocaleString()} PLN</span>
+                        <LikeButton
+                            offerId={offer.id}
+                            initialLiked={true}
+                            onLikeToggle={isLiked => handleLikeToggle(offer.id, isLiked)}
+                        />
+                      </div>
+                    </div>
 
-                <div className="offer-info">
-                  <p>
-                    <strong>Rok:</strong> <span>{offer.year}</span>
-                  </p>
-                  <p>
-                    <strong>Przebieg:</strong> <span>{offer.mileage.toLocaleString()} km</span>
-                  </p>
-                  <p>
-                    <strong>Typ paliwa:</strong>{' '}
-                    <span>{getTranslation('fuelType', offer.fuelType)}</span>
-                  </p>
-                  <p>
-                    <strong>Moc silnika:</strong> <span>{offer.enginePower} KM</span>
-                  </p>
-                  <p>
-                    <strong>Pojemność silnika:</strong> <span>{offer.displacement}</span>
-                  </p>
-                </div>
+                    <div className="offer-info">
+                      <p>
+                        <strong>Rok:</strong> <span>{offer.year}</span>
+                      </p>
+                      <p>
+                        <strong>Przebieg:</strong> <span>{offer.mileage.toLocaleString()} km</span>
+                      </p>
+                      <p>
+                        <strong>Typ paliwa:</strong>{' '}
+                        <span>{getTranslation('fuelType', offer.fuelType)}</span>
+                      </p>
+                      <p>
+                        <strong>Moc silnika:</strong> <span>{offer.enginePower} KM</span>
+                      </p>
+                      <p>
+                        <strong>Pojemność silnika:</strong> <span>{offer.displacement}</span>
+                      </p>
+                    </div>
 
-                <div className="offer-compare-bottom">
-                  <CompareCheckbox
-                    offerId={offer.id}
-                    isSelected={isOfferSelected(offer.id)}
-                    isDisabled={!canAddMoreOffers() && !isOfferSelected(offer.id)}
-                    onToggle={handleToggleComparison}
-                  />
+                    <div className="offer-compare-bottom">
+                      <CompareCheckbox
+                          offerId={offer.id}
+                          isSelected={isOfferSelected(offer.id)}
+                          isDisabled={!canAddMoreOffers() && !isOfferSelected(offer.id)}
+                          onToggle={handleToggleComparison}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
     );
   };
 
   if (!isAuthenticated) {
     return (
-      <AuthRequired
-        pageTitle="Ulubione oferty"
-        message="Dodawaj interesujące Cię oferty do ulubionych i miej do nich szybki dostęp."
-      />
+        <AuthRequired
+            pageTitle="Ulubione oferty"
+            message="Dodawaj interesujące Cię oferty do ulubionych i miej do nich szybki dostęp."
+        />
     );
   }
 
   return (
-    <div className="liked-offers-page">
-      <h1>Ulubione oferty</h1>
-      {renderAuthenticatedContent()}
+      <div className="liked-offers-page">
+        <h1>Ulubione oferty</h1>
+        {renderAuthenticatedContent()}
 
-      <ComparisonBar selectedOffers={selectedOffers} removeFromComparison={removeFromComparison} />
-    </div>
+        <ComparisonBar selectedOffers={selectedOffers} removeFromComparison={removeFromComparison} />
+      </div>
   );
 };
 
