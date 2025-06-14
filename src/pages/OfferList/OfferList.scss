@@ -398,6 +398,21 @@
 
 @media (max-width: 768px) {
   .offer-list-container {
-    padding-top: 60px;
+    padding-top: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .offer-list-container {
+    padding-top: 160px;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}
+
+/* Tablet responsive spacing */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .offer-list-container {
+    padding-top: 100px;
   }
 }
