@@ -12,10 +12,7 @@ interface RequireAuthProps {
  * @param children - The component to render if authenticated
  * @param allowRedirect - If true, show auth required page; if false, render children with isAuthenticated=false
  */
-const RequireAuth: React.FC<RequireAuthProps> = ({
-  children,
-  allowRedirect = true
-}) => {
+const RequireAuth: React.FC<RequireAuthProps> = ({ children, allowRedirect = true }) => {
   const { isAuthenticated } = useAuth();
 
   if (!isAuthenticated && allowRedirect) {

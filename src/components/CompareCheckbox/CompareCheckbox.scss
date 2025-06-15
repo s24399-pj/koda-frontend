@@ -5,7 +5,7 @@
   margin-bottom: 8px;
   user-select: none;
 
-  input[type="checkbox"] {
+  input[type='checkbox'] {
     margin-right: 8px;
     cursor: pointer;
 
@@ -20,12 +20,12 @@
     cursor: pointer;
   }
 
-  input[type="checkbox"]:checked + label {
+  input[type='checkbox']:checked + label {
     color: #4285f4;
     font-weight: 500;
   }
 
-  input[type="checkbox"]:disabled + label {
+  input[type='checkbox']:disabled + label {
     color: #aaa;
     cursor: not-allowed;
   }

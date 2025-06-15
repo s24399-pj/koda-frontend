@@ -44,7 +44,8 @@
   }
 }
 
-.slick-prev, .slick-next {
+.slick-prev,
+.slick-next {
   background-color: transparent;
   border: none;
   outline: none;
@@ -54,12 +55,14 @@
   justify-content: center;
 }
 
-.slick-prev:before, .slick-next:before {
+.slick-prev:before,
+.slick-next:before {
   font-size: 30px;
   color: #007be5;
 }
 
-.slick-prev:hover:before, .slick-next:hover:before {
+.slick-prev:hover:before,
+.slick-next:hover:before {
   color: #005bb5;
 }
 

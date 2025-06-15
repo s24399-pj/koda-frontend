@@ -173,7 +173,7 @@
           align-items: center;
           gap: 8px;
 
-          input[type="checkbox"] {
+          input[type='checkbox'] {
             accent-color: #007be5;
             width: 18px;
             height: 18px;
@@ -290,7 +290,8 @@
         align-items: flex-start;
         gap: 15px;
 
-        .remember-me, .forgot-password {
+        .remember-me,
+        .forgot-password {
           width: 100%;
         }
       }
