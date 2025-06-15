@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import Slider from 'react-slick';
@@ -24,8 +24,8 @@ const OfferSlider: React.FC = () => {
         const target = event.target as HTMLImageElement;
         if (!target.dataset.errorHandled) {
             target.dataset.errorHandled = "true";
-            target.src = "https://placehold.co/600x400";
             console.warn('Image loading error in slider:', target.src);
+            target.src = "https://placehold.co/600x400";
         }
     };
 
