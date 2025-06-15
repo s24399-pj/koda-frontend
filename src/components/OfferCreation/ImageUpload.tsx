@@ -41,7 +41,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ formik }) => {
                 const newFiles = [...currentFiles, ...validFiles];
 
                 if (newFiles.length > 10) {
-                    alert('You can add maximum 10 images');
+                    alert('Możesz dodać maksymalnie 10 zdjęć');
                     const limitedFiles = newFiles.slice(0, 10);
                     formik.setFieldValue('imageFiles', limitedFiles);
                 } else {
@@ -151,8 +151,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ formik }) => {
                 ) : (
                     <div className="upload-content">
                         <div className="upload-icon">📸</div>
-                        <p>Click or drag images here</p>
-                        <small>Supported formats: JPG, PNG, WEBP (max 5MB each)</small>
+                        <p>Naciśnij lub przeciągnij zdjęcia</p>
+                        <small>Wspierane formaty: JPG, PNG, WEBP (max 5MB każde)</small>
                     </div>
                 )}
             </div>
@@ -214,7 +214,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ formik }) => {
                 <div className="error-text">{String(formik.errors.imageFiles)}</div>
             )}
 
-            <small className="image-count">{currentImages.length}/10 images</small>
+            <small className="image-count">{currentImages.length}/10 Zdjęć</small>
         </div>
     );
 };
