@@ -2,7 +2,6 @@
 
 A modern, responsive web application for browsing and managing car listings. Built with React, TypeScript, and connected to the Koda backend API.
 
-![Koda Logo](./public/logo.png)
 
 ## Features
 
@@ -317,15 +316,6 @@ Testing infrastructure is set up but tests are not yet implemented. The planned 
 npm test
 # or
 yarn test
-```
-
-### Planned Test Structure
-```
-tests/
-├── unit/              # Unit tests for components and utilities
-├── integration/       # API integration tests
-├── e2e/              # End-to-end tests
-└── __mocks__/        # Test mocks and fixtures
 ```
 
 ## Deployment
