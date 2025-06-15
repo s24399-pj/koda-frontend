@@ -6,7 +6,6 @@ import {FormikProps} from 'formik'
 import ContactAndSummaryStep from '../ContactAndSummaryStep'
 import {BodyType, FuelType, OfferFormValues, TransmissionType} from '../../../types/offer/OfferTypes'
 
-// Mock Formik components
 vi.mock('formik', async () => {
     const actual = await vi.importActual('formik')
     return {
@@ -310,7 +309,6 @@ describe('ContactAndSummaryStep', () => {
         const expirationField = screen.getByTestId('field-expirationDate')
         const minDate = expirationField.getAttribute('min')
 
-        // Should be tomorrow's date
         const tomorrow = new Date()
         tomorrow.setDate(tomorrow.getDate() + 1)
         const expectedMin = tomorrow.toISOString().split('T')[0]

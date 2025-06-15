@@ -15,7 +15,6 @@ vi.mock('react-router-dom', async () => {
     }
 })
 
-// Mock sessionStorage
 const mockSessionStorage = {
     getItem: vi.fn(),
     setItem: vi.fn(),
@@ -168,7 +167,6 @@ describe('ComparisonBar', () => {
 
         const compareButton = screen.getByText('Porównaj')
 
-        // Try to click disabled button
         await user.click(compareButton)
 
         expect(mockNavigate).not.toHaveBeenCalled()
@@ -192,7 +190,7 @@ describe('ComparisonBar', () => {
         renderWithRouter(<ComparisonBar {...defaultProps} selectedOffers={[mockOffer1, mockOffer2]}/>)
 
         const removeButtons = screen.getAllByText('✕')
-        await user.click(removeButtons[1]) // Click remove on second offer
+        await user.click(removeButtons[1])
 
         expect(mockRemoveFromComparison).toHaveBeenCalledWith('offer-2')
     })

@@ -6,7 +6,6 @@ import {FormikProps} from 'formik'
 import BasicInfoStep from '../BasicInfoStep'
 import {OfferFormValues} from '../../../types/offer/OfferTypes'
 
-// Mock Formik components
 vi.mock('formik', async () => {
     const actual = await vi.importActual('formik')
     return {
@@ -35,14 +34,12 @@ vi.mock('formik', async () => {
     }
 })
 
-// Mock ImageUpload component
 vi.mock('../ImageUpload', () => ({
     default: () => (
         <div data-testid="image-upload">ImageUpload Component</div>
     )
 }))
 
-// Mock DOM methods
 const mockScrollIntoView = vi.fn()
 const mockFocus = vi.fn()
 
@@ -137,7 +134,6 @@ describe('BasicInfoStep', () => {
         vi.clearAllMocks()
         mockValidateForm.mockResolvedValue({})
 
-        // Mock document.getElementById
         global.document.getElementById = vi.fn().mockReturnValue({
             scrollIntoView: mockScrollIntoView,
             focus: mockFocus

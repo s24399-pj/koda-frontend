@@ -5,7 +5,6 @@ import {FormikProps} from 'formik'
 import EquipmentStep from '../EquipmentStep'
 import {CarEquipment, OfferFormValues} from '../../../types/offer/OfferTypes'
 
-// Mock Formik components
 vi.mock('formik', async () => {
     const actual = await vi.importActual('formik')
     return {
@@ -18,7 +17,6 @@ vi.mock('formik', async () => {
                 }
                 const mockForm = {
                     setFieldValue: vi.fn((fieldName: string, value: any) => {
-                        // Simulate checkbox toggle
                         const checkbox = document.getElementById(fieldName) as HTMLInputElement
                         if (checkbox) {
                             checkbox.checked = value

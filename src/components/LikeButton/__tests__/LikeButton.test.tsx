@@ -4,7 +4,6 @@ import {afterEach, beforeEach, describe, expect, test, vi} from 'vitest'
 import LikeButton from '../LikeButton'
 import {likedOfferApi} from '../../../api/likedOfferApi'
 
-// Mock the API
 vi.mock('../../../api/likedOfferApi', () => ({
     likedOfferApi: {
         isOfferLiked: vi.fn(),
@@ -13,7 +12,6 @@ vi.mock('../../../api/likedOfferApi', () => ({
     }
 }))
 
-// Mock localStorage
 const mockLocalStorage = {
     getItem: vi.fn(),
     setItem: vi.fn(),
@@ -25,7 +23,6 @@ Object.defineProperty(window, 'localStorage', {
     value: mockLocalStorage
 })
 
-// Mock alert and console.error
 global.alert = vi.fn()
 global.console.error = vi.fn()
 
@@ -40,7 +37,7 @@ describe('LikeButton', () => {
 
     beforeEach(() => {
         vi.clearAllMocks()
-        mockLocalStorage.getItem.mockReturnValue('mock-token') // Default: user logged in
+        mockLocalStorage.getItem.mockReturnValue('mock-token')
     })
 
     afterEach(() => {
@@ -214,13 +211,11 @@ describe('LikeButton', () => {
 
         const button = screen.getByRole('button')
 
-        // Initially unliked
         expect(button).not.toHaveClass('liked')
 
         await user.click(button)
 
         await waitFor(() => {
-            // Should rollback to unliked state
             expect(button).not.toHaveClass('liked')
             expect(button).toHaveAttribute('aria-label', 'Dodaj do ulubionych')
         })
@@ -268,7 +263,6 @@ describe('LikeButton', () => {
         await user.click(button)
 
         expect(likedOfferApi.likeOffer).toHaveBeenCalledWith('offer-123')
-        // Should not throw error when onLikeToggle is undefined
     })
 
     test('handles empty offerId during toggle gracefully', async () => {
@@ -276,7 +270,6 @@ describe('LikeButton', () => {
         const {rerender} = render(<LikeButton {...defaultProps} />)
         rerender(<LikeButton {...defaultProps} offerId=""/>)
 
-        // Component should not render with empty offerId
         expect(screen.queryByRole('button')).not.toBeInTheDocument()
     })
 
