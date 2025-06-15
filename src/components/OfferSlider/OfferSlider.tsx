@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, {useEffect, useRef, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import Slider from 'react-slick';
 import { MiniOffer } from '../../types/miniOfferTypes';

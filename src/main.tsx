@@ -1,4 +1,5 @@
 window.global = window;
+// @ts-ignore
 window.process = {
   env: { DEBUG: undefined },
 };
