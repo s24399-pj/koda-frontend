@@ -171,7 +171,7 @@ describe('AdvancedFilter', () => {
         const user = userEvent.setup()
         render(<AdvancedFilter onSearch={mockOnSearch} onLoading={mockOnLoading}/>)
 
-        await user.type(screen.getByLabelText('Szukaj'), '__tests__ search')
+        await user.type(screen.getByLabelText('Szukaj'), 'tests search')
 
         const priceContainer = screen.getByText('Cena (PLN)').closest('.filter-field')
         const minPriceInput = priceContainer?.querySelector('input[name="minPrice"]') as HTMLInputElement
