@@ -1,22 +1,20 @@
 .offer-list-container {
-  max-width: 1200px;
+  max-width: var(--desktop);
   margin: 0 auto;
-  padding: 20px;
-  padding-bottom: 80px;
+  padding: var(--space-lg);
   padding-top: 80px;
-  color: #1d1d1f;
-  background-color: #f5f5f7;
+  padding-bottom: 80px;
+  color: var(--text-color);
+  background-color: var(--background-color);
 
   h1 {
-    margin-bottom: 24px;
-    margin-top: 0;
+    margin: 0 0 var(--space-lg);
     text-align: center;
     font-size: 32px;
     font-weight: 600;
     letter-spacing: -0.02em;
   }
 
-  /* Layout structure - Top filter */
   .offer-list-layout {
     display: flex;
     flex-direction: column;
@@ -24,18 +22,18 @@
     position: relative;
     z-index: 1;
 
-    /* Filter panel */
     .filter-panel {
-      background-color: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      background-color: var(--background-secondary);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
       width: 100%;
+      border: 1px solid var(--border-color);
       position: relative;
       z-index: 5;
 
       &.show {
         display: block;
-        margin-bottom: 20px;
+        margin-bottom: var(--space-lg);
       }
 
       &.hide {
@@ -43,7 +41,6 @@
       }
     }
 
-    /* Filter toggle button - now visible for all screens */
     .filter-toggle {
       display: flex;
       justify-content: center;
@@ -52,22 +49,29 @@
       z-index: 5;
 
       button {
-        padding: 10px 20px;
-        background-color: white;
-        border: none;
-        border-radius: 20px;
+        padding: 10px var(--space-lg);
+        background-color: var(--background-secondary);
+        border-radius: var(--radius-xl);
         font-size: 15px;
         font-weight: 500;
-        color: #0066cc;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        transition: all 0.2s ease;
+        color: var(--primary-color);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-color);
+        transition: all var(--transition-fast);
         cursor: pointer;
         display: flex;
         align-items: center;
         gap: 6px;
 
         &:hover {
-          background-color: #f5f5f7;
+          background-color: var(--background-color);
+          transform: translateY(-1px);
+          box-shadow: var(--shadow-md);
+        }
+
+        &:focus {
+          outline: none;
+          box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.3);
         }
 
         &:after {
@@ -75,10 +79,10 @@
           display: inline-block;
           width: 10px;
           height: 10px;
-          border-right: 2px solid #0066cc;
-          border-bottom: 2px solid #0066cc;
+          border-right: 2px solid var(--primary-color);
+          border-bottom: 2px solid var(--primary-color);
           transform: rotate(45deg);
-          transition: transform 0.2s ease;
+          transition: transform var(--transition-fast);
         }
 
         &.expanded:after {
@@ -88,12 +92,11 @@
       }
     }
 
-    /* Offers panel */
     .offers-panel {
       width: 100%;
 
       .offers-header {
-        margin-bottom: 20px;
+        margin-bottom: var(--space-lg);
 
         h1 {
           margin-top: 0;
@@ -101,29 +104,26 @@
         }
       }
 
-      /* Results summary */
       .results-summary {
         font-size: 15px;
-        color: #6e6e73;
-        margin-bottom: 15px;
+        color: var(--text-secondary);
+        margin-bottom: var(--space-md);
       }
 
-      /* Error message */
       .error-message {
-        background-color: #fff2f2;
-        border: 1px solid #ffcccc;
-        color: #d43f3a;
-        padding: 15px;
-        border-radius: 8px;
-        margin-bottom: 20px;
+        background-color: rgba(255, 59, 48, 0.1);
+        border: 1px solid rgba(255, 59, 48, 0.3);
+        color: var(--danger-color);
+        padding: var(--space-md);
+        border-radius: var(--radius-md);
+        margin-bottom: var(--space-lg);
         font-size: 15px;
       }
 
-      /* Loading indicator */
       .loading-indicator {
         text-align: center;
         padding: 40px 0;
-        color: #6e6e73;
+        color: var(--text-secondary);
         font-size: 16px;
       }
     }
@@ -135,31 +135,31 @@
     gap: 18px;
 
     .offer-card {
-      background-color: white;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-      border-radius: 12px;
+      background-color: var(--background-secondary);
+      box-shadow: var(--shadow-sm);
+      border-radius: var(--radius-lg);
       overflow: hidden;
-      transition:
-        transform 0.2s ease-in-out,
-        box-shadow 0.2s ease-in-out;
+      border: 1px solid var(--border-color);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
       display: flex;
       flex-direction: column;
       position: relative;
-      border: none;
 
       &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary-light);
+      }
+
+      &:focus-within {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.3);
       }
 
       .offer-clickable {
         display: flex;
         cursor: pointer;
         height: 100%;
-
-        @media (max-width: 768px) {
-          flex-direction: column;
-        }
       }
 
       .offer-image-container {
@@ -167,27 +167,26 @@
         height: 210px;
         flex-shrink: 0;
         overflow: hidden;
-        background-color: #f5f5f7;
+        background-color: var(--background-color);
         display: flex;
         align-items: center;
         justify-content: center;
         position: relative;
-
-        @media (max-width: 768px) {
-          width: 100%;
-          height: 240px;
-        }
 
         img {
           width: 100%;
           height: 100%;
           object-fit: cover;
           object-position: center;
-          transition: transform 0.3s ease;
+          transition: transform var(--transition-medium);
+        }
+
+        &:hover img {
+          transform: scale(1.05);
         }
 
         .no-image {
-          color: #86868b;
+          color: var(--text-tertiary);
           font-size: 14px;
           text-align: center;
         }
@@ -195,7 +194,7 @@
 
       .offer-details {
         flex: 1;
-        padding: 18px 24px;
+        padding: 18px var(--space-lg);
         display: flex;
         flex-direction: column;
         position: relative;
@@ -204,34 +203,29 @@
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
-          margin-bottom: 15px;
-
-          @media (max-width: 768px) {
-            flex-direction: column;
-            gap: 10px;
-          }
+          margin-bottom: var(--space-md);
 
           h2 {
             margin: 0;
             font-size: 18px;
             font-weight: 600;
-            color: #1d1d1f;
+            color: var(--text-color);
             line-height: 1.3;
-            padding-right: 15px;
+            padding-right: var(--space-md);
             letter-spacing: -0.01em;
           }
 
           .price-actions {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: var(--space-md);
             white-space: nowrap;
           }
 
           .offer-price {
             font-weight: 600;
             font-size: 20px;
-            color: #0066cc;
+            color: var(--primary-color);
             white-space: nowrap;
           }
         }
@@ -239,7 +233,7 @@
         .offer-info {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-          gap: 14px 24px;
+          gap: 14px var(--space-lg);
           margin-bottom: 45px;
 
           p {
@@ -251,8 +245,8 @@
             line-height: 1.4;
 
             strong {
-              margin-right: 8px;
-              color: #6e6e73;
+              margin-right: var(--space-sm);
+              color: var(--text-secondary);
               min-width: 110px;
               flex-shrink: 0;
               font-weight: 500;
@@ -260,7 +254,7 @@
 
             span {
               white-space: nowrap;
-              color: #1d1d1f;
+              color: var(--text-color);
               font-weight: 400;
             }
           }
@@ -269,7 +263,7 @@
         .offer-compare-bottom {
           position: absolute;
           bottom: 18px;
-          right: 24px;
+          right: var(--space-lg);
         }
       }
     }
@@ -282,23 +276,31 @@
     gap: 6px;
 
     button {
-      padding: 8px 14px;
-      background-color: #fff;
-      border: none;
-      border-radius: 20px;
+      padding: var(--space-sm) 14px;
+      background-color: var(--background-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
       cursor: pointer;
       font-size: 14px;
-      color: #0066cc;
-      transition: all 0.2s ease;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+      color: var(--primary-color);
+      transition: all var(--transition-fast);
+      box-shadow: var(--shadow-sm);
 
       &:hover:not(:disabled) {
-        background-color: #f5f5f7;
+        background-color: var(--background-color);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+      }
+
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.3);
       }
 
       &.active {
-        background-color: #0066cc;
+        background-color: var(--primary-color);
         color: white;
+        border-color: var(--primary-color);
       }
 
       &:disabled {
@@ -308,49 +310,47 @@
     }
 
     .pagination-ellipsis {
-      padding: 8px 5px;
-      color: #6e6e73;
+      padding: var(--space-sm) 5px;
+      color: var(--text-secondary);
     }
   }
 
   .no-results {
-    background-color: white;
-    border-radius: 12px;
-    padding: 40px 20px;
+    background-color: var(--background-secondary);
+    border-radius: var(--radius-lg);
+    padding: 40px var(--space-lg);
     text-align: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
 
     .no-offers {
       font-size: 18px;
       font-weight: 500;
-      color: #1d1d1f;
+      color: var(--text-color);
       margin-bottom: 10px;
     }
 
     .no-offers-hint {
       font-size: 15px;
-      color: #6e6e73;
+      color: var(--text-secondary);
     }
   }
 
-  /* Apple-style checkbox */
   input[type='checkbox'] {
-    -webkit-appearance: none;
-    -moz-appearance: none;
     appearance: none;
     width: 18px;
     height: 18px;
-    border: 1px solid #d2d2d7;
-    border-radius: 4px;
-    margin: 0;
-    margin-right: 8px;
-    transition: all 0.2s ease;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    margin-right: var(--space-sm);
+    transition: all var(--transition-fast);
     position: relative;
     cursor: pointer;
+    background-color: var(--background-secondary);
 
     &:checked {
-      background-color: #0066cc;
-      border-color: #0066cc;
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
 
       &:after {
         content: '';
@@ -365,6 +365,11 @@
       }
     }
 
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.3);
+    }
+
     &:disabled {
       opacity: 0.5;
       cursor: not-allowed;
@@ -373,46 +378,125 @@
 
   label {
     font-size: 14px;
-    color: #6e6e73;
+    color: var(--text-secondary);
     cursor: pointer;
     user-select: none;
-    transition: color 0.2s ease;
+    transition: color var(--transition-fast);
 
     &:hover {
-      color: #0066cc;
+      color: var(--primary-color);
     }
   }
 
-  /* Styling when checkbox is checked */
   input[type='checkbox']:checked + label {
-    color: #0066cc;
+    color: var(--primary-color);
     font-weight: 500;
   }
 
-  /* Styling when checkbox is disabled */
   input[type='checkbox']:disabled + label {
-    color: #a1a1a6;
+    color: var(--text-tertiary);
     cursor: not-allowed;
+  }
+}
+
+@media (max-width: 1024px) and (min-width: 769px) {
+  .offer-list-container {
+    padding-top: 100px;
   }
 }
 
 @media (max-width: 768px) {
   .offer-list-container {
     padding-top: 180px;
+    margin-top: 20px;
+
+    .offer-list .offer-card .offer-clickable {
+      flex-direction: column;
+    }
+
+    .offer-list .offer-card .offer-image-container {
+      width: 100%;
+      height: 240px;
+    }
+
+    .offer-list .offer-card .offer-details .offer-header {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .offer-list-container {
+    padding-left: var(--space-sm);
+    padding-right: var(--space-sm);
+
+    .offer-list {
+      gap: var(--space-md);
+
+      .offer-card .offer-details {
+        padding: var(--space-md);
+
+        .offer-header {
+          margin-bottom: var(--space-sm);
+
+          h2 {
+            font-size: 16px;
+            padding-right: var(--space-sm);
+          }
+
+          .offer-price {
+            font-size: 18px;
+          }
+        }
+
+        .offer-info {
+          gap: var(--space-sm) var(--space-md);
+          margin-bottom: 35px;
+
+          p {
+            font-size: 14px;
+
+            strong {
+              min-width: 90px;
+            }
+          }
+        }
+
+        .offer-compare-bottom {
+          bottom: var(--space-md);
+          right: var(--space-md);
+        }
+      }
+    }
+
+    .pagination {
+      gap: 4px;
+
+      button {
+        padding: 6px var(--space-sm);
+        font-size: 13px;
+      }
+    }
+
+    .no-results {
+      padding: var(--space-lg) var(--space-md);
+
+      .no-offers {
+        font-size: 16px;
+      }
+
+      .no-offers-hint {
+        font-size: 14px;
+      }
+    }
   }
 }
 
 @media (max-width: 480px) {
   .offer-list-container {
     padding-top: 160px;
-    padding-left: 15px;
-    padding-right: 15px;
-  }
-}
-
-/* Tablet responsive spacing */
-@media (max-width: 1024px) and (min-width: 769px) {
-  .offer-list-container {
-    padding-top: 100px;
+    padding-left: var(--space-md);
+    padding-right: var(--space-md);
   }
 }

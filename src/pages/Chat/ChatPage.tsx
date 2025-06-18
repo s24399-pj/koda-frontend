@@ -5,7 +5,6 @@ import './ChatError.scss';
 import { getUserProfile, searchUsers } from '../../api/useInternalApi';
 import { UserProfile } from '../../types/user/UserProfile';
 import SearchUsers from '../../components/Chat/SearchUsers.tsx';
-import ChatHeader from '../../components/Chat/ChatHeader.tsx';
 import MessageList from '../../components/Chat/MessageList.tsx';
 import MessageInput from '../../components/Chat/MessageInput.tsx';
 import ConversationList from '../../components/Chat/ConversationList.tsx';
@@ -14,6 +13,7 @@ import { LocationState } from '../../types/chat/LocationState.ts';
 import { ChatMessage } from '../../types/chat/ChatMessage.ts';
 import { Conversation } from '../../types/chat/Conversation.ts';
 import { chatService, isTokenValid } from '../../api/chatApi.ts';
+import { DEFAULT_PROFILE_IMAGE } from '../../assets/defaultProfilePicture.ts';
 
 const ChatPage: React.FC = () => {
   const { recipientId } = useParams<{ recipientId: string }>();
@@ -34,6 +34,8 @@ const ChatPage: React.FC = () => {
   const [isLoadingMessages, setIsLoadingMessages] = useState<boolean>(false);
   const [isWebSocketConnected, setIsWebSocketConnected] = useState<boolean>(false);
 
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
+
   const redirectToLogin = useCallback(() => {
     localStorage.removeItem('accessToken');
     navigate('/user/login', { state: { returnUrl: window.location.pathname } });
@@ -51,7 +53,7 @@ const ChatPage: React.FC = () => {
       setIsWebSocketConnected(true);
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : 'Failed to connect to chat server.';
+          error instanceof Error ? error.message : 'Failed to connect to chat server.';
       setConnectionError(errorMessage);
       setIsWebSocketConnected(false);
 
@@ -80,54 +82,71 @@ const ChatPage: React.FC = () => {
   }, [redirectToLogin]);
 
   const loadMessages = useCallback(
-    async (recipientId: string) => {
-      setIsLoadingMessages(true);
-      try {
-        const chatHistory = await chatService.getChatHistory(recipientId);
-        setMessages(chatHistory);
-        return chatHistory;
-      } catch (error) {
-        if ((error as any).response?.status === 401) {
-          redirectToLogin();
-        } else {
-          setMessages([]);
-          setConnectionError('Failed to load messages history');
+      async (recipientId: string) => {
+        setIsLoadingMessages(true);
+        try {
+          const chatHistory = await chatService.getChatHistory(recipientId);
+          setMessages(chatHistory);
+          return chatHistory;
+        } catch (error) {
+          if ((error as any).response?.status === 401) {
+            redirectToLogin();
+          } else {
+            setMessages([]);
+            setConnectionError('Failed to load messages history');
+          }
+          return [];
+        } finally {
+          setIsLoadingMessages(false);
         }
-        return [];
-      } finally {
-        setIsLoadingMessages(false);
-      }
-    },
-    [redirectToLogin]
+      },
+      [redirectToLogin]
   );
 
   const loadRecipientProfile = useCallback(
-    async (userId: string) => {
-      const conversation = conversations.find(conv => conv.userId === userId);
-      if (conversation) {
-        const profileFromConversation: UserProfile = {
-          id: userId,
-          firstName: conversation.userName.split(' ')[0] || 'User',
-          lastName: conversation.userName.split(' ').slice(1).join(' ') || '',
-          email: '',
-          profilePictureBase64: conversation.profilePicture,
-        };
-        setActiveRecipient(profileFromConversation);
-        return profileFromConversation;
-      }
+      async (userId: string) => {
+        const conversation = conversations.find(conv => conv.userId === userId);
+        if (conversation) {
+          const profileFromConversation: UserProfile = {
+            id: userId,
+            firstName: conversation.userName.split(' ')[0] || 'User',
+            lastName: conversation.userName.split(' ').slice(1).join(' ') || '',
+            email: '',
+            profilePictureBase64: conversation.profilePicture, // To jest URL!
+          };
+          setActiveRecipient(profileFromConversation);
+          return profileFromConversation;
+        }
 
-      const basicProfile: UserProfile = {
-        id: userId,
-        firstName: 'User',
-        lastName: '',
-        email: '',
-        profilePictureBase64: undefined,
-      };
-      setActiveRecipient(basicProfile);
-      return basicProfile;
-    },
-    [conversations]
+        // Jeśli nie ma conversation w lokalnej liście, spróbuj pobrać profil z API
+        try {
+          const profile = await getUserProfile(userId);
+          setActiveRecipient(profile);
+          return profile;
+        } catch (error) {
+          console.error('Failed to load user profile:', error);
+          // Fallback do podstawowego profilu tylko jeśli API zawiedzie
+          const basicProfile: UserProfile = {
+            id: userId,
+            firstName: 'User',
+            lastName: '',
+            email: '',
+            profilePictureBase64: undefined,
+          };
+          setActiveRecipient(basicProfile);
+          return basicProfile;
+        }
+      },
+      [conversations]
   );
+
+  const toggleMobileSidebar = useCallback(() => {
+    setIsMobileSidebarOpen(prev => !prev);
+  }, []);
+
+  const closeMobileSidebar = useCallback(() => {
+    setIsMobileSidebarOpen(false);
+  }, []);
 
   useEffect(() => {
     if (!isTokenValid()) {
@@ -199,7 +218,7 @@ const ChatPage: React.FC = () => {
   ]);
 
   useEffect(() => {
-    if (recipientId && isInitialized && !isLoadingMessages) {
+    if (recipientId && isInitialized) {
       if (recipientId !== activeRecipientId) {
         setActiveRecipientId(recipientId);
         loadRecipientProfile(recipientId);
@@ -209,11 +228,32 @@ const ChatPage: React.FC = () => {
   }, [
     recipientId,
     isInitialized,
-    isLoadingMessages,
     activeRecipientId,
     loadRecipientProfile,
     loadMessages,
   ]);
+
+  // Dodatkowy useEffect - aktualizuj profil gdy konwersacje się załadują
+  useEffect(() => {
+    if (activeRecipientId && conversations.length > 0) {
+      const conversation = conversations.find(conv => conv.userId === activeRecipientId);
+      if (conversation) {
+        setActiveRecipient(prev => {
+          // Sprawdź czy naprawdę potrzebujemy aktualizacji
+          if (!prev || prev.id !== activeRecipientId || !prev.profilePictureBase64) {
+            return {
+              id: activeRecipientId,
+              firstName: conversation.userName.split(' ')[0] || 'User',
+              lastName: conversation.userName.split(' ').slice(1).join(' ') || '',
+              email: '',
+              profilePictureBase64: conversation.profilePicture, // To jest URL, nie base64!
+            };
+          }
+          return prev; // Nie zmieniaj jeśli już mamy prawidłowe dane
+        });
+      }
+    }
+  }, [conversations, activeRecipientId]); // Usuń activeRecipient z zależności!
 
   useEffect(() => {
     if (isWebSocketConnected) {
@@ -245,8 +285,8 @@ const ChatPage: React.FC = () => {
         const isCurrentUserSender = message.senderId === currentUser.id;
         const conversationUserId = isCurrentUserSender ? message.recipientId : message.senderId;
         const conversationUserName = isCurrentUserSender
-          ? message.recipientName
-          : message.senderName;
+            ? message.recipientName
+            : message.senderName;
 
         let conversation = updatedConversations.find(c => c.userId === conversationUserId);
 
@@ -259,8 +299,8 @@ const ChatPage: React.FC = () => {
         }
 
         if (
-          !conversation.lastMessageDate ||
-          new Date(message.createdAt) > new Date(conversation.lastMessageDate)
+            !conversation.lastMessageDate ||
+            new Date(message.createdAt) > new Date(conversation.lastMessageDate)
         ) {
           conversation.lastMessage = message.content;
           conversation.lastMessageDate = message.createdAt;
@@ -310,10 +350,6 @@ const ChatPage: React.FC = () => {
     setSearchQuery('');
     setSearchResults([]);
 
-    if (userId === activeRecipientId) {
-      return;
-    }
-
     setActiveRecipientId(userId);
     navigate(`/chat/${userId}`, { replace: true });
 
@@ -321,16 +357,14 @@ const ChatPage: React.FC = () => {
     loadMessages(userId);
 
     setTimeout(() => {
-      const chatMain = document.querySelector('.chat-main');
-      if (chatMain) {
-        (chatMain as HTMLElement).focus({ preventScroll: true });
-      }
-    }, 0);
+      closeMobileSidebar();
+    }, 300);
   };
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) {
       setSearchResults([]);
+      setIsSearching(false);
       return;
     }
 
@@ -347,67 +381,109 @@ const ChatPage: React.FC = () => {
   if (connectionError && !isInitialized) {
     const isTokenError = connectionError.includes('token');
     return (
-      <div className="chat-error">
-        <h3>{isTokenError ? 'Authentication error' : 'Connection problem'}</h3>
-        <p>{connectionError}</p>
-        <button onClick={isTokenError ? redirectToLogin : connectWebSocket}>
-          {isTokenError ? 'Login again' : 'Try again'}
-        </button>
-      </div>
+        <div className="chat-error">
+          <h3>{isTokenError ? 'Authentication error' : 'Connection problem'}</h3>
+          <p>{connectionError}</p>
+          <button onClick={isTokenError ? redirectToLogin : connectWebSocket}>
+            {isTokenError ? 'Login again' : 'Try again'}
+          </button>
+        </div>
     );
   }
 
   return (
-    <div className="chat-page">
-      <div className="chat-sidebar">
-        <SearchUsers
-          searchQuery={searchQuery}
-          onSearchQueryChange={setSearchQuery}
-          onSearch={handleSearch}
-          searchResults={searchResults}
-          onSelectUser={handleSelectConversation}
-          onCancel={() => {
-            setIsSearching(false);
-            setSearchQuery('');
-            setSearchResults([]);
-          }}
-          isSearching={isSearching}
-          activeUserId={activeRecipientId || undefined}
-        />
-
-        {!isSearching && (
-          <ConversationList
-            conversations={conversations}
-            activeRecipientId={activeRecipientId}
-            onSelectConversation={handleSelectConversation}
-          />
+      <>
+        {isMobileSidebarOpen && (
+            <div className="mobile-sidebar-overlay" onClick={closeMobileSidebar}></div>
         )}
-      </div>
 
-      <div className="chat-main">
-        {activeRecipientId && activeRecipient ? (
-          <>
-            <ChatHeader recipient={activeRecipient} />
-            {isLoadingMessages ? (
-              <div className="loading-messages">
-                <div className="loading-spinner"></div>
-                <p>Ładowanie wiadomości...</p>
-              </div>
-            ) : (
-              <MessageList messages={messages} currentUser={currentUser} />
+        <div className="chat-page">
+          <div className={`chat-sidebar ${isMobileSidebarOpen ? 'mobile-open' : ''}`}>
+            <SearchUsers
+                searchQuery={searchQuery}
+                onSearchQueryChange={setSearchQuery}
+                onSearch={handleSearch}
+                searchResults={searchResults}
+                onSelectUser={handleSelectConversation}
+                onCancel={() => {
+                  setIsSearching(false);
+                  setSearchQuery('');
+                  setSearchResults([]);
+                }}
+                isSearching={isSearching}
+                activeUserId={activeRecipientId || undefined}
+            />
+
+            {!isSearching && (
+                <ConversationList
+                    conversations={conversations}
+                    activeRecipientId={activeRecipientId}
+                    onSelectConversation={handleSelectConversation}
+                />
             )}
-            <MessageInput onSendMessage={handleSendMessage} isConnected={isWebSocketConnected} />
-          </>
-        ) : (
-          <div className="no-conversation-selected">
-            <div className="welcome-content">
-              <h3>Witaj w czacie!</h3>
-              <p>Wybierz konwersację z listy lub wyszukaj użytkownika, aby rozpocząć rozmowę</p>
-            </div>
           </div>
-        )}
-      </div>
-    </div>
+
+          <div className="chat-main">
+            {activeRecipientId && activeRecipient ? (
+                <>
+                  <div className="chat-header">
+                    <button
+                        className={`mobile-hamburger ${isMobileSidebarOpen ? 'active' : ''}`}
+                        onClick={toggleMobileSidebar}
+                        aria-label="Toggle chat list"
+                    >
+                      <div className="hamburger-line"></div>
+                      <div className="hamburger-line"></div>
+                      <div className="hamburger-line"></div>
+                    </button>
+
+                    <div className="recipient-info">
+                      <div className="recipient-avatar">
+                        <img
+                            src={activeRecipient.profilePictureBase64 || DEFAULT_PROFILE_IMAGE}
+                            alt={`${activeRecipient.firstName} ${activeRecipient.lastName}`}
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = DEFAULT_PROFILE_IMAGE;
+                            }}
+                        />
+                      </div>
+                      <div className="recipient-details">
+                        <h3>{`${activeRecipient.firstName} ${activeRecipient.lastName}`}</h3>
+                      </div>
+                    </div>
+                  </div>
+
+                  {isLoadingMessages ? (
+                      <div className="loading-messages">
+                        <div className="loading-spinner"></div>
+                        <p>Ładowanie wiadomości...</p>
+                      </div>
+                  ) : (
+                      <MessageList messages={messages} currentUser={currentUser} />
+                  )}
+                  <MessageInput onSendMessage={handleSendMessage} isConnected={isWebSocketConnected} />
+                </>
+            ) : (
+                <div className="no-conversation-selected">
+                  <button
+                      className={`mobile-hamburger welcome-hamburger ${isMobileSidebarOpen ? 'active' : ''}`}
+                      onClick={toggleMobileSidebar}
+                      aria-label="Toggle chat list"
+                  >
+                    <div className="hamburger-line"></div>
+                    <div className="hamburger-line"></div>
+                    <div className="hamburger-line"></div>
+                  </button>
+
+                  <div className="welcome-content">
+                    <h3>Witaj w czacie!</h3>
+                    <p>Wybierz konwersację z listy lub wyszukaj użytkownika, aby rozpocząć rozmowę</p>
+                  </div>
+                </div>
+            )}
+          </div>
+        </div>
+      </>
   );
 };
 

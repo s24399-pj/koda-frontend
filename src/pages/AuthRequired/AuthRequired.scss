@@ -1,11 +1,11 @@
 .auth-required-page {
   max-width: 900px;
   margin: 0 auto;
-  padding: 40px 20px;
-  color: #333;
+  padding: 40px var(--space-lg);
+  color: var(--text-color);
 
   @media (max-width: 768px) {
-    padding: 160px 15px;
+    padding: 160px var(--space-md);
   }
 
   @media (max-width: 480px) {
@@ -16,7 +16,8 @@
     font-size: 32px;
     text-align: center;
     margin: 40px 0 30px;
-    color: #007be5;
+    color: var(--primary-color);
+    font-weight: 600;
 
     @media (max-width: 768px) {
       font-size: 28px;
@@ -25,30 +26,32 @@
 
     @media (max-width: 480px) {
       font-size: 24px;
-      margin: 20px 0 20px;
+      margin: var(--space-lg) 0 var(--space-lg);
     }
   }
 
   .auth-required-container {
-    background-color: #f6f6f6;
-    border-radius: 8px;
+    background-color: var(--background-color);
+    border-radius: var(--radius-md);
     padding: 40px;
     text-align: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    margin: 20px 0;
+    box-shadow: var(--shadow-sm);
+    margin: var(--space-lg) 0;
+    border: 1px solid var(--border-color);
 
     @media (max-width: 768px) {
       padding: 30px;
     }
 
     @media (max-width: 480px) {
-      padding: 20px;
+      padding: var(--space-lg);
     }
 
     h1 {
       font-size: 22px;
-      margin-bottom: 15px;
-      color: #444;
+      margin-bottom: var(--space-md);
+      color: var(--text-color);
+      font-weight: 600;
 
       @media (max-width: 768px) {
         font-size: 20px;
@@ -62,17 +65,18 @@
     .auth-message {
       margin-bottom: 25px;
       font-size: 16px;
-      color: #666;
+      color: var(--text-secondary);
       max-width: 600px;
       margin-left: auto;
       margin-right: auto;
 
       p {
-        margin-bottom: 12px;
+        margin-bottom: var(--space-sm);
+        line-height: 1.5;
 
         @media (max-width: 480px) {
           font-size: 15px;
-          margin-bottom: 20px;
+          margin-bottom: var(--space-lg);
         }
       }
     }
@@ -80,46 +84,69 @@
     .auth-buttons {
       display: flex;
       justify-content: center;
-      gap: 15px;
+      gap: var(--space-md);
 
       @media (max-width: 480px) {
         flex-direction: column;
         width: 100%;
         max-width: 250px;
         margin: 0 auto;
+        gap: var(--space-sm);
       }
 
       .login-btn,
       .register-btn {
         display: inline-block;
         padding: 10px 25px;
-        border-radius: 4px;
+        border-radius: var(--radius-sm);
         font-weight: 500;
         text-decoration: none;
-        transition: all 0.2s ease;
+        transition: all var(--transition-fast);
+        font-size: 14px;
+        cursor: pointer;
 
         @media (max-width: 480px) {
           width: 100%;
           text-align: center;
+          padding: var(--space-sm) var(--space-lg);
+        }
+
+        &:focus {
+          outline: none;
+          box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.3);
         }
       }
 
       .login-btn {
-        background-color: #007be5;
+        background-color: var(--primary-color);
         color: white;
+        border: 1px solid var(--primary-color);
 
         &:hover {
-          background-color: #005bb5;
+          background-color: var(--primary-dark);
+          border-color: var(--primary-dark);
+          transform: translateY(-1px);
+          box-shadow: var(--shadow-sm);
+        }
+
+        &:active {
+          transform: translateY(0);
         }
       }
 
       .register-btn {
-        background-color: white;
-        color: #007be5;
-        border: 1px solid #007be5;
+        background-color: var(--background-secondary);
+        color: var(--primary-color);
+        border: 1px solid var(--primary-color);
 
         &:hover {
-          background-color: #f0f8ff;
+          background-color: rgba(0, 102, 204, 0.05);
+          transform: translateY(-1px);
+          box-shadow: var(--shadow-sm);
+        }
+
+        &:active {
+          transform: translateY(0);
         }
       }
     }
@@ -128,12 +155,52 @@
       margin-top: 25px;
 
       a {
-        color: #666;
+        color: var(--text-secondary);
         text-decoration: none;
         font-size: 14px;
+        transition: color var(--transition-fast);
 
         &:hover {
           text-decoration: underline;
+          color: var(--text-color);
+        }
+
+        &:focus {
+          outline: none;
+          color: var(--primary-color);
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .auth-required-page {
+    .auth-required-container {
+      margin: var(--space-md) 0;
+
+      .auth-message {
+        margin-bottom: var(--space-lg);
+
+        p {
+          font-size: 14px;
+        }
+      }
+
+      .auth-buttons {
+        .login-btn,
+        .register-btn {
+          font-size: 14px;
+          padding: var(--space-sm) var(--space-md);
+        }
+      }
+
+      .back-link {
+        margin-top: var(--space-lg);
+
+        a {
+          font-size: 13px;
         }
       }
     }

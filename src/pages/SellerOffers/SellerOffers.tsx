@@ -11,6 +11,7 @@ import ComparisonBar from '../../components/ComparisonBar/ComparisonBar';
 import { useComparison } from '../../context/ComparisonContext';
 import { translations } from '../../translations/carEquipmentTranslations';
 
+
 const API_URL = import.meta.env.VITE_API_URL;
 const DEFAULT_CAR_IMAGE = 'https://placehold.co/600x400';
 

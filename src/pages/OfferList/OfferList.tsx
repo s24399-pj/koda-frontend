@@ -41,7 +41,6 @@ const OfferList: React.FC = () => {
     }
   };
 
-  // Handle search results from AdvancedFilter
   const handleSearchResults = (results: SearchResponse<MiniOffer>) => {
     setError(null);
 

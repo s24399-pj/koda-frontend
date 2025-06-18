@@ -13,7 +13,6 @@ const ComparisonBar: React.FC<ComparisonBarProps> = ({ selectedOffers, removeFro
 
   const handleCompare = () => {
     if (selectedOffers.length === 2) {
-      // Store selected offers in sessionStorage before navigating
       sessionStorage.setItem('comparisonOffers', JSON.stringify(selectedOffers));
       navigate('/comparison');
     }

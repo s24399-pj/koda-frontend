@@ -1,7 +1,7 @@
 .offer-comparison-page {
-  max-width: 1200px;
+  max-width: var(--desktop);
   margin: 0 auto;
-  padding: 20px;
+  padding: var(--space-lg);
 
   @media (max-width: 768px) {
     padding: 10px;
@@ -10,16 +10,17 @@
   h1 {
     text-align: center;
     margin-top: 100px;
-    color: #333;
+    color: var(--text-color);
     font-size: 28px;
+    font-weight: 600;
 
     @media (max-width: 768px) {
-      margin: 80px 0 30px 0;
+      margin: 200px 0 30px 0;
       font-size: 24px;
     }
 
     @media (max-width: 480px) {
-      margin: 60px 0 20px 0;
+      margin: 160px 0 var(--space-lg) 0;
       font-size: 22px;
     }
   }
@@ -29,20 +30,21 @@
     justify-content: center;
     align-items: flex-start;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: var(--space-lg);
     margin-bottom: 30px;
     margin-top: 60px;
-    background-color: #fff;
+    background-color: var(--background-secondary);
     padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.05);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
     width: 100%;
     box-sizing: border-box;
+    border: 1px solid var(--border-color);
 
     @media (max-width: 768px) {
       flex-direction: column;
-      padding: 15px;
-      gap: 15px;
+      padding: var(--space-md);
+      gap: var(--space-md);
     }
 
     .input-group {
@@ -59,43 +61,49 @@
       label {
         font-size: 14px;
         font-weight: 600;
-        color: #333;
+        color: var(--text-color);
         margin-bottom: 6px;
       }
 
       input {
         font-size: 16px;
-        color: #555;
-        border: 1px solid #ddd;
-        background: #f9f9f9;
-        padding: 14px 16px;
-        border-radius: 8px;
+        color: var(--text-secondary);
+        border: 1px solid var(--border-color);
+        background: var(--background-color);
+        padding: 14px var(--space-md);
+        border-radius: var(--radius-md);
         transition:
-          border-color 0.3s ease,
-          box-shadow 0.3s ease;
+                border-color var(--transition-medium),
+                box-shadow var(--transition-medium);
         width: 100%;
         box-sizing: border-box;
 
         &:focus {
-          border-color: #007be5;
-          box-shadow: 0 0 6px rgba(0, 123, 229, 0.4);
+          border-color: var(--primary-color);
+          box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.2);
           outline: none;
+          background-color: var(--background-secondary);
         }
 
         &:disabled {
-          background-color: #f2f2f2;
+          background-color: var(--background-color);
           cursor: not-allowed;
+          opacity: 0.6;
+        }
+
+        &::placeholder {
+          color: var(--text-tertiary);
         }
 
         @media (max-width: 480px) {
           font-size: 14px;
-          padding: 12px 14px;
+          padding: var(--space-sm) 14px;
         }
       }
 
       .loading {
         margin-top: 6px;
-        color: #888;
+        color: var(--text-tertiary);
         font-style: italic;
         font-size: 13px;
       }
@@ -105,8 +113,9 @@
         height: 45px;
         object-fit: cover;
         object-position: center;
-        border-radius: 4px;
-        margin-top: 8px;
+        border-radius: var(--radius-sm);
+        margin-top: var(--space-sm);
+        border: 1px solid var(--border-color);
       }
     }
   }
@@ -114,31 +123,36 @@
   .suggestions {
     position: absolute;
     width: 100%;
-    background: white;
-    border: 1px solid #ddd;
+    background: var(--background-secondary);
+    border: 1px solid var(--border-color);
     border-top: none;
-    border-radius: 0 0 8px 8px;
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
     max-height: 350px;
     overflow-y: auto;
     z-index: 10;
     margin: 0;
     padding: 0;
     list-style: none;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
     top: 100%;
     left: 0;
     box-sizing: border-box;
 
     li {
       cursor: pointer;
-      transition: background-color 0.2s;
+      transition: background-color var(--transition-fast);
 
       &:hover {
-        background-color: #f0f8ff;
+        background-color: rgba(0, 102, 204, 0.05);
+      }
+
+      &:focus {
+        outline: none;
+        background-color: rgba(0, 102, 204, 0.1);
       }
 
       &:not(:last-child) {
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid var(--border-color);
       }
     }
 
@@ -148,7 +162,7 @@
       padding: 10px;
 
       @media (max-width: 480px) {
-        padding: 8px;
+        padding: var(--space-sm);
       }
     }
 
@@ -157,8 +171,9 @@
       height: 45px;
       object-fit: cover;
       object-position: center;
-      border-radius: 3px;
+      border-radius: var(--radius-xs);
       margin-right: 10px;
+      border: 1px solid var(--border-color);
 
       @media (max-width: 480px) {
         width: 50px;
@@ -178,6 +193,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       max-width: 100%;
+      color: var(--text-color);
 
       @media (max-width: 480px) {
         font-size: 13px;
@@ -186,7 +202,7 @@
 
     .suggestion-info {
       font-size: 13px;
-      color: #666;
+      color: var(--text-secondary);
 
       @media (max-width: 480px) {
         font-size: 12px;
@@ -195,117 +211,123 @@
   }
 
   .error-message {
-    color: #d32f2f;
+    color: var(--danger-color);
     margin: 10px 0;
     padding: 10px;
-    background-color: #ffebee;
-    border-radius: 8px;
+    background-color: rgba(255, 59, 48, 0.1);
+    border-radius: var(--radius-md);
     text-align: center;
+    border: 1px solid rgba(255, 59, 48, 0.2);
   }
 
   .button-container {
     display: flex;
     justify-content: center;
-    margin: 20px 0;
+    margin: var(--space-lg) 0;
 
     @media (max-width: 480px) {
-      margin: 15px 0;
+      margin: var(--space-md) 0;
     }
   }
 
   .reset-button {
-    padding: 12px 24px;
-    background-color: #007be5;
-    color: #fff;
+    padding: var(--space-sm) var(--space-lg);
+    background-color: var(--primary-color);
+    color: white;
     border: none;
-    border-radius: 8px;
-    font-weight: 600;
+    border-radius: var(--radius-md);
+    font-weight: 500;
     font-size: 15px;
     cursor: pointer;
-    transition:
-      background-color 0.3s ease,
-      transform 0.2s ease;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all var(--transition-medium);
+    box-shadow: var(--shadow-sm);
 
     &:hover {
-      background-color: #005bb5;
+      background-color: var(--primary-dark);
       transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.3);
     }
 
     &:active {
-      background-color: #004494;
+      background-color: var(--primary-dark);
       transform: translateY(0);
     }
 
     @media (max-width: 480px) {
       width: 100%;
-      padding: 10px 20px;
+      padding: 10px var(--space-lg);
       font-size: 14px;
     }
   }
 
   .compare-table {
     overflow-x: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-    background: white;
-    margin-top: 20px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    background: var(--background-secondary);
+    margin-top: var(--space-lg);
     -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--border-color);
 
     &::-webkit-scrollbar {
       height: 8px;
     }
 
     &::-webkit-scrollbar-thumb {
-      background: #ccc;
-      border-radius: 8px;
+      background: var(--text-tertiary);
+      border-radius: var(--radius-md);
     }
 
     &::-webkit-scrollbar-track {
-      background: #f5f5f5;
-      border-radius: 8px;
+      background: var(--background-color);
+      border-radius: var(--radius-md);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
       margin: 0;
-      table-layout: fixed; /* Dodane - zapewnia równą szerokość kolumn */
+      table-layout: fixed;
 
       th,
       td {
-        padding: 15px;
+        padding: var(--space-md);
         text-align: left;
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid var(--border-color);
         min-width: 120px;
-        width: 33.33%; /* Dodane - każda z trzech kolumn ma równą szerokość */
-        word-wrap: break-word; /* Dodane - zawijanie długiego tekstu */
-        overflow-wrap: break-word; /* Dodane - wsparcie dla IE */
-        hyphens: auto; /* Dodane - automatyczne dzielenie wyrazów */
+        width: 33.33%;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
 
         @media (max-width: 768px) {
-          padding: 12px 10px;
+          padding: var(--space-sm) 10px;
           font-size: 14px;
         }
 
         @media (max-width: 480px) {
-          padding: 10px 8px;
+          padding: 10px var(--space-sm);
           font-size: 13px;
           min-width: 100px;
         }
       }
 
-      /* Kolumna z nazwami parametrów */
       td:first-child {
         font-weight: 500;
-        width: 25%; /* Nieco węższa niż pozostałe dwie kolumny z danymi */
+        width: 25%;
         position: sticky;
         left: 0;
-        background-color: white;
+        background-color: var(--background-secondary);
         z-index: 1;
+        color: var(--text-color);
 
         &:hover {
-          background-color: #f9f9f9;
+          background-color: var(--background-color);
         }
 
         @media (max-width: 768px) {
@@ -317,18 +339,18 @@
         }
       }
 
-      /* Kolumny z danymi pojazdów - równa szerokość */
       td:not(:first-child),
       th:not(:first-child) {
-        width: 37.5%; /* Pozostałe dwie kolumny mają po równo resztę szerokości */
+        width: 37.5%;
       }
 
       th {
-        background-color: #f5f5f5;
-        font-weight: bold;
+        background-color: var(--background-color);
+        font-weight: 600;
         position: sticky;
         top: 0;
         z-index: 1;
+        color: var(--text-color);
       }
 
       .car-header {
@@ -342,8 +364,9 @@
           max-width: 300px;
           object-fit: cover;
           object-position: center;
-          border-radius: 8px;
-          margin-bottom: 8px;
+          border-radius: var(--radius-md);
+          margin-bottom: var(--space-sm);
+          border: 1px solid var(--border-color);
 
           @media (max-width: 768px) {
             height: 150px;
@@ -358,6 +381,7 @@
           font-size: 14px;
           text-align: center;
           font-weight: 500;
+          color: var(--text-color);
 
           @media (max-width: 480px) {
             font-size: 12px;
@@ -366,13 +390,13 @@
       }
 
       tr:hover {
-        background-color: #f9f9f9;
+        background-color: var(--background-color);
       }
 
       .highlight {
-        background-color: #e6f7ff;
-        font-weight: bold;
-        color: #0066cc;
+        background-color: rgba(0, 102, 204, 0.1);
+        font-weight: 600;
+        color: var(--primary-color);
       }
 
       td img {
@@ -380,8 +404,9 @@
         height: 75px;
         object-fit: cover;
         object-position: center;
-        border-radius: 4px;
+        border-radius: var(--radius-sm);
         margin: 0 auto;
+        border: 1px solid var(--border-color);
 
         @media (max-width: 768px) {
           width: 80px;
@@ -392,14 +417,15 @@
       .no-image {
         width: 100px;
         height: 75px;
-        background-color: #f0f0f0;
-        border-radius: 4px;
+        background-color: var(--background-color);
+        border-radius: var(--radius-sm);
         display: flex;
         justify-content: center;
         align-items: center;
-        color: #888;
+        color: var(--text-tertiary);
         font-size: 12px;
         font-weight: 500;
+        border: 1px solid var(--border-color);
 
         @media (max-width: 768px) {
           width: 80px;
@@ -415,7 +441,8 @@
     height: 60px;
     object-fit: cover;
     object-position: center;
-    border-radius: 3px;
+    border-radius: var(--radius-xs);
+    border: 1px solid var(--border-color);
 
     @media (max-width: 480px) {
       width: 65px;
@@ -429,9 +456,10 @@
     max-width: 300px;
     object-fit: cover;
     object-position: center;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     margin: 0 auto;
     display: block;
+    border: 1px solid var(--border-color);
 
     @media (max-width: 768px) {
       height: 150px;
@@ -439,6 +467,58 @@
 
     @media (max-width: 480px) {
       height: 120px;
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .offer-comparison-page {
+    padding: var(--space-sm);
+
+    .compare-inputs {
+      padding: var(--space-sm);
+      margin-top: var(--space-xxl);
+
+      .input-group {
+        input {
+          padding: var(--space-sm);
+        }
+
+        img {
+          width: 50px;
+          height: 38px;
+        }
+      }
+    }
+
+    .compare-table {
+      table {
+        th, td {
+          padding: var(--space-xs) var(--space-xs);
+          font-size: 12px;
+        }
+
+        .car-header {
+          img {
+            height: 100px;
+          }
+
+          span {
+            font-size: 11px;
+          }
+        }
+
+        td img {
+          width: 60px;
+          height: 45px;
+        }
+
+        .no-image {
+          width: 60px;
+          height: 45px;
+          font-size: 10px;
+        }
+      }
     }
   }
 }
