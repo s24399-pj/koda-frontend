@@ -112,20 +112,18 @@ const ChatPage: React.FC = () => {
             firstName: conversation.userName.split(' ')[0] || 'User',
             lastName: conversation.userName.split(' ').slice(1).join(' ') || '',
             email: '',
-            profilePictureBase64: conversation.profilePicture, // To jest URL!
+            profilePictureBase64: conversation.profilePicture,
           };
           setActiveRecipient(profileFromConversation);
           return profileFromConversation;
         }
 
-        // Jeśli nie ma conversation w lokalnej liście, spróbuj pobrać profil z API
         try {
           const profile = await getUserProfile(userId);
           setActiveRecipient(profile);
           return profile;
         } catch (error) {
           console.error('Failed to load user profile:', error);
-          // Fallback do podstawowego profilu tylko jeśli API zawiedzie
           const basicProfile: UserProfile = {
             id: userId,
             firstName: 'User',
@@ -233,27 +231,25 @@ const ChatPage: React.FC = () => {
     loadMessages,
   ]);
 
-  // Dodatkowy useEffect - aktualizuj profil gdy konwersacje się załadują
   useEffect(() => {
     if (activeRecipientId && conversations.length > 0) {
       const conversation = conversations.find(conv => conv.userId === activeRecipientId);
       if (conversation) {
         setActiveRecipient(prev => {
-          // Sprawdź czy naprawdę potrzebujemy aktualizacji
           if (!prev || prev.id !== activeRecipientId || !prev.profilePictureBase64) {
             return {
               id: activeRecipientId,
               firstName: conversation.userName.split(' ')[0] || 'User',
               lastName: conversation.userName.split(' ').slice(1).join(' ') || '',
               email: '',
-              profilePictureBase64: conversation.profilePicture, // To jest URL, nie base64!
+              profilePictureBase64: conversation.profilePicture,
             };
           }
-          return prev; // Nie zmieniaj jeśli już mamy prawidłowe dane
+          return prev;
         });
       }
     }
-  }, [conversations, activeRecipientId]); // Usuń activeRecipient z zależności!
+  }, [conversations, activeRecipientId]);
 
   useEffect(() => {
     if (isWebSocketConnected) {
