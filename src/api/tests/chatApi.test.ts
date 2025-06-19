@@ -94,8 +94,19 @@ describe('ChatService', () => {
     describe('getAllConversations', () => {
         test('should fetch all conversations successfully', async () => {
             const mockConversations: Conversation[] = [
-                {id: '1', name: 'User 1', lastMessage: 'Hello', timestamp: new Date().toISOString()},
-                {id: '2', name: 'User 2', lastMessage: 'Hi', timestamp: new Date().toISOString()}
+                {
+                    userId: '1',
+                    userName: 'User 1',
+                    profilePicture: 'avatar1.jpg',
+                    lastMessage: 'Hello',
+                    lastMessageDate: new Date().toISOString()
+                },
+                {
+                    userId: '2',
+                    userName: 'User 2',
+                    lastMessage: 'Hi',
+                    lastMessageDate: new Date().toISOString()
+                }
             ]
 
             mockAxiosGet.mockResolvedValueOnce({data: mockConversations})
@@ -248,11 +259,23 @@ describe('ChatService', () => {
                 {
                     id: '1',
                     senderId: 'user1',
+                    senderName: 'User One',
                     recipientId: 'user2',
+                    recipientName: 'User Two',
                     content: 'Hello',
-                    timestamp: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    status: 'SENT'
                 },
-                {id: '2', senderId: 'user2', recipientId: 'user1', content: 'Hi', timestamp: new Date().toISOString()}
+                {
+                    id: '2',
+                    senderId: 'user2',
+                    senderName: 'User Two',
+                    recipientId: 'user1',
+                    recipientName: 'User One',
+                    content: 'Hi',
+                    createdAt: new Date().toISOString(),
+                    status: 'DELIVERED'
+                }
             ]
 
             mockAxiosGet.mockResolvedValueOnce({data: mockMessages})
