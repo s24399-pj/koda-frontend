@@ -12,6 +12,7 @@ import { DEFAULT_PROFILE_IMAGE } from '../../assets/defaultProfilePicture.ts';
 import { CarEquipment } from '../../types/offer/OfferTypes.ts';
 import { equipmentCategories } from '../../types/offer/carEquipmentCategories.ts';
 import { translations } from '../../translations/carEquipmentTranslations.ts';
+import { DEFAULT_CAR_IMAGE } from '../../util/constants.tsx';
 
 interface LightboxProps {
   images: string[];
@@ -88,7 +89,7 @@ const Lightbox: React.FC<LightboxProps> = ({
     const target = event.target as HTMLImageElement;
     if (!target.dataset.errorHandled) {
       target.dataset.errorHandled = 'true';
-      target.src = 'https://placehold.co/600x400';
+      target.src = DEFAULT_CAR_IMAGE;
       console.warn('Image loading error:', target.src);
     }
   };
@@ -321,7 +322,7 @@ const Offer: React.FC = () => {
     const target = event.target as HTMLImageElement;
     if (!target.dataset.errorHandled) {
       target.dataset.errorHandled = 'true';
-      target.src = 'https://placehold.co/600x400';
+      target.src = DEFAULT_CAR_IMAGE;
       console.warn('Image loading error - replaced with placeholder:', target.src);
     }
   };

@@ -10,6 +10,7 @@ import { useComparison } from '../../context/ComparisonContext';
 import AdvancedFilter from '../../components/AdvancedFilter/AdvancedFilter';
 import { translations } from '../../translations/carEquipmentTranslations';
 import offerApiService, { SearchResponse } from '../../api/offerApi';
+import { DEFAULT_CAR_IMAGE } from '../../util/constants.tsx';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -36,12 +37,11 @@ const OfferList: React.FC = () => {
     const target = event.target as HTMLImageElement;
     if (!target.dataset.errorHandled) {
       target.dataset.errorHandled = 'true';
-      target.src = 'https://via.placeholder.com/300x200?text=No+image';
+      target.src = DEFAULT_CAR_IMAGE;
       console.warn('Error loading image in offer list:', target.src);
     }
   };
 
-  // Handle search results from AdvancedFilter
   const handleSearchResults = (results: SearchResponse<MiniOffer>) => {
     setError(null);
 
@@ -180,14 +180,11 @@ const OfferList: React.FC = () => {
 
   return (
     <div className="offer-list-container">
-      {/* Two-column layout for desktop */}
       <div className="offer-list-layout">
-        {/* Filter Panel - Left column on desktop, toggleable on mobile */}
         <div className={`filter-panel ${showFilters ? 'show' : ''}`}>
           <AdvancedFilter onSearch={handleSearchResults} onLoading={handleLoading} />
         </div>
 
-        {/* Offers List - Right column */}
         <div className="offers-panel">
           <div className="offers-header">
             <h1>Dostępne oferty</h1>

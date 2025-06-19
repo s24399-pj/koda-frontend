@@ -6,11 +6,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s ease;
-  border-radius: 50%;
+  transition: transform var(--transition-fast);
+  border-radius: var(--radius-full);
 
   &:hover:not(:disabled) {
     transform: scale(1.1);
+    background-color: rgba(0, 102, 204, 0.1);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.3);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.95);
   }
 
   &:disabled {
@@ -18,7 +28,11 @@
     cursor: not-allowed;
   }
 
+  svg {
+    transition: fill var(--transition-fast);
+  }
+
   &.liked svg {
-    fill: #3b82f6;
+    fill: var(--primary-color);
   }
 }

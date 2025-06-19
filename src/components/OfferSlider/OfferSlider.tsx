@@ -1,5 +1,5 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Slider from 'react-slick';
 import { MiniOffer } from '../../types/miniOfferTypes';
@@ -7,6 +7,7 @@ import { MiniOffer } from '../../types/miniOfferTypes';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import './offerslider.scss';
+import {DEFAULT_CAR_IMAGE} from "../../util/constants.tsx";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -24,7 +25,7 @@ const OfferSlider: React.FC = () => {
     const target = event.target as HTMLImageElement;
     if (!target.dataset.errorHandled) {
       target.dataset.errorHandled = 'true';
-      target.src = 'https://placehold.co/600x400';
+      target.src = DEFAULT_CAR_IMAGE;
       console.warn('Image loading error in slider:', target.src);
     }
   };
@@ -135,7 +136,7 @@ const OfferSlider: React.FC = () => {
                   src={
                     offer.mainImage
                       ? `${API_URL}${offer.mainImage}`
-                      : 'https://placehold.co/600x400'
+                      : DEFAULT_CAR_IMAGE
                   }
                   alt={offer.title}
                   className="vehicle-image"

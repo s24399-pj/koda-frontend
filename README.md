@@ -2,7 +2,6 @@
 
 A modern, responsive web application for browsing and managing car listings. Built with React, TypeScript, and connected to the Koda backend API.
 
-
 ## Features
 
 - **Browse Cars**: Search and filter through extensive car listings with advanced filters
@@ -190,30 +189,35 @@ export const likedOfferApi = {
 ## Key Features Implementation
 
 ### Authentication System
+
 - JWT token-based authentication with automatic refresh
 - Protected routes using `RequireAuth` component
 - Persistent login state with local storage
 - Automatic logout on token expiration
 
 ### Real-time Chat
+
 - WebSocket connection using STOMP protocol
 - Real-time message delivery and status updates
 - Conversation management with message history
 - User search and chat initiation
 
 ### Advanced Search & Filtering
+
 - Multi-criteria search (brand, model, price, fuel type, etc.)
 - Real-time search suggestions
 - Pagination with optimized loading
 - Filter persistence and URL state management
 
 ### Car Comparison
+
 - Side-by-side comparison of up to 2 cars
 - Detailed specification comparison
 - Visual differences highlighting
 - Session storage for comparison state
 
 ### Image Management
+
 - Multiple image upload for car listings
 - Image carousel with lightbox view
 - Responsive image galleries
@@ -222,15 +226,12 @@ export const likedOfferApi = {
 ## Component Examples
 
 ### Car Card Component
+
 ```tsx
 const CarCard: React.FC<{ offer: MiniOffer }> = ({ offer }) => {
   return (
     <div className="car-card">
-      <img 
-        src={`${API_URL}${offer.mainImage}`} 
-        alt={offer.title}
-        onError={handleImageError}
-      />
+      <img src={`${API_URL}${offer.mainImage}`} alt={offer.title} onError={handleImageError} />
       <div className="car-info">
         <h3>{offer.title}</h3>
         <p className="price">{formatPrice(offer.price, offer.currency)}</p>
@@ -251,6 +252,7 @@ const CarCard: React.FC<{ offer: MiniOffer }> = ({ offer }) => {
 ```
 
 ### Advanced Filter Component
+
 ```tsx
 const AdvancedFilter: React.FC = ({ onSearch, onLoading }) => {
   const [filters, setFilters] = useState<FilterState>({});
@@ -266,15 +268,17 @@ const AdvancedFilter: React.FC = ({ onSearch, onLoading }) => {
 
   return (
     <div className="advanced-filter">
-      <input 
+      <input
         type="text"
         placeholder="Search cars..."
-        onChange={(e) => setFilters(prev => ({ ...prev, phrase: e.target.value }))}
+        onChange={e => setFilters(prev => ({ ...prev, phrase: e.target.value }))}
       />
-      <select onChange={(e) => setFilters(prev => ({ ...prev, brand: e.target.value }))}>
+      <select onChange={e => setFilters(prev => ({ ...prev, brand: e.target.value }))}>
         <option value="">All Brands</option>
         {brands.map(brand => (
-          <option key={brand} value={brand}>{brand}</option>
+          <option key={brand} value={brand}>
+            {brand}
+          </option>
         ))}
       </select>
       <button onClick={handleSearch}>Search</button>
@@ -288,23 +292,25 @@ const AdvancedFilter: React.FC = ({ onSearch, onLoading }) => {
 The application uses React Context for global state management:
 
 ### Authentication Context
+
 ```tsx
 const AuthContext = createContext<{
   isAuthenticated: boolean;
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => void;
   validateToken: () => Promise<boolean>;
-}>()
+}>();
 ```
 
 ### Comparison Context
+
 ```tsx
 const ComparisonContext = createContext<{
   selectedOffers: MiniOffer[];
   addToComparison: (offer: MiniOffer) => void;
   removeFromComparison: (id: string) => void;
   canAddMoreOffers: () => boolean;
-}>()
+}>();
 ```
 
 ## Testing
@@ -338,12 +344,14 @@ VITE_API_URL=https://api.koda.com npm run build
 ## Development Tools
 
 ### ESLint Configuration
+
 - TypeScript ESLint rules
 - React hooks linting
 - Prettier integration
 - Custom rules for code quality
 
 ### Prettier Configuration
+
 - Consistent code formatting
 - SCSS and TypeScript support
 - Integration with ESLint

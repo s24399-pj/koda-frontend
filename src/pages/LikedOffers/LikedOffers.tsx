@@ -12,6 +12,7 @@ import { likedOfferApi } from '../../api/likedOfferApi';
 import { MiniOffer } from '../../types/miniOfferTypes';
 import { RawOfferData } from '../../types/offer/RawOfferData';
 import { translations } from '../../translations/carEquipmentTranslations';
+import { DEFAULT_CAR_IMAGE } from '../../util/constants.tsx';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -39,7 +40,7 @@ const LikedOffersList: React.FC = () => {
     const target = event.target as HTMLImageElement;
     if (!target.dataset.errorHandled) {
       target.dataset.errorHandled = 'true';
-      target.src = 'https://placehold.co/600x400';
+      target.src = DEFAULT_CAR_IMAGE;
       console.warn('Image loading error in liked offers:', target.src);
     }
   };
@@ -154,11 +155,7 @@ const LikedOffersList: React.FC = () => {
             <div className="offer-clickable" onClick={() => handleOfferClick(offer.id)}>
               <div className="offer-image-container">
                 <img
-                  src={
-                    offer.mainImage
-                      ? `${API_URL}${offer.mainImage}`
-                      : 'https://placehold.co/600x400'
-                  }
+                  src={offer.mainImage ? `${API_URL}${offer.mainImage}` : DEFAULT_CAR_IMAGE}
                   alt={offer.title}
                   loading="lazy"
                   onError={handleImageError}

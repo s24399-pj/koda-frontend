@@ -3,19 +3,19 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: #f0f8ff;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  background-color: var(--background-secondary);
+  box-shadow: var(--shadow-lg);
   z-index: 1000;
   padding: 10px;
-  border-top: 1px solid #d0e0f0;
+  border-top: 1px solid var(--border-color);
 
   .comparison-bar-content {
-    max-width: 1200px;
+    max-width: var(--desktop);
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 20px;
+    gap: var(--space-lg);
 
     .selected-offers {
       display: flex;
@@ -24,63 +24,92 @@
 
       .selected-offer,
       .placeholder-offer {
-        background-color: white;
-        border: 1px solid #d0e0f0;
-        border-radius: 4px;
-        padding: 8px 12px;
+        background-color: var(--background-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        padding: var(--space-sm) var(--space-sm);
         display: flex;
         align-items: center;
         justify-content: space-between;
         min-width: 200px;
         max-width: 300px;
         overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        transition: box-shadow var(--transition-fast);
+
+        &:hover {
+          box-shadow: var(--shadow-md);
+        }
 
         .offer-title {
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
           margin-right: 10px;
+          color: var(--text-color);
+          font-size: 14px;
         }
 
         .remove-button {
           background: none;
           border: none;
-          color: #ff4d4d;
+          color: var(--danger-color);
           cursor: pointer;
           font-weight: bold;
           font-size: 14px;
           padding: 0 5px;
+          border-radius: var(--radius-full);
+          transition: background-color var(--transition-fast);
 
           &:hover {
-            background-color: #fff0f0;
-            border-radius: 50%;
+            background-color: rgba(255, 59, 48, 0.1);
+          }
+
+          &:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(255, 59, 48, 0.3);
           }
         }
       }
 
       .placeholder-offer {
-        color: #888;
+        color: var(--text-tertiary);
         font-style: italic;
         justify-content: center;
+        border-style: dashed;
       }
     }
 
     .compare-button {
-      background-color: #4285f4;
+      background-color: var(--primary-color);
       color: white;
       border: none;
-      border-radius: 4px;
-      padding: 8px 16px;
-      font-weight: bold;
+      border-radius: var(--radius-sm);
+      padding: var(--space-sm) var(--space-md);
+      font-weight: 500;
       cursor: pointer;
+      transition: all var(--transition-fast);
+      font-size: 14px;
 
       &:disabled {
-        background-color: #a0c0e0;
+        background-color: var(--text-tertiary);
         cursor: not-allowed;
+        opacity: 0.6;
       }
 
       &:hover:not(:disabled) {
-        background-color: #3b78e7;
+        background-color: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+      }
+
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.3);
+      }
+
+      &:active:not(:disabled) {
+        transform: translateY(0);
       }
     }
   }
