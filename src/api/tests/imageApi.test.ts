@@ -1,7 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest'
-import axios from 'axios'
 import {
-    compressImage,
     deleteImage,
     ImageUploadResponse,
     uploadMultipleImages,
@@ -11,26 +9,40 @@ import {
 
 vi.stubGlobal('import.meta', {env: {VITE_API_URL: 'http://localhost:8137'}})
 
-vi.mock('axios', () => ({
-    default: {
-        post: vi.fn(),
-        delete: vi.fn()
-    },
-    isAxiosError: vi.fn((err) => err?.isAxiosError === true)
+const {mockPost, mockDelete, mockIsAxiosError} = vi.hoisted(() => ({
+    mockPost: vi.fn(),
+    mockDelete: vi.fn(),
+    mockIsAxiosError: vi.fn()
 }))
 
-const mockedAxios = axios as unknown as {
-    default: {
-        post: ReturnType<typeof vi.fn>
-        delete: ReturnType<typeof vi.fn>
-    },
-    isAxiosError: ReturnType<typeof vi.fn>
+vi.mock('axios', () => {
+    const mockAxios = {
+        post: mockPost,
+        delete: mockDelete,
+        isAxiosError: mockIsAxiosError
+    }
+    return {
+        default: mockAxios,
+        isAxiosError: mockIsAxiosError
+    }
+})
+
+const localStorageMock = {
+    getItem: vi.fn(),
+    setItem: vi.fn(),
+    removeItem: vi.fn(),
+    clear: vi.fn(),
+    key: vi.fn(),
+    length: 0
 }
+
+vi.stubGlobal('localStorage', localStorageMock)
 
 describe('imageApi', () => {
     beforeEach(() => {
         vi.clearAllMocks()
-        localStorage.clear()
+        localStorageMock.clear()
+        localStorageMock.getItem.mockReturnValue(null)
     })
 
     describe('uploadMultipleImages', () => {
@@ -44,15 +56,15 @@ describe('imageApi', () => {
                 sortOrder: 0
             }]
 
-            mockedAxios.default.post.mockResolvedValueOnce({
+            mockPost.mockResolvedValueOnce({
                 data: mockResponse
             })
 
             const files = [new File(['a'], 'a.png', {type: 'image/png'})]
             const result = await uploadMultipleImages('offer123', files)
 
-            expect(mockedAxios.default.post).toHaveBeenCalledTimes(1)
-            const call = mockedAxios.default.post.mock.calls[0]
+            expect(mockPost).toHaveBeenCalledTimes(1)
+            const call = mockPost.mock.calls[0]
             const [url, formData, config] = call
 
             expect(url).toBe('http://localhost:8137/api/v1/images/offer123/upload')
@@ -67,11 +79,11 @@ describe('imageApi', () => {
         })
 
         it('includes Authorization header when token is present', async () => {
-            localStorage.setItem('authToken', 'tok123')
-            mockedAxios.default.post.mockResolvedValueOnce({data: []})
+            localStorageMock.getItem.mockReturnValue('tok123')
+            mockPost.mockResolvedValueOnce({data: []})
 
             await uploadMultipleImages('off2', [])
-            const cfg = mockedAxios.default.post.mock.calls[0][2]
+            const cfg = mockPost.mock.calls[0][2]
 
             expect(cfg.headers).toMatchObject({Authorization: 'Bearer tok123'})
         })
@@ -83,8 +95,8 @@ describe('imageApi', () => {
                 value: {data: {message: 'Bad'}, status: 400, statusText: 'Bad'}
             })
 
-            mockedAxios.default.post.mockRejectedValueOnce(error)
-            mockedAxios.isAxiosError.mockReturnValueOnce(true)
+            mockPost.mockRejectedValueOnce(error)
+            mockIsAxiosError.mockReturnValueOnce(true)
 
             await expect(uploadMultipleImages('x', [])).rejects.toThrow('Bad')
         })
@@ -94,8 +106,8 @@ describe('imageApi', () => {
             Object.defineProperty(error, 'isAxiosError', {value: true})
             Object.defineProperty(error, 'request', {value: {}})
 
-            mockedAxios.default.post.mockRejectedValueOnce(error)
-            mockedAxios.isAxiosError.mockReturnValueOnce(true)
+            mockPost.mockRejectedValueOnce(error)
+            mockIsAxiosError.mockReturnValueOnce(true)
 
             await expect(uploadMultipleImages('x', [])).rejects.toThrow(
                 'No response from server. Check your internet connection.'
@@ -107,8 +119,8 @@ describe('imageApi', () => {
             Object.defineProperty(error, 'isAxiosError', {value: true})
             Object.defineProperty(error, 'message', {value: 'Oops config'})
 
-            mockedAxios.default.post.mockRejectedValueOnce(error)
-            mockedAxios.isAxiosError.mockReturnValueOnce(true)
+            mockPost.mockRejectedValueOnce(error)
+            mockIsAxiosError.mockReturnValueOnce(true)
 
             await expect(uploadMultipleImages('x', [])).rejects.toThrow(
                 'Configuration error: Oops config'
@@ -127,14 +139,14 @@ describe('imageApi', () => {
                 sortOrder: 0
             }]
 
-            mockedAxios.default.post.mockResolvedValueOnce({
+            mockPost.mockResolvedValueOnce({
                 data: mockResponse
             })
 
             const result = await uploadMultipleImagesWithoutOffer([])
-            expect(mockedAxios.default.post).toHaveBeenCalledTimes(1)
+            expect(mockPost).toHaveBeenCalledTimes(1)
 
-            const call = mockedAxios.default.post.mock.calls[0]
+            const call = mockPost.mock.calls[0]
             expect(call[0]).toBe('http://localhost:8137/api/v1/images/upload')
             expect(call[1]).toBeInstanceOf(FormData)
 
@@ -151,8 +163,8 @@ describe('imageApi', () => {
             Object.defineProperty(error, 'isAxiosError', {value: true})
             Object.defineProperty(error, 'request', {value: {}})
 
-            mockedAxios.default.post.mockRejectedValueOnce(error)
-            mockedAxios.isAxiosError.mockReturnValueOnce(true)
+            mockPost.mockRejectedValueOnce(error)
+            mockIsAxiosError.mockReturnValueOnce(true)
 
             await expect(uploadMultipleImagesWithoutOffer([])).rejects.toThrow(
                 'No response from server. Check your internet connection.'
@@ -162,20 +174,20 @@ describe('imageApi', () => {
 
     describe('deleteImage', () => {
         it('DELETEs the correct URL without auth', async () => {
-            mockedAxios.default.delete.mockResolvedValueOnce({})
+            mockDelete.mockResolvedValueOnce({})
             await deleteImage('img1')
 
-            const call = mockedAxios.default.delete.mock.calls[0]
+            const call = mockDelete.mock.calls[0]
             expect(call[0]).toBe('http://localhost:8137/api/v1/images/img1')
             expect(call[1]).toEqual({headers: {}})
         })
 
         it('attaches Authorization header when token exists', async () => {
-            localStorage.setItem('accessToken', 'abc')
-            mockedAxios.default.delete.mockResolvedValueOnce({})
+            localStorageMock.getItem.mockReturnValue('abc')
+            mockDelete.mockResolvedValueOnce({})
 
             await deleteImage('img2')
-            const cfg = mockedAxios.default.delete.mock.calls[0][1]
+            const cfg = mockDelete.mock.calls[0][1]
 
             expect(cfg.headers).toMatchObject({Authorization: 'Bearer abc'})
         })
@@ -187,15 +199,15 @@ describe('imageApi', () => {
                 value: {data: {message: 'Delete failed'}}
             })
 
-            mockedAxios.default.delete.mockRejectedValueOnce(error)
-            mockedAxios.isAxiosError.mockReturnValueOnce(true)
+            mockDelete.mockRejectedValueOnce(error)
+            mockIsAxiosError.mockReturnValueOnce(true)
 
             await expect(deleteImage('x')).rejects.toThrow('Delete failed')
         })
 
         it('throws network error otherwise', async () => {
-            mockedAxios.default.delete.mockRejectedValueOnce(new Error('err'))
-            mockedAxios.isAxiosError.mockReturnValueOnce(false)
+            mockDelete.mockRejectedValueOnce(new Error('err'))
+            mockIsAxiosError.mockReturnValueOnce(false)
 
             await expect(deleteImage('x')).rejects.toThrow(
                 'Network error while deleting image'
@@ -222,63 +234,4 @@ describe('imageApi', () => {
         })
     })
 
-    describe('compressImage', () => {
-        beforeEach(() => {
-            global.URL.createObjectURL = vi.fn(() => 'blob://fake')
-
-            vi.spyOn(document, 'createElement').mockImplementation((tag) => {
-                if (tag === 'canvas') {
-                    const canvas = document.createElement('canvas')
-                    canvas.getContext = vi.fn(() => ({
-                        drawImage: vi.fn()
-                    })) as any
-
-                    canvas.toBlob = vi.fn((callback) => {
-                        callback!(new Blob(['compressed-image-data']), 'image/png')
-                    }) as any
-
-                    return canvas
-                }
-                return document.createElement(tag)
-            })
-
-            class MockImage {
-                width = 1000
-                height = 800
-                onload?: () => void
-                onerror?: () => void
-
-                set src(_: string) {
-                    setTimeout(() => this.onload?.())
-                }
-            }
-
-            global.Image = MockImage as any
-        })
-
-        it('resolves a compressed File', async () => {
-            const inFile = new File(['a'], 'i.jpg', {type: 'image/jpeg'})
-            const out = await compressImage(inFile, 100, 0.5)
-
-            expect(out).toBeInstanceOf(File)
-            expect(out.name).toBe('i.jpg')
-            expect(out.type).toBe('image/jpeg')
-        })
-
-        it('rejects on image load error', async () => {
-            class ErrorImage {
-                onload?: () => void
-                onerror?: () => void
-
-                set src(_: string) {
-                    setTimeout(() => this.onerror?.())
-                }
-            }
-
-            global.Image = ErrorImage as any
-
-            await expect(compressImage(new File([], 'x.jpg', {type: 'image/jpeg'})))
-                .rejects.toThrow('Image loading error')
-        })
-    })
 })

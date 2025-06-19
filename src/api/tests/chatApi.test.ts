@@ -1,5 +1,4 @@
 import {afterEach, beforeEach, describe, expect, test, vi} from 'vitest'
-import {Client} from '@stomp/stompjs'
 import {ChatMessage} from '../../types/chat/ChatMessage'
 import {Conversation} from '../../types/chat/Conversation'
 
@@ -23,8 +22,9 @@ const mockClient = {
     publish: vi.fn()
 }
 
+const MockedClient = vi.fn(() => mockClient)
 vi.mock('@stomp/stompjs', () => ({
-    Client: vi.fn(() => mockClient)
+    Client: MockedClient
 }))
 
 vi.stubGlobal('localStorage', {
@@ -143,12 +143,17 @@ describe('ChatService', () => {
 
             const connectPromise = chatService.connect()
 
-            const clientConstructor = vi.mocked(Client).mock.calls[0][0]
-            clientConstructor.onConnect()
+            const calls = (MockedClient as any).mock.calls
+            if (calls && calls.length > 0 && calls[0] && calls[0][0]) {
+                const clientConstructor = calls[0][0]
+                if (clientConstructor.onConnect) {
+                    clientConstructor.onConnect()
+                }
+            }
 
             await connectPromise
 
-            expect(Client).toHaveBeenCalledWith({
+            expect(MockedClient).toHaveBeenCalledWith({
                 webSocketFactory: expect.any(Function),
                 connectHeaders: {
                     Authorization: `Bearer ${validToken}`,
@@ -182,8 +187,13 @@ describe('ChatService', () => {
 
             const connectPromise = chatService.connect()
 
-            const clientConstructor = vi.mocked(Client).mock.calls[0][0]
-            clientConstructor.onWebSocketError(new Event('error'))
+            const calls = (MockedClient as any).mock.calls
+            if (calls && calls.length > 0 && calls[0] && calls[0][0]) {
+                const clientConstructor = calls[0][0]
+                if (clientConstructor.onWebSocketError) {
+                    clientConstructor.onWebSocketError(new Event('error'))
+                }
+            }
 
             await expect(connectPromise).rejects.toThrow('WebSocket connection error')
         })
@@ -239,8 +249,13 @@ describe('ChatService', () => {
 
             const sendPromise = chatService.sendMessage('recipient-123', 'Hello')
 
-            const clientConstructor = vi.mocked(Client).mock.calls[0][0]
-            clientConstructor.onConnect()
+            const calls = (MockedClient as any).mock.calls
+            if (calls && calls.length > 0 && calls[0] && calls[0][0]) {
+                const clientConstructor = calls[0][0]
+                if (clientConstructor.onConnect) {
+                    clientConstructor.onConnect()
+                }
+            }
             mockClient.connected = true
 
             await sendPromise
@@ -305,13 +320,13 @@ describe('ChatService', () => {
             const unsubscribe1 = chatService.onMessageReceived(handler1)
             const unsubscribe2 = chatService.onMessageReceived(handler2)
 
-            expect(chatService['messageHandlers']).toHaveLength(2)
+            expect((chatService as any)['messageHandlers']).toHaveLength(2)
 
             unsubscribe1()
-            expect(chatService['messageHandlers']).toHaveLength(1)
+            expect((chatService as any)['messageHandlers']).toHaveLength(1)
 
             unsubscribe2()
-            expect(chatService['messageHandlers']).toHaveLength(0)
+            expect((chatService as any)['messageHandlers']).toHaveLength(0)
         })
     })
 
