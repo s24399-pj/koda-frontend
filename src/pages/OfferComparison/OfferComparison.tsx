@@ -10,9 +10,10 @@ import {
   ComparisonType,
   Feature,
 } from '../../types/offer/comparisionFeatures.ts';
+import {DEFAULT_CAR_IMAGE} from "../../util/constants.tsx";
+
 
 const API_URL = import.meta.env.VITE_API_URL;
-const PLACEHOLDER_IMAGE = 'https://placehold.co/600x400';
 
 const OfferComparison: React.FC = () => {
   useTitle('Porównaj');
@@ -36,7 +37,7 @@ const OfferComparison: React.FC = () => {
     const target = event.target as HTMLImageElement;
     if (!target.dataset.errorHandled) {
       target.dataset.errorHandled = 'true';
-      target.src = PLACEHOLDER_IMAGE;
+      target.src = DEFAULT_CAR_IMAGE;
       console.warn('Image loading error in comparison:', target.src);
     }
   };
@@ -261,7 +262,7 @@ const OfferComparison: React.FC = () => {
                 >
                   <div className="suggestion-item">
                     <img
-                      src={getMainImageUrl(offer) || PLACEHOLDER_IMAGE}
+                      src={getMainImageUrl(offer) || DEFAULT_CAR_IMAGE}
                       alt={offer.title}
                       className="suggestion-image"
                       onError={handleImageError}
@@ -296,7 +297,7 @@ const OfferComparison: React.FC = () => {
                 >
                   <div className="suggestion-item">
                     <img
-                      src={getMainImageUrl(offer) || PLACEHOLDER_IMAGE}
+                      src={getMainImageUrl(offer) || DEFAULT_CAR_IMAGE}
                       alt={offer.title}
                       className="suggestion-image"
                       onError={handleImageError}
@@ -331,7 +332,7 @@ const OfferComparison: React.FC = () => {
                   <th>
                     <div className="car-header">
                       <img
-                        src={getMainImageUrl(offerA) || PLACEHOLDER_IMAGE}
+                        src={getMainImageUrl(offerA) || DEFAULT_CAR_IMAGE}
                         alt="Oferta 1"
                         className="car-thumbnail"
                         onError={handleImageError}
@@ -341,7 +342,7 @@ const OfferComparison: React.FC = () => {
                   <th>
                     <div className="car-header">
                       <img
-                        src={getMainImageUrl(offerB) || PLACEHOLDER_IMAGE}
+                        src={getMainImageUrl(offerB) || DEFAULT_CAR_IMAGE}
                         alt="Oferta 2"
                         className="car-thumbnail"
                         onError={handleImageError}
