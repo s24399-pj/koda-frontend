@@ -1,6 +1,8 @@
 .footer {
-  background-color: #001d36;
-  color: #ffffff;
+  --footer-bg: #001d36;
+  --footer-gradient: linear-gradient(90deg, #34c8db, var(--primary-color), #400ff1);
+  background-color: var(--footer-bg);
+  color: var(--background-secondary);
   position: relative;
   overflow: hidden;
 
@@ -11,7 +13,7 @@
     left: 0;
     width: 100%;
     height: 3px;
-    background: linear-gradient(90deg, #34c8db, var(--primary-color), #400ff1);
+    background: var(--footer-gradient);
   }
 
   .footer-container {
@@ -44,12 +46,12 @@
           font-weight: 600;
           margin: 0 0 5px;
           letter-spacing: 1px;
-          color: #ffffff;
+          color: var(--background-secondary);
         }
 
         .tagline {
           font-size: 14px;
-          color: #a0b4c9;
+          color: var(--text-tertiary);
           margin: 0;
         }
       }
@@ -67,7 +69,7 @@
           height: 36px;
           border-radius: var(--radius-full);
           background-color: rgba(255, 255, 255, 0.1);
-          color: #ffffff;
+          color: var(--background-secondary);
           font-size: 16px;
           transition: all var(--transition-medium);
 
@@ -91,6 +93,7 @@
       margin-bottom: var(--space-lg);
       position: relative;
       padding-bottom: 10px;
+      color: var(--background-secondary);
 
       &::after {
         content: '';
@@ -121,19 +124,19 @@
 
         a,
         span {
-          color: #d1d9e6;
+          color: var(--background-secondary);
           text-decoration: none;
           font-size: 15px;
           transition: all var(--transition-medium);
 
           &:hover {
-            color: #ffffff;
+            color: var(--primary-light);
             padding-left: 5px;
           }
 
           &:focus {
             outline: none;
-            color: #ffffff;
+            color: var(--primary-light);
             text-decoration: underline;
           }
         }
@@ -168,7 +171,7 @@
 
   .footer-bottom {
     padding-top: var(--space-lg);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -177,7 +180,7 @@
 
     .copyright {
       font-size: 14px;
-      color: #a0b4c9;
+      color: var(--text-tertiary);
     }
 
     .footer-links {
@@ -186,17 +189,17 @@
 
       a {
         font-size: 14px;
-        color: #a0b4c9;
+        color: var(--text-tertiary);
         text-decoration: none;
         transition: color var(--transition-medium);
 
         &:hover {
-          color: #ffffff;
+          color: var(--background-secondary);
         }
 
         &:focus {
           outline: none;
-          color: #ffffff;
+          color: var(--background-secondary);
           text-decoration: underline;
         }
       }

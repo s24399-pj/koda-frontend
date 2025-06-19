@@ -9,7 +9,6 @@ import {
 import './AdvancedFilter.scss';
 import offerApiService, { AdvancedSearchParams } from '../../api/offerApi';
 
-// Convert enum to array of options for select inputs
 const enumToOptions = (enumObject: any) => {
   return Object.keys(enumObject)
     .filter(key => isNaN(Number(key)))
@@ -56,7 +55,6 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
     accidentFree: null,
     serviceHistory: null,
 
-    // Car equipment
     airConditioning: null,
     automaticClimate: null,
     heatedSeats: null,
@@ -69,7 +67,6 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
     ledLights: null,
   });
 
-  // Create options arrays from enums
   const fuelTypeOptions = enumToOptions(FuelType);
   const transmissionOptions = enumToOptions(TransmissionType);
   const bodyTypeOptions = enumToOptions(BodyType);
@@ -261,7 +258,6 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
   return (
     <div className="advanced-filter">
       <form onSubmit={searchOffers}>
-        {/* Basic Filters - Always Visible */}
         <div className="filter-section basic-filters">
           <div className="filter-row">
             <div className="filter-field">
@@ -363,14 +359,12 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
           </div>
         </div>
 
-        {/* Toggle Advanced Filters Button */}
         <div className="toggle-advanced">
           <button type="button" className="toggle-button" onClick={toggleAdvancedFilters}>
             {showAdvanced ? 'Ukryj filtry zaawansowane' : 'Pokaż filtry zaawansowane'}
           </button>
         </div>
 
-        {/* Advanced Filters - Toggleable */}
         {showAdvanced && (
           <div className="filter-section advanced-filters">
             <h3>Szczegóły pojazdu</h3>
@@ -678,7 +672,6 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
           </div>
         )}
 
-        {/* Filter Action Buttons */}
         <div className="filter-actions">
           <button
             type="button"
