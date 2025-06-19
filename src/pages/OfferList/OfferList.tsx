@@ -10,7 +10,7 @@ import { useComparison } from '../../context/ComparisonContext';
 import AdvancedFilter from '../../components/AdvancedFilter/AdvancedFilter';
 import { translations } from '../../translations/carEquipmentTranslations';
 import offerApiService, { SearchResponse } from '../../api/offerApi';
-import {DEFAULT_CAR_IMAGE} from "../../util/constants.tsx";
+import { DEFAULT_CAR_IMAGE } from '../../util/constants.tsx';
 
 const API_URL = import.meta.env.VITE_API_URL;
 

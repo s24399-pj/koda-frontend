@@ -10,8 +10,7 @@ import {
   ComparisonType,
   Feature,
 } from '../../types/offer/comparisionFeatures.ts';
-import {DEFAULT_CAR_IMAGE} from "../../util/constants.tsx";
-
+import { DEFAULT_CAR_IMAGE } from '../../util/constants.tsx';
 
 const API_URL = import.meta.env.VITE_API_URL;
 

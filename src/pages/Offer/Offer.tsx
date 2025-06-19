@@ -12,7 +12,7 @@ import { DEFAULT_PROFILE_IMAGE } from '../../assets/defaultProfilePicture.ts';
 import { CarEquipment } from '../../types/offer/OfferTypes.ts';
 import { equipmentCategories } from '../../types/offer/carEquipmentCategories.ts';
 import { translations } from '../../translations/carEquipmentTranslations.ts';
-import {DEFAULT_CAR_IMAGE} from "../../util/constants.tsx";
+import { DEFAULT_CAR_IMAGE } from '../../util/constants.tsx';
 
 interface LightboxProps {
   images: string[];

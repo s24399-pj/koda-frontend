@@ -148,8 +148,8 @@
         padding: var(--space-sm) 10px;
         border-radius: var(--radius-sm);
         transition:
-                border-color var(--transition-medium),
-                box-shadow var(--transition-medium);
+          border-color var(--transition-medium),
+          box-shadow var(--transition-medium);
 
         @media (min-width: 768px) {
           font-size: 18px;

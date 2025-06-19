@@ -4,9 +4,9 @@ import './UserOffers.scss';
 import { getUserOffers, deleteOffer } from '../../api/offerApi';
 import { ApiOffer, OfferData } from '../../types/offerTypes.ts';
 import { translations } from '../../translations/carEquipmentTranslations';
+import {DEFAULT_CAR_IMAGE} from "../../util/constants.tsx";
 
 const API_URL = import.meta.env.VITE_API_URL;
-const DEFAULT_CAR_IMAGE = 'https://placehold.co/600x400';
 
 const formatPrice = (price: number, currency: string = 'zł'): string => {
   return price.toLocaleString('pl-PL') + ' ' + currency;
@@ -148,10 +148,15 @@ const UserOffers: React.FC = () => {
       return null;
     }
 
-    const translatedFuelType = translations.fuelType[offer.CarDetailsDto.fuelType as keyof typeof translations.fuelType] || offer.CarDetailsDto.fuelType;
+    const translatedFuelType =
+      translations.fuelType[offer.CarDetailsDto.fuelType as keyof typeof translations.fuelType] ||
+      offer.CarDetailsDto.fuelType;
 
     const getTranslatedTransmission = (transmission: string) => {
-      return translations.transmissionType[transmission as keyof typeof translations.transmissionType] || transmission;
+      return (
+        translations.transmissionType[transmission as keyof typeof translations.transmissionType] ||
+        transmission
+      );
     };
 
     const getTranslatedBodyType = (bodyType: string) => {
@@ -163,50 +168,50 @@ const UserOffers: React.FC = () => {
     };
 
     return (
-        <div className="offer-card" onClick={() => handleOfferClick(offer.id)}>
-          <div className="offer-image">
-            <img
-                src={offer.mainImage ? `${API_URL}${offer.mainImage}` : DEFAULT_CAR_IMAGE}
-                alt={offer.title}
-                onError={handleImageError}
-            />
-          </div>
-          <div className="offer-details">
-            <h4 className="offer-title">{offer.title}</h4>
-            <div className="offer-specs">
-              <span className="offer-year">{offer.CarDetailsDto.year}</span>
-              <span className="offer-engine">
+      <div className="offer-card" onClick={() => handleOfferClick(offer.id)}>
+        <div className="offer-image">
+          <img
+            src={offer.mainImage ? `${API_URL}${offer.mainImage}` : DEFAULT_CAR_IMAGE}
+            alt={offer.title}
+            onError={handleImageError}
+          />
+        </div>
+        <div className="offer-details">
+          <h4 className="offer-title">{offer.title}</h4>
+          <div className="offer-specs">
+            <span className="offer-year">{offer.CarDetailsDto.year}</span>
+            <span className="offer-engine">
               {offer.CarDetailsDto.enginePower} KM | {offer.CarDetailsDto.displacement} |{' '}
-                {translatedFuelType}
+              {translatedFuelType}
             </span>
-              <span className="offer-mileage">{formatMileage(offer.CarDetailsDto.mileage)}</span>
-              {offer.CarDetailsDto.transmission && (
-                  <span className="offer-transmission">
+            <span className="offer-mileage">{formatMileage(offer.CarDetailsDto.mileage)}</span>
+            {offer.CarDetailsDto.transmission && (
+              <span className="offer-transmission">
                 {getTranslatedTransmission(offer.CarDetailsDto.transmission)}
               </span>
-              )}
-              {offer.CarDetailsDto.bodyType && (
-                  <span className="offer-body-type">
+            )}
+            {offer.CarDetailsDto.bodyType && (
+              <span className="offer-body-type">
                 {getTranslatedBodyType(offer.CarDetailsDto.bodyType)}
               </span>
-              )}
-              {offer.CarDetailsDto.driveType && (
-                  <span className="offer-drive-type">
+            )}
+            {offer.CarDetailsDto.driveType && (
+              <span className="offer-drive-type">
                 {getTranslatedDriveType(offer.CarDetailsDto.driveType)}
               </span>
-              )}
-            </div>
-            <div className="offer-price">{formatPrice(offer.price, offer.currency)}</div>
+            )}
           </div>
-          <div className="offer-actions">
-            <button className="edit-offer-btn" onClick={e => handleEditOffer(offer.id, e)}>
-              Edytuj
-            </button>
-            <button className="delete-offer-btn" onClick={e => handleDeleteOffer(offer.id, e)}>
-              Usuń
-            </button>
-          </div>
+          <div className="offer-price">{formatPrice(offer.price, offer.currency)}</div>
         </div>
+        <div className="offer-actions">
+          <button className="edit-offer-btn" onClick={e => handleEditOffer(offer.id, e)}>
+            Edytuj
+          </button>
+          <button className="delete-offer-btn" onClick={e => handleDeleteOffer(offer.id, e)}>
+            Usuń
+          </button>
+        </div>
+      </div>
     );
   };
 
@@ -221,13 +226,13 @@ const UserOffers: React.FC = () => {
 
     if (noUserIdError) {
       return (
-          <div className="offers-error">
-            <p>Nie można pobrać ogłoszeń. Brak ID użytkownika.</p>
-            <p>Przejdź najpierw do profilu, aby załadować swoje dane.</p>
-            <button className="primary-btn" onClick={redirectToProfile}>
-              Przejdź do profilu
-            </button>
-          </div>
+        <div className="offers-error">
+          <p>Nie można pobrać ogłoszeń. Brak ID użytkownika.</p>
+          <p>Przejdź najpierw do profilu, aby załadować swoje dane.</p>
+          <button className="primary-btn" onClick={redirectToProfile}>
+            Przejdź do profilu
+          </button>
+        </div>
       );
     }
 
@@ -237,34 +242,34 @@ const UserOffers: React.FC = () => {
 
     if (!offers || offers.length === 0) {
       return (
-          <div className="offers-empty">
-            <p>Obecnie nie masz żadnych aktywnych ogłoszeń.</p>
-            <button className="create-offer-btn" onClick={navigateToCreateOffer}>
-              Dodaj nowe ogłoszenie
-            </button>
-          </div>
+        <div className="offers-empty">
+          <p>Obecnie nie masz żadnych aktywnych ogłoszeń.</p>
+          <button className="create-offer-btn" onClick={navigateToCreateOffer}>
+            Dodaj nowe ogłoszenie
+          </button>
+        </div>
       );
     }
 
     return (
-        <div className="offers-list">
-          {offers.map(offer => (
-              <OfferCard key={offer.id} offer={offer} />
-          ))}
-          <div className="add-offer-container">
-            <button className="create-offer-btn" onClick={navigateToCreateOffer}>
-              Dodaj nowe ogłoszenie
-            </button>
-          </div>
+      <div className="offers-list">
+        {offers.map(offer => (
+          <OfferCard key={offer.id} offer={offer} />
+        ))}
+        <div className="add-offer-container">
+          <button className="create-offer-btn" onClick={navigateToCreateOffer}>
+            Dodaj nowe ogłoszenie
+          </button>
         </div>
+      </div>
     );
   };
 
   return (
-      <div className="user-offers">
-        <h3>Moje ogłoszenia</h3>
-        {renderOffers()}
-      </div>
+    <div className="user-offers">
+      <h3>Moje ogłoszenia</h3>
+      {renderOffers()}
+    </div>
   );
 };
 

@@ -10,7 +10,7 @@ import CompareCheckbox from '../../components/CompareCheckbox/CompareCheckbox';
 import ComparisonBar from '../../components/ComparisonBar/ComparisonBar';
 import { useComparison } from '../../context/ComparisonContext';
 import { translations } from '../../translations/carEquipmentTranslations';
-import {DEFAULT_CAR_IMAGE} from "../../util/constants.tsx";
+import { DEFAULT_CAR_IMAGE } from '../../util/constants.tsx';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
