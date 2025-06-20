@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import logo from '../../assets/images/koda_logo.svg';
+import logo from '../../assets/icons/favicon.svg';
 import './navbar.scss';
 import { useAuth } from '../../context/AuthContext.tsx';
 import '@fortawesome/fontawesome-free/css/all.min.css';
