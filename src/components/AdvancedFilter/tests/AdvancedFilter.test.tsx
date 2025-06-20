@@ -1,17 +1,41 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import axios from 'axios';
 import AdvancedFilter from '../AdvancedFilter';
 
-vi.mock('axios', () => ({
-  default: {
+const { mockAxiosInstance, mockedAxios } = vi.hoisted(() => {
+  const mockAxiosInstance = {
     get: vi.fn(),
     post: vi.fn(),
-  },
-}));
+    put: vi.fn(),
+    delete: vi.fn(),
+    patch: vi.fn(),
+    interceptors: {
+      request: { use: vi.fn(), eject: vi.fn() },
+      response: { use: vi.fn(), eject: vi.fn() },
+    },
+  };
 
-const mockedAxios = axios as any;
+  return {
+    mockAxiosInstance,
+    mockedAxios: {
+      get: vi.fn(),
+      post: vi.fn(),
+      put: vi.fn(),
+      delete: vi.fn(),
+      patch: vi.fn(),
+      create: vi.fn(() => mockAxiosInstance),
+      interceptors: {
+        request: { use: vi.fn(), eject: vi.fn() },
+        response: { use: vi.fn(), eject: vi.fn() },
+      },
+    },
+  };
+});
+
+vi.mock('axios', () => ({
+  default: mockedAxios,
+}));
 
 vi.stubGlobal('import.meta', {
   env: {
@@ -60,6 +84,20 @@ describe('AdvancedFilter', () => {
     });
 
     mockedAxios.post.mockResolvedValue({
+      data: {
+        content: [],
+        totalElements: 0,
+        totalPages: 0,
+      },
+    });
+
+    mockAxiosInstance.get.mockResolvedValue({
+      data: {
+        content: [],
+      },
+    });
+
+    mockAxiosInstance.post.mockResolvedValue({
       data: {
         content: [],
         totalElements: 0,
@@ -261,7 +299,9 @@ describe('AdvancedFilter', () => {
   });
 
   test('handles API errors gracefully', async () => {
+    // Mock both main axios and instance to reject
     mockedAxios.post.mockRejectedValueOnce(new Error('API Error'));
+    mockAxiosInstance.post.mockRejectedValueOnce(new Error('API Error'));
 
     const user = userEvent.setup();
     render(<AdvancedFilter onSearch={mockOnSearch} onLoading={mockOnLoading} />);
@@ -284,7 +324,10 @@ describe('AdvancedFilter', () => {
     render(<AdvancedFilter onSearch={mockOnSearch} onLoading={mockOnLoading} />);
 
     await waitFor(() => {
-      expect(mockedAxios.post).toHaveBeenCalled();
+      // Check if either main axios or instance post was called
+      expect(
+        mockedAxios.post.mock.calls.length > 0 || mockAxiosInstance.post.mock.calls.length > 0
+      ).toBe(true);
     });
   });
 });
