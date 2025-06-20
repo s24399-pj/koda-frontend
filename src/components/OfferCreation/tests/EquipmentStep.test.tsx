@@ -257,7 +257,6 @@ describe('EquipmentStep', () => {
 
       expect(screen.getByText('Wybrano 1 elementów wyposażenia')).toBeInTheDocument();
 
-      // Simulate adding another item
       formik.values.equipment = { airConditioning: true, bluetooth: true };
       rerender(<EquipmentStep formik={formik} onNext={mockOnNext} onPrevious={mockOnPrevious} />);
 

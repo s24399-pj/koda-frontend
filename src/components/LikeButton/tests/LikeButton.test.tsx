@@ -220,8 +220,8 @@ describe('LikeButton', () => {
       expect(button).toHaveAttribute('aria-label', 'Dodaj do ulubionych');
     });
 
-    expect(mockOnLikeToggle).toHaveBeenCalledWith(true); // Initial optimistic update
-    expect(mockOnLikeToggle).toHaveBeenCalledWith(false); // Rollback
+    expect(mockOnLikeToggle).toHaveBeenCalledWith(true);
+    expect(mockOnLikeToggle).toHaveBeenCalledWith(false);
     expect(alert).toHaveBeenCalledWith('Wystąpił błąd podczas aktualizacji statusu polubienia.');
     expect(console.error).toHaveBeenCalledWith(
       'Błąd podczas aktualizacji statusu polubienia:',
@@ -266,7 +266,6 @@ describe('LikeButton', () => {
   });
 
   test('handles empty offerId during toggle gracefully', async () => {
-    // Start with valid offerId, then rerender with empty
     const { rerender } = render(<LikeButton {...defaultProps} />);
     rerender(<LikeButton {...defaultProps} offerId="" />);
 

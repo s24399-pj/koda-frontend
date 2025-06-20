@@ -193,7 +193,6 @@ describe('Offer Component', () => {
       value: 1024,
     });
 
-    // Mock scrollTo for DOM elements
     Element.prototype.scrollTo = vi.fn();
 
     const mockGeocodeResponse = {
@@ -206,10 +205,8 @@ describe('Offer Component', () => {
       ],
     };
 
-    // Reset axios mock to default behavior
     mockAxios.get.mockReset();
 
-    // Setup axios mocks to return consistent data
     mockAxios.get.mockImplementation(url => {
       if (url.includes('nominatim')) {
         return Promise.resolve(mockGeocodeResponse);
@@ -224,14 +221,12 @@ describe('Offer Component', () => {
   });
 
   test('shows loading state initially', () => {
-    // Mock axios to never resolve to keep loading state
     mockAxios.get.mockImplementation(() => new Promise(() => {}));
     renderWithRouter(<Offer />);
     expect(screen.getByText('Ładowanie...')).toBeInTheDocument();
   });
 
   test('shows error message when API call fails', async () => {
-    // Mock axios to reject on first call (main API call)
     mockAxios.get.mockRejectedValueOnce(new Error('API Error'));
 
     renderWithRouter(<Offer />);
@@ -256,7 +251,6 @@ describe('Offer Component', () => {
     expect(screen.getByText('Black')).toBeInTheDocument();
     expect(screen.getByText('WA12345')).toBeInTheDocument();
 
-    // Check year in technical specs specifically
     const techSpecs = document.querySelector('.tech-specs');
     expect(techSpecs).toHaveTextContent('2020');
   });
@@ -478,7 +472,6 @@ describe('Offer Component', () => {
       },
     };
 
-    // Override mock for this test
     mockAxios.get.mockImplementation(url => {
       if (url.includes('nominatim')) {
         return Promise.resolve({
@@ -500,7 +493,6 @@ describe('Offer Component', () => {
       expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
     });
 
-    // Should render basic offer info
     expect(screen.getByText(/150,000.*PLN/)).toBeInTheDocument();
   });
 
@@ -510,7 +502,6 @@ describe('Offer Component', () => {
       seller: undefined,
     };
 
-    // Override mock for this test
     mockAxios.get.mockImplementation(url => {
       if (url.includes('nominatim')) {
         return Promise.resolve({
@@ -544,7 +535,6 @@ describe('Offer Component', () => {
       },
     };
 
-    // Override mock for this test
     mockAxios.get.mockImplementation(url => {
       if (url.includes('nominatim')) {
         return Promise.resolve({
@@ -566,7 +556,6 @@ describe('Offer Component', () => {
       expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
     });
 
-    // Should render basic offer info
     expect(screen.getByText(/150,000.*PLN/)).toBeInTheDocument();
   });
 
@@ -576,7 +565,6 @@ describe('Offer Component', () => {
       seller: undefined,
     };
 
-    // Override mock for this test
     mockAxios.get.mockImplementation(url => {
       if (url.includes('nominatim')) {
         return Promise.resolve({
@@ -616,7 +604,6 @@ describe('Offer Component', () => {
       CarDetailsDto: null,
     };
 
-    // Mock axios to return offer without CarDetailsDto
     mockAxios.get.mockImplementation(url => {
       if (url.includes('nominatim')) {
         return Promise.resolve({

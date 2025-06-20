@@ -28,23 +28,18 @@ describe('<RegisterPage />', () => {
       </MemoryRouter>
     );
 
-    // Header
     expect(screen.getByRole('heading', { name: 'Zarejestruj się' })).toBeInTheDocument();
-    // Inputs
     expect(screen.getByLabelText('Imię')).toBeInTheDocument();
     expect(screen.getByLabelText('Nazwisko')).toBeInTheDocument();
     expect(screen.getByLabelText('Email')).toBeInTheDocument();
     expect(screen.getByLabelText('Numer telefonu')).toBeInTheDocument();
     expect(screen.getByLabelText('Hasło')).toBeInTheDocument();
     expect(screen.getByLabelText('Powtórz hasło')).toBeInTheDocument();
-    // Terms checkbox: match partial text via regex
     expect(
       screen.getByRole('checkbox', { name: /Akceptuję.*politykę prywatności/ })
     ).toBeInTheDocument();
-    // Submit button
     const submit = screen.getByRole('button', { name: 'Zarejestruj się' });
     expect(submit).toBeEnabled();
-    // Link to login
     expect(screen.getByText('Masz już konto?')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Zaloguj się' })).toHaveAttribute(
       'href',
@@ -106,7 +101,6 @@ describe('<RegisterPage />', () => {
       </MemoryRouter>
     );
 
-    // fill everything except ensure passwords differ
     fireEvent.change(screen.getByLabelText('Imię'), { target: { value: 'A' } });
     fireEvent.change(screen.getByLabelText('Nazwisko'), { target: { value: 'B' } });
     fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'a@b.com' } });
@@ -150,7 +144,6 @@ describe('<RegisterPage />', () => {
       </MemoryRouter>
     );
 
-    // fill valid data
     fireEvent.change(screen.getByLabelText('Imię'), { target: { value: 'A' } });
     fireEvent.change(screen.getByLabelText('Nazwisko'), { target: { value: 'B' } });
     fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'a@b.com' } });
@@ -184,7 +177,6 @@ describe('<RegisterPage />', () => {
       </MemoryRouter>
     );
 
-    // fill valid data
     fireEvent.change(screen.getByLabelText('Imię'), { target: { value: 'A' } });
     fireEvent.change(screen.getByLabelText('Nazwisko'), { target: { value: 'B' } });
     fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'a@b.com' } });

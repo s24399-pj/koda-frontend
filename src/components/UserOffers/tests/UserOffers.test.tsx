@@ -55,7 +55,6 @@ describe('UserOffers Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     window.confirm = vi.fn(() => true);
-    // reset href stub
     Object.defineProperty(window, 'location', {
       value: { href: '' },
       writable: true,
@@ -92,24 +91,19 @@ describe('UserOffers Component', () => {
       </MemoryRouter>
     );
 
-    // wait for card
     const title = await screen.findByText('First Car');
     expect(title).toBeInTheDocument();
 
-    // simulate img error fallback
     const img = screen.getByRole('img');
     fireEvent.error(img);
     expect(img).toHaveAttribute('src', 'https://placehold.co/600x400');
 
-    // click card → navigate
     fireEvent.click(title.closest('.offer-card')!);
     expect(mockNavigate).toHaveBeenCalledWith('/offer/1');
 
-    // edit button
     fireEvent.click(screen.getByRole('button', { name: /Edytuj/ }));
     expect(window.location.href).toContain('/offer/edit/1');
 
-    // delete button
     fireEvent.click(screen.getByRole('button', { name: /Usuń/ }));
     await waitFor(() => expect(screen.queryByText('First Car')).not.toBeInTheDocument());
   });

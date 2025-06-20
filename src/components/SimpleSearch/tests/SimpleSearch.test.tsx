@@ -35,11 +35,9 @@ describe('SimpleSearch Component', () => {
     fireEvent.change(minInput, { target: { value: '10000' } });
     expect(minInput).toHaveValue('10 000');
 
-    // set max lower than min to trigger error
     fireEvent.change(maxInput, { target: { value: '5000' } });
     await waitFor(() => expect(screen.getByText(/Cena maksymalna nie może/)).toBeInTheDocument());
 
-    // show notification
     expect(screen.getByRole('button', { name: 'Zamknij powiadomienie' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Zamknij powiadomienie' }));
     await waitFor(() => expect(screen.queryByText(/Cena maksymalna nie może/)).toBeNull());

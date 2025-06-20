@@ -17,7 +17,6 @@ vi.mock('formik', async () => {
     ...actual,
     Field: ({ children, name, type, id, placeholder, className, min, ...props }: any) => {
       if (typeof children === 'function') {
-        // Custom Field render function
         const mockField = { name, value: false };
         const mockForm = { setFieldValue: vi.fn() };
         return children({ field: mockField, form: mockForm });

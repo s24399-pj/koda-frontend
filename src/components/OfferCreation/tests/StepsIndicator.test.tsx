@@ -2,10 +2,6 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import StepsIndicator from '../StepsIndicator';
 
-// ---------------------------------------------------
-// Test suite for StepsIndicator component
-// ---------------------------------------------------
-
 describe('StepsIndicator Component', () => {
   const steps = ['First', 'Second', 'Third', 'Fourth'];
 
@@ -18,17 +14,14 @@ describe('StepsIndicator Component', () => {
   it('renders the correct number of steps with labels and numbers', () => {
     render(<StepsIndicator steps={steps} activeStep={0} />);
 
-    // Should render each step label and number
     steps.forEach((label, index) => {
       const labelElement = screen.getByText(label);
       expect(labelElement).toBeInTheDocument();
       const numberElement = screen.getByText(`${index + 1}`);
       expect(numberElement).toBeInTheDocument();
-      // Check number has correct class
       expect(numberElement).toHaveClass('step-number');
     });
 
-    // Should render exactly steps.length step containers
     const stepContainers = document.querySelectorAll('.step');
     expect(stepContainers.length).toBe(steps.length);
   });
@@ -69,13 +62,11 @@ describe('StepsIndicator Component', () => {
   it('updates active classes when props change', () => {
     const { container, rerender } = render(<StepsIndicator steps={steps} activeStep={1} />);
 
-    // initially first two steps active
     let stepElements = container.querySelectorAll('.step');
     expect(stepElements[0]).toHaveClass('active');
     expect(stepElements[1]).toHaveClass('active');
     expect(stepElements[2]).not.toHaveClass('active');
 
-    // rerender with different activeStep
     rerender(<StepsIndicator steps={steps} activeStep={3} />);
     stepElements = container.querySelectorAll('.step');
     stepElements.forEach(el => {

@@ -218,7 +218,6 @@ vi.mock('../../../components/OfferCreation/ContactAndSummaryStep', () => ({
         setShowError(true);
       } else {
         setShowError(false);
-        // Trigger the form submission
         formik.handleSubmit(e);
       }
     };
@@ -252,7 +251,6 @@ vi.mock('../../../components/OfferCreation/ContactAndSummaryStep', () => ({
   },
 }));
 
-// Mock window.scrollTo
 Object.defineProperty(window, 'scrollTo', {
   value: mockScrollTo,
   writable: true,
@@ -283,7 +281,6 @@ describe('OfferCreation Component', () => {
   test('navigates to next step when validation passes', async () => {
     renderComponent();
 
-    // Fill required fields for step 1
     fireEvent.change(screen.getByTestId('title-input'), {
       target: { value: 'Test Car Title' },
     });
@@ -317,7 +314,6 @@ describe('OfferCreation Component', () => {
       expect(screen.getByText('Tytuł jest wymagany')).toBeInTheDocument();
     });
 
-    // Should still be on step 1
     expect(screen.getByText('Step 1 of 4: Podstawowe informacje')).toBeInTheDocument();
     expect(screen.getByTestId('basic-info-step')).toBeInTheDocument();
   });
@@ -325,7 +321,6 @@ describe('OfferCreation Component', () => {
   test('validates title length constraints', async () => {
     renderComponent();
 
-    // Test too short title
     fireEvent.change(screen.getByTestId('title-input'), {
       target: { value: 'AB' },
     });
@@ -346,7 +341,6 @@ describe('OfferCreation Component', () => {
   test('validates price input', async () => {
     renderComponent();
 
-    // Test negative price
     fireEvent.change(screen.getByTestId('title-input'), {
       target: { value: 'Valid title' },
     });
@@ -367,7 +361,6 @@ describe('OfferCreation Component', () => {
   test('navigates between steps correctly', async () => {
     renderComponent();
 
-    // Go to step 2
     await fillValidBasicInfo();
     fireEvent.click(screen.getByTestId('next-button'));
 
@@ -375,7 +368,6 @@ describe('OfferCreation Component', () => {
       expect(screen.getByTestId('vehicle-details-step')).toBeInTheDocument();
     });
 
-    // Go back to step 1
     fireEvent.click(screen.getByTestId('previous-button'));
 
     await waitFor(() => {
@@ -389,7 +381,6 @@ describe('OfferCreation Component', () => {
   test('validates VIN format', async () => {
     renderComponent();
 
-    // Navigate to step 2
     await fillValidBasicInfo();
     fireEvent.click(screen.getByTestId('next-button'));
 
@@ -397,7 +388,6 @@ describe('OfferCreation Component', () => {
       expect(screen.getByTestId('vehicle-details-step')).toBeInTheDocument();
     });
 
-    // Fill required fields with valid VIN first to test VIN format validation
     fireEvent.change(screen.getByTestId('brand-input'), {
       target: { value: 'BMW' },
     });
@@ -405,7 +395,6 @@ describe('OfferCreation Component', () => {
       target: { value: 'X5' },
     });
 
-    // Test invalid VIN
     fireEvent.change(screen.getByTestId('vin-input'), {
       target: { value: 'INVALID_VIN' },
     });
@@ -418,7 +407,6 @@ describe('OfferCreation Component', () => {
       ).toBeInTheDocument();
     });
 
-    // Should still be on step 2
     expect(screen.getByTestId('vehicle-details-step')).toBeInTheDocument();
     expect(screen.getByText('Step 2 of 4: Szczegóły pojazdu')).toBeInTheDocument();
   });
@@ -426,7 +414,6 @@ describe('OfferCreation Component', () => {
   test('validates required fields in vehicle details step', async () => {
     renderComponent();
 
-    // Navigate to step 2
     await fillValidBasicInfo();
     fireEvent.click(screen.getByTestId('next-button'));
 
@@ -434,7 +421,6 @@ describe('OfferCreation Component', () => {
       expect(screen.getByTestId('vehicle-details-step')).toBeInTheDocument();
     });
 
-    // Try to proceed without filling required fields
     fireEvent.click(screen.getByTestId('next-button'));
 
     await waitFor(() => {
@@ -442,7 +428,6 @@ describe('OfferCreation Component', () => {
       expect(screen.getByText('Marka jest wymagana')).toBeInTheDocument();
     });
 
-    // Should still be on step 2
     expect(screen.getByTestId('vehicle-details-step')).toBeInTheDocument();
   });
 
@@ -452,7 +437,6 @@ describe('OfferCreation Component', () => {
 
     renderComponent();
 
-    // Fill all steps
     await fillValidBasicInfo();
     fireEvent.click(screen.getByTestId('next-button'));
 
@@ -473,7 +457,6 @@ describe('OfferCreation Component', () => {
       expect(screen.getByTestId('contact-summary-step')).toBeInTheDocument();
     });
 
-    // Accept terms and submit
     fireEvent.click(screen.getByTestId('terms-checkbox'));
     fireEvent.click(screen.getByTestId('submit-button'));
 
@@ -497,14 +480,11 @@ describe('OfferCreation Component', () => {
   test('shows error when terms are not accepted', async () => {
     renderComponent();
 
-    // Navigate to final step
     await navigateToFinalStep();
 
-    // Try to submit without accepting terms
     fireEvent.click(screen.getByTestId('submit-button'));
 
     await waitFor(() => {
-      // Check for the error that's actually displayed in the mock component
       expect(screen.getByText('Musisz zaakceptować regulamin')).toBeInTheDocument();
     });
 
@@ -518,12 +498,9 @@ describe('OfferCreation Component', () => {
 
     await navigateToFinalStep();
 
-    // Accept terms and submit
     fireEvent.click(screen.getByTestId('terms-checkbox'));
     fireEvent.click(screen.getByTestId('submit-button'));
 
-    // Since API errors are handled by the main component and we're using mocks,
-    // we just verify the API was called and failed
     await waitFor(() => {
       expect(mockCreateOffer).toHaveBeenCalled();
     });
@@ -534,7 +511,6 @@ describe('OfferCreation Component', () => {
 
     await navigateToFinalStep();
 
-    // Accept terms and submit
     fireEvent.click(screen.getByTestId('terms-checkbox'));
     fireEvent.click(screen.getByTestId('submit-button'));
 
@@ -553,13 +529,11 @@ describe('OfferCreation Component', () => {
       );
     });
 
-    // Verify that termsAccepted and imageFiles are not included
     const callArguments = mockCreateOffer.mock.calls[0][0];
     expect(callArguments).not.toHaveProperty('termsAccepted');
     expect(callArguments).not.toHaveProperty('imageFiles');
   });
 
-  // Helper functions
   const fillValidBasicInfo = async () => {
     fireEvent.change(screen.getByTestId('title-input'), {
       target: { value: 'Test Car Title' },
@@ -588,7 +562,6 @@ describe('OfferCreation Component', () => {
   };
 
   const navigateToFinalStep = async () => {
-    // Step 1
     await fillValidBasicInfo();
     fireEvent.click(screen.getByTestId('next-button'));
 
@@ -596,7 +569,6 @@ describe('OfferCreation Component', () => {
       expect(screen.getByTestId('vehicle-details-step')).toBeInTheDocument();
     });
 
-    // Step 2
     await fillValidVehicleDetails();
     fireEvent.click(screen.getByTestId('next-button'));
 
@@ -604,7 +576,6 @@ describe('OfferCreation Component', () => {
       expect(screen.getByTestId('equipment-step')).toBeInTheDocument();
     });
 
-    // Step 3
     fireEvent.click(screen.getByTestId('next-button'));
 
     await waitFor(() => {

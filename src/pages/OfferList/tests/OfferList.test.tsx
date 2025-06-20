@@ -98,7 +98,6 @@ vi.mock('../../../components/AdvancedFilter/AdvancedFilter', () => ({
     const handleSearch = () => {
       onLoading(true);
 
-      // Simulate API delay
       setTimeout(() => {
         const mockResults: SearchResponse<MiniOffer> = {
           content: mockOffers,
@@ -124,12 +123,10 @@ vi.mock('../../../components/AdvancedFilter/AdvancedFilter', () => ({
   },
 }));
 
-// Mock constants
 vi.mock('../../../util/constants.tsx', () => ({
   DEFAULT_CAR_IMAGE: 'default-car.png',
 }));
 
-// Mock translations
 vi.mock('../../../translations/carEquipmentTranslations', () => ({
   translations: {
     fuelType: {
@@ -141,7 +138,6 @@ vi.mock('../../../translations/carEquipmentTranslations', () => ({
   },
 }));
 
-// Mock environment
 Object.defineProperty(import.meta, 'env', {
   value: {
     VITE_API_URL: 'http://localhost:8137',
@@ -149,13 +145,11 @@ Object.defineProperty(import.meta, 'env', {
   writable: true,
 });
 
-// Mock window.scrollTo
 Object.defineProperty(window, 'scrollTo', {
   value: mockScrollTo,
   writable: true,
 });
 
-// Mock window.innerWidth
 Object.defineProperty(window, 'innerWidth', {
   value: 1024,
   writable: true,
@@ -245,7 +239,6 @@ describe('OfferList Component', () => {
   test('displays offers when search results are provided', async () => {
     renderComponent();
 
-    // Trigger search from advanced filter
     fireEvent.click(screen.getByTestId('search-button'));
 
     await waitFor(() => {
@@ -260,7 +253,6 @@ describe('OfferList Component', () => {
 
     fireEvent.click(screen.getByTestId('search-button'));
 
-    // Should show loading indicator
     expect(screen.getByText('Ładowanie ofert...')).toBeInTheDocument();
 
     await waitFor(() => {
@@ -280,7 +272,6 @@ describe('OfferList Component', () => {
       expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
     });
 
-    // Find the clickable container for BMW offer
     const offerCard = screen.getByText('BMW X5 2020').closest('.offer-clickable');
     fireEvent.click(offerCard!);
 
@@ -307,7 +298,6 @@ describe('OfferList Component', () => {
       expect(screen.getByTestId('compare-checkbox-1')).toBeInTheDocument();
     });
 
-    // Check the comparison checkbox
     fireEvent.click(screen.getByTestId('compare-checkbox-1'));
 
     expect(mockAddToComparison).toHaveBeenCalledWith(mockOffers[0]);
@@ -330,8 +320,8 @@ describe('OfferList Component', () => {
       const checkbox1 = screen.getByTestId('compare-checkbox-1');
       const checkbox3 = screen.getByTestId('compare-checkbox-3');
 
-      expect(checkbox1).not.toBeDisabled(); // Selected offer should not be disabled
-      expect(checkbox3).toBeDisabled(); // Unselected offer should be disabled when limit reached
+      expect(checkbox1).not.toBeDisabled();
+      expect(checkbox3).toBeDisabled();
     });
   });
 
@@ -346,7 +336,6 @@ describe('OfferList Component', () => {
     fireEvent.click(screen.getByTestId('search-button'));
 
     await waitFor(() => {
-      // Component should handle empty mainImage gracefully
       expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
     });
   });
@@ -362,10 +351,6 @@ describe('OfferList Component', () => {
     };
 
     renderComponent();
-
-    // We need to simulate the AdvancedFilter calling onSearch with empty results
-    // Since we can't easily access the callback, we'll test the no results state differently
-    // by ensuring the component handles empty arrays properly
 
     await waitFor(() => {
       expect(
@@ -392,7 +377,6 @@ describe('OfferList Component', () => {
     fireEvent.click(screen.getByTestId('search-button'));
 
     await waitFor(() => {
-      // With only one page, pagination should not be visible
       expect(screen.queryByText('>')).not.toBeInTheDocument();
       expect(screen.queryByText('<')).not.toBeInTheDocument();
     });
@@ -420,14 +404,10 @@ describe('OfferList Component', () => {
 
     renderComponent();
 
-    // The truncation logic is tested implicitly when offers are rendered
-    // The actual truncation happens in the component's truncateText function
-
     await waitFor(() => {
       expect(screen.getByTestId('advanced-filter')).toBeInTheDocument();
     });
 
-    // Reset to desktop width
     Object.defineProperty(window, 'innerWidth', {
       value: 1024,
       writable: true,
@@ -470,7 +450,6 @@ describe('OfferList Component', () => {
 
     renderComponent();
 
-    // The component should handle missing/empty data by showing "Brak danych"
     await waitFor(() => {
       expect(screen.getByTestId('advanced-filter')).toBeInTheDocument();
     });
@@ -481,7 +460,6 @@ describe('OfferList Component', () => {
 
     renderComponent();
 
-    // Test that component handles invalid results gracefully
     expect(screen.getByTestId('advanced-filter')).toBeInTheDocument();
 
     consoleSpy.mockRestore();

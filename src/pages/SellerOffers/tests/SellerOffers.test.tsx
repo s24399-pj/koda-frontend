@@ -107,12 +107,10 @@ vi.mock('../../../components/ComparisonBar/ComparisonBar', () => ({
   ),
 }));
 
-// Mock constants
 vi.mock('../../../util/constants.tsx', () => ({
   DEFAULT_CAR_IMAGE: 'default-car.png',
 }));
 
-// Mock translations
 vi.mock('../../../translations/carEquipmentTranslations', () => ({
   translations: {
     fuelType: {
@@ -124,7 +122,6 @@ vi.mock('../../../translations/carEquipmentTranslations', () => ({
   },
 }));
 
-// Mock environment
 Object.defineProperty(import.meta, 'env', {
   value: {
     VITE_API_URL: 'http://localhost:8137',
@@ -132,7 +129,6 @@ Object.defineProperty(import.meta, 'env', {
   writable: true,
 });
 
-// Mock browser APIs
 Object.defineProperty(window, 'scrollTo', {
   value: mockScrollTo,
   writable: true,
@@ -342,7 +338,6 @@ describe('SellerOffers Component', () => {
       expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
     });
 
-    // Find the clickable container for BMW offer
     const offerCard = screen.getByText('BMW X5 2020').closest('.offer-clickable');
     fireEvent.click(offerCard!);
 
@@ -398,8 +393,8 @@ describe('SellerOffers Component', () => {
       const checkbox1 = screen.getByTestId('compare-checkbox-1');
       const checkbox2 = screen.getByTestId('compare-checkbox-2');
 
-      expect(checkbox1).not.toBeDisabled(); // Selected offer should not be disabled
-      expect(checkbox2).not.toBeDisabled(); // Selected offer should not be disabled
+      expect(checkbox1).not.toBeDisabled();
+      expect(checkbox2).not.toBeDisabled();
     });
   });
 
@@ -435,13 +430,11 @@ describe('SellerOffers Component', () => {
 
     const image = screen.getByAltText('BMW X5 2020') as HTMLImageElement;
 
-    // First error
     fireEvent.error(image);
     expect(image.dataset.errorHandled).toBe('true');
 
     const firstSrc = image.src;
 
-    // Second error should not change src again
     fireEvent.error(image);
     expect(image.src).toBe(firstSrc);
   });
@@ -498,7 +491,6 @@ describe('SellerOffers Component', () => {
       expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
     });
 
-    // Should still show offers even if seller details fail
     expect(screen.getByText('Oferty sprzedającego')).toBeInTheDocument();
     expect(consoleSpy).toHaveBeenCalledWith('Failed to fetch seller data:', expect.any(Error));
 
@@ -514,7 +506,6 @@ describe('SellerOffers Component', () => {
       expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
     });
 
-    // Wait for the setTimeout to complete
     await waitFor(
       () => {
         expect(mockScrollTo).toHaveBeenCalledWith(0, 800);
@@ -567,7 +558,6 @@ describe('SellerOffers Component', () => {
 
     await waitFor(() => {
       expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
-      // Location should not be displayed when empty
       expect(screen.queryByText('Lokalizacja:')).not.toBeInTheDocument();
     });
   });
@@ -610,7 +600,6 @@ describe('SellerOffers Component', () => {
   });
 
   test('handles offers count pluralization correctly', async () => {
-    // Test with 1 offer
     mockGetOffersBySeller.mockResolvedValue({
       content: [mockApiOffers[0]],
       totalPages: 1,
@@ -625,7 +614,6 @@ describe('SellerOffers Component', () => {
       expect(screen.getByText(/Znaleziono 1 ofertę/)).toBeInTheDocument();
     });
 
-    // Test with 5 offers (should use "ofert")
     const fiveOffers = Array(5)
       .fill(null)
       .map((_, i) => ({ ...mockApiOffers[0], id: `${i + 1}` }));

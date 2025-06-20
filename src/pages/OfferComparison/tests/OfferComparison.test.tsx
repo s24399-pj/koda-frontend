@@ -245,7 +245,6 @@ describe('OfferComparison Component', () => {
       expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
     });
 
-    // Click the first suggestion (BMW X5 2020)
     const suggestions = screen.getAllByText('BMW X5 2020');
     fireEvent.click(suggestions[0]);
 
@@ -267,7 +266,6 @@ describe('OfferComparison Component', () => {
 
     renderComponent();
 
-    // Select first offer
     const input1 = screen.getByPlaceholderText('Wpisz nazwę pierwszego auta');
     fireEvent.change(input1, { target: { value: 'BMW' } });
     fireEvent.focus(input1);
@@ -279,12 +277,10 @@ describe('OfferComparison Component', () => {
     const bmwSuggestions = screen.getAllByText('BMW X5 2020');
     fireEvent.click(bmwSuggestions[0]);
 
-    // Wait for first selection to complete and clear suggestions
     await waitFor(() => {
       expect(input1).toHaveValue('BMW X5 2020');
     });
 
-    // Select second offer
     const input2 = screen.getByPlaceholderText('Wpisz nazwę drugiego auta');
     fireEvent.change(input2, { target: { value: 'Audi' } });
     fireEvent.focus(input2);
@@ -295,7 +291,7 @@ describe('OfferComparison Component', () => {
     });
 
     const audiSuggestions = screen.getAllByText('Audi Q7 2019');
-    fireEvent.click(audiSuggestions[audiSuggestions.length - 1]); // Click the last one (from second list)
+    fireEvent.click(audiSuggestions[audiSuggestions.length - 1]);
 
     await waitFor(() => {
       expect(screen.getByText('Wyczyść porównanie')).toBeInTheDocument();
@@ -320,7 +316,6 @@ describe('OfferComparison Component', () => {
 
     renderComponent();
 
-    // Select both offers
     const input1 = screen.getByPlaceholderText('Wpisz nazwę pierwszego auta');
     fireEvent.change(input1, { target: { value: 'BMW' } });
     fireEvent.focus(input1);
@@ -350,7 +345,6 @@ describe('OfferComparison Component', () => {
     fireEvent.click(audiSuggestions[audiSuggestions.length - 1]);
 
     await waitFor(() => {
-      // Check that better values are highlighted
       const highlightedCells = document.querySelectorAll('.highlight');
       expect(highlightedCells.length).toBeGreaterThan(0);
     });
@@ -369,7 +363,6 @@ describe('OfferComparison Component', () => {
 
     renderComponent();
 
-    // Select both offers first
     const input1 = screen.getByPlaceholderText('Wpisz nazwę pierwszego auta');
     fireEvent.change(input1, { target: { value: 'BMW' } });
     fireEvent.focus(input1);
@@ -402,7 +395,6 @@ describe('OfferComparison Component', () => {
       expect(screen.getByText('Wyczyść porównanie')).toBeInTheDocument();
     });
 
-    // Reset
     fireEvent.click(screen.getByText('Wyczyść porównanie'));
 
     expect(input1).toHaveValue('');
@@ -557,13 +549,11 @@ describe('OfferComparison Component', () => {
 
     const image = screen.getByAltText('BMW X5 2020') as HTMLImageElement;
 
-    // First error
     fireEvent.error(image);
     expect(image.dataset.errorHandled).toBe('true');
 
     const firstSrc = image.src;
 
-    // Second error should not change src again
     fireEvent.error(image);
     expect(image.src).toBe(firstSrc);
   });
@@ -574,7 +564,6 @@ describe('OfferComparison Component', () => {
     const input1 = screen.getByPlaceholderText('Wpisz nazwę pierwszego auta');
     fireEvent.change(input1, { target: { value: 'B' } });
 
-    // Wait to ensure no search is triggered
     await new Promise(resolve => setTimeout(resolve, 400));
 
     expect(mockAxios.get).not.toHaveBeenCalled();

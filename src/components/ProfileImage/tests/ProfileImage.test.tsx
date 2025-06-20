@@ -16,7 +16,6 @@ describe('ProfileImage Component', () => {
     const bytes = new Uint8Array([72, 101, 108, 108, 111]); // 'Hello'
     render(<ProfileImage imageData={bytes} alt="Hello" size="large" className="custom" />);
     const img = screen.getByRole('img');
-    // Manually compute base64
     const binary = String.fromCharCode(...Array.from(bytes));
     const base64 = btoa(binary);
     expect(img).toHaveAttribute('src', `data:image/jpeg;base64,${base64}`);
@@ -27,13 +26,11 @@ describe('ProfileImage Component', () => {
     const bytes = new Uint8Array([0xff]); // invalid JPEG header
     render(<ProfileImage imageData={bytes} alt="Invalid" />);
     const img = screen.getByRole('img');
-    // simulate image loading error
     fireEvent.error(img);
     expect(img).toHaveAttribute('src', DEFAULT_PROFILE_IMAGE);
   });
 
   it('handles btoa exceptions and still renders default image', () => {
-    // mock btoa to throw
     const originalBtoa = global.btoa;
     global.btoa = vi.fn(() => {
       throw new Error('fail');

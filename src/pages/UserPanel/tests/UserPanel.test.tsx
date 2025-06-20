@@ -139,7 +139,6 @@ describe('UserPanel Component', () => {
     const profileImage = screen.getAllByAltText('Zdjęcie profilowe')[0];
     fireEvent.error(profileImage);
 
-    // Should fallback to default avatar
     expect(profileImage.getAttribute('src')).toContain('data:image/svg+xml');
   });
 
@@ -171,7 +170,6 @@ describe('UserPanel Component', () => {
       expect(screen.getByText('John Doe')).toBeInTheDocument();
     });
 
-    // Click on the navigation tab in the sidebar
     const navigation = screen.getByRole('navigation');
     const offersTab = within(navigation).getByText('Moje Ogłoszenia');
     fireEvent.click(offersTab);
@@ -310,7 +308,6 @@ describe('UserPanel Component', () => {
       expect(confirmPasswordInput).toHaveValue('newpassword');
 
       fireEvent.click(submitButton);
-      // Note: No actual API call is implemented in the component yet
     });
   });
 
@@ -337,8 +334,6 @@ describe('UserPanel Component', () => {
     fireEvent.change(screen.getByLabelText('Wybierz nowe zdjęcie'), {
       target: { files: [file] },
     });
-
-    // Note: File handling logic would need to be implemented in the component
   });
 
   test('handles edit profile button click', async () => {
@@ -351,7 +346,6 @@ describe('UserPanel Component', () => {
     const editButton = screen.getByText('Edytuj profil');
     fireEvent.click(editButton);
 
-    // Note: Edit functionality would need to be implemented
     expect(editButton).toBeInTheDocument();
   });
 
@@ -370,7 +364,6 @@ describe('UserPanel Component', () => {
       const removeButton = screen.getByText('Usuń zdjęcie');
       fireEvent.click(removeButton);
 
-      // Note: Remove image functionality would need to be implemented
       expect(removeButton).toBeInTheDocument();
     });
   });
@@ -390,7 +383,6 @@ describe('UserPanel Component', () => {
       const deleteButton = screen.getByRole('button', { name: 'Usuń konto' });
       fireEvent.click(deleteButton);
 
-      // Note: Delete account functionality would need to be implemented
       expect(deleteButton).toBeInTheDocument();
     });
   });
@@ -407,20 +399,16 @@ describe('UserPanel Component', () => {
     const offersTab = within(navigation).getByText('Moje Ogłoszenia');
     const settingsTab = within(navigation).getByText('Ustawienia Konta');
 
-    // Start with profile tab
     expect(profileTab.closest('li')).toHaveClass('active');
 
-    // Switch to offers
     fireEvent.click(offersTab);
     expect(offersTab.closest('li')).toHaveClass('active');
     expect(profileTab.closest('li')).not.toHaveClass('active');
 
-    // Switch to settings
     fireEvent.click(settingsTab);
     expect(settingsTab.closest('li')).toHaveClass('active');
     expect(offersTab.closest('li')).not.toHaveClass('active');
 
-    // Switch back to profile
     fireEvent.click(profileTab);
     expect(profileTab.closest('li')).toHaveClass('active');
     expect(settingsTab.closest('li')).not.toHaveClass('active');
@@ -441,7 +429,6 @@ describe('UserPanel Component', () => {
     expect(screen.queryByTestId('user-offers')).not.toBeInTheDocument();
     expect(screen.queryByText('Ustawienia konta')).not.toBeInTheDocument();
 
-    // Switch to offers tab
     fireEvent.click(offersTab);
     await waitFor(() => {
       expect(screen.getByTestId('user-offers')).toBeInTheDocument();
@@ -449,7 +436,6 @@ describe('UserPanel Component', () => {
       expect(screen.queryByText('Ustawienia konta')).not.toBeInTheDocument();
     });
 
-    // Switch to settings tab
     fireEvent.click(settingsTab);
     await waitFor(() => {
       expect(screen.getByText('Ustawienia konta')).toBeInTheDocument();
