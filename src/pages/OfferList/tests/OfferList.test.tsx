@@ -1,488 +1,489 @@
-import React from 'react';
-import {fireEvent, render, screen, waitFor} from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import {beforeEach, describe, expect, test, vi} from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import OfferList from '../OfferList';
-import {MiniOffer} from '../../../types/miniOfferTypes';
-import {SearchResponse} from '../../../api/offerApi';
+import { MiniOffer } from '../../../types/miniOfferTypes';
+import { SearchResponse } from '../../../api/offerApi';
 
-const {
-    mockUseTitle,
-    mockUseNavigate,
-    mockUseComparison,
-    mockOfferApiService,
-    mockScrollTo
-} = vi.hoisted(() => ({
+const { mockUseTitle, mockUseNavigate, mockUseComparison, mockOfferApiService, mockScrollTo } =
+  vi.hoisted(() => ({
     mockUseTitle: vi.fn(),
     mockUseNavigate: vi.fn(),
     mockUseComparison: vi.fn(),
     mockOfferApiService: {
-        searchOffers: vi.fn()
+      searchOffers: vi.fn(),
     },
-    mockScrollTo: vi.fn()
-}));
+    mockScrollTo: vi.fn(),
+  }));
 
-// Mock hooks
 vi.mock('../../../hooks/useTitle', () => ({
-    default: mockUseTitle
+  default: mockUseTitle,
 }));
 
 vi.mock('react-router-dom', () => ({
-    useNavigate: mockUseNavigate
+  useNavigate: mockUseNavigate,
 }));
 
 vi.mock('../../../context/ComparisonContext', () => ({
-    useComparison: mockUseComparison
+  useComparison: mockUseComparison,
 }));
 
-// Mock API service
 vi.mock('../../../api/offerApi', () => ({
-    default: mockOfferApiService
+  default: mockOfferApiService,
 }));
 
-// Mock components
 vi.mock('../../../components/LikeButton/LikeButton', () => ({
-    default: ({offerId}: { offerId: string }) => (
-        <button data-testid={`like-button-${offerId}`}>❤️</button>
-    )
+  default: ({ offerId }: { offerId: string }) => (
+    <button data-testid={`like-button-${offerId}`}>❤️</button>
+  ),
 }));
 
 vi.mock('../../../components/CompareCheckbox/CompareCheckbox', () => ({
-    default: ({offerId, isSelected, isDisabled, onToggle}: {
-        offerId: string,
-        isSelected: boolean,
-        isDisabled: boolean,
-        onToggle: (id: string, checked: boolean) => void
-    }) => (
-        <input
-            data-testid={`compare-checkbox-${offerId}`}
-            type="checkbox"
-            checked={isSelected}
-            disabled={isDisabled}
-            onChange={(e) => onToggle(offerId, e.target.checked)}
-        />
-    )
+  default: ({
+    offerId,
+    isSelected,
+    isDisabled,
+    onToggle,
+  }: {
+    offerId: string;
+    isSelected: boolean;
+    isDisabled: boolean;
+    onToggle: (id: string, checked: boolean) => void;
+  }) => (
+    <input
+      data-testid={`compare-checkbox-${offerId}`}
+      type="checkbox"
+      checked={isSelected}
+      disabled={isDisabled}
+      onChange={e => onToggle(offerId, e.target.checked)}
+    />
+  ),
 }));
 
 vi.mock('../../../components/ComparisonBar/ComparisonBar', () => ({
-    default: ({selectedOffers, removeFromComparison}: {
-        selectedOffers: MiniOffer[],
-        removeFromComparison: (id: string) => void
-    }) => (
-        <div data-testid="comparison-bar">
-            {selectedOffers.length > 0 && (
-                <div>
-                    <span>Porównywane oferty: {selectedOffers.length}</span>
-                    {selectedOffers.map(offer => (
-                        <button
-                            key={offer.id}
-                            onClick={() => removeFromComparison(offer.id)}
-                            data-testid={`remove-from-comparison-${offer.id}`}
-                        >
-                            Usuń {offer.title}
-                        </button>
-                    ))}
-                </div>
-            )}
+  default: ({
+    selectedOffers,
+    removeFromComparison,
+  }: {
+    selectedOffers: MiniOffer[];
+    removeFromComparison: (id: string) => void;
+  }) => (
+    <div data-testid="comparison-bar">
+      {selectedOffers.length > 0 && (
+        <div>
+          <span>Porównywane oferty: {selectedOffers.length}</span>
+          {selectedOffers.map(offer => (
+            <button
+              key={offer.id}
+              onClick={() => removeFromComparison(offer.id)}
+              data-testid={`remove-from-comparison-${offer.id}`}
+            >
+              Usuń {offer.title}
+            </button>
+          ))}
         </div>
-    )
+      )}
+    </div>
+  ),
 }));
 
 vi.mock('../../../components/AdvancedFilter/AdvancedFilter', () => ({
-    default: ({onSearch, onLoading}: {
-        onSearch: (results: SearchResponse<MiniOffer>) => void,
-        onLoading: (loading: boolean) => void
-    }) => {
-        const handleSearch = () => {
-            onLoading(true);
+  default: ({
+    onSearch,
+    onLoading,
+  }: {
+    onSearch: (results: SearchResponse<MiniOffer>) => void;
+    onLoading: (loading: boolean) => void;
+  }) => {
+    const handleSearch = () => {
+      onLoading(true);
 
-            // Simulate API delay
-            setTimeout(() => {
-                const mockResults: SearchResponse<MiniOffer> = {
-                    content: mockOffers,
-                    totalPages: 2,
-                    number: 0,
-                    size: 10,
-                    totalElements: 15,
-                    empty: false
-                };
-                onSearch(mockResults);
-                onLoading(false);
-            }, 100);
+      // Simulate API delay
+      setTimeout(() => {
+        const mockResults: SearchResponse<MiniOffer> = {
+          content: mockOffers,
+          totalPages: 2,
+          number: 0,
+          size: 10,
+          totalElements: 15,
+          empty: false,
         };
+        onSearch(mockResults);
+        onLoading(false);
+      }, 100);
+    };
 
-        return (
-            <div data-testid="advanced-filter">
-                <input
-                    data-testid="filter-input"
-                    placeholder="Wyszukaj oferty"
-                />
-                <button data-testid="search-button" onClick={handleSearch}>
-                    Szukaj
-                </button>
-            </div>
-        );
-    }
+    return (
+      <div data-testid="advanced-filter">
+        <input data-testid="filter-input" placeholder="Wyszukaj oferty" />
+        <button data-testid="search-button" onClick={handleSearch}>
+          Szukaj
+        </button>
+      </div>
+    );
+  },
 }));
 
 // Mock constants
 vi.mock('../../../util/constants.tsx', () => ({
-    DEFAULT_CAR_IMAGE: 'default-car.png'
+  DEFAULT_CAR_IMAGE: 'default-car.png',
 }));
 
 // Mock translations
 vi.mock('../../../translations/carEquipmentTranslations', () => ({
-    translations: {
-        fuelType: {
-            'Benzyna': 'Benzyna',
-            'Diesel': 'Diesel',
-            'Elektryczny': 'Elektryczny',
-            'Hybryda': 'Hybryda'
-        }
-    }
+  translations: {
+    fuelType: {
+      Benzyna: 'Benzyna',
+      Diesel: 'Diesel',
+      Elektryczny: 'Elektryczny',
+      Hybryda: 'Hybryda',
+    },
+  },
 }));
 
 // Mock environment
 Object.defineProperty(import.meta, 'env', {
-    value: {
-        VITE_API_URL: 'http://localhost:8137'
-    },
-    writable: true
+  value: {
+    VITE_API_URL: 'http://localhost:8137',
+  },
+  writable: true,
 });
 
 // Mock window.scrollTo
 Object.defineProperty(window, 'scrollTo', {
-    value: mockScrollTo,
-    writable: true
+  value: mockScrollTo,
+  writable: true,
 });
 
 // Mock window.innerWidth
 Object.defineProperty(window, 'innerWidth', {
-    value: 1024,
-    writable: true
+  value: 1024,
+  writable: true,
 });
 
 const mockOffers: MiniOffer[] = [
-    {
-        id: '1',
-        title: 'BMW X5 2020',
-        price: 150000,
-        mainImage: '/images/bmw-1.jpg',
-        year: 2020,
-        mileage: 50000,
-        fuelType: 'Benzyna',
-        enginePower: 265,
-        displacement: '3.0L'
-    },
-    {
-        id: '2',
-        title: 'Audi Q7 2019',
-        price: 140000,
-        mainImage: '/images/audi-1.jpg',
-        year: 2019,
-        mileage: 60000,
-        fuelType: 'Diesel',
-        enginePower: 250,
-        displacement: '3.0L'
-    },
-    {
-        id: '3',
-        title: 'Tesla Model S 2021',
-        price: 200000,
-        mainImage: '/images/tesla-1.jpg',
-        year: 2021,
-        mileage: 30000,
-        fuelType: 'Elektryczny',
-        enginePower: 400,
-        displacement: 'N/A'
-    }
+  {
+    id: '1',
+    title: 'BMW X5 2020',
+    price: 150000,
+    mainImage: '/images/bmw-1.jpg',
+    year: 2020,
+    mileage: 50000,
+    fuelType: 'Benzyna',
+    enginePower: 265,
+    displacement: '3.0L',
+  },
+  {
+    id: '2',
+    title: 'Audi Q7 2019',
+    price: 140000,
+    mainImage: '/images/audi-1.jpg',
+    year: 2019,
+    mileage: 60000,
+    fuelType: 'Diesel',
+    enginePower: 250,
+    displacement: '3.0L',
+  },
+  {
+    id: '3',
+    title: 'Tesla Model S 2021',
+    price: 200000,
+    mainImage: '/images/tesla-1.jpg',
+    year: 2021,
+    mileage: 30000,
+    fuelType: 'Elektryczny',
+    enginePower: 400,
+    displacement: 'N/A',
+  },
 ];
 
 const mockSearchResponse: SearchResponse<MiniOffer> = {
-    content: mockOffers,
-    totalPages: 1,
-    number: 0,
-    size: 10,
-    totalElements: 3,
-    empty: false
+  content: mockOffers,
+  totalPages: 1,
+  number: 0,
+  size: 10,
+  totalElements: 3,
+  empty: false,
 };
 
 const renderComponent = () => {
-    return render(<OfferList/>);
+  return render(<OfferList />);
 };
 
 describe('OfferList Component', () => {
-    beforeEach(() => {
-        vi.clearAllMocks();
-        mockUseTitle.mockReset();
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockUseTitle.mockReset();
 
-        const mockNavigate = vi.fn();
-        mockUseNavigate.mockReturnValue(mockNavigate);
+    const mockNavigate = vi.fn();
+    mockUseNavigate.mockReturnValue(mockNavigate);
 
-        mockUseComparison.mockReturnValue({
-            selectedOffers: [],
-            addToComparison: vi.fn(),
-            removeFromComparison: vi.fn(),
-            isOfferSelected: vi.fn().mockReturnValue(false),
-            canAddMoreOffers: vi.fn().mockReturnValue(true)
-        });
-
-        mockOfferApiService.searchOffers.mockResolvedValue(mockSearchResponse);
+    mockUseComparison.mockReturnValue({
+      selectedOffers: [],
+      addToComparison: vi.fn(),
+      removeFromComparison: vi.fn(),
+      isOfferSelected: vi.fn().mockReturnValue(false),
+      canAddMoreOffers: vi.fn().mockReturnValue(true),
     });
 
-    test('calls useTitle with correct title', () => {
-        renderComponent();
-        expect(mockUseTitle).toHaveBeenCalledWith('Dostępne oferty');
+    mockOfferApiService.searchOffers.mockResolvedValue(mockSearchResponse);
+  });
+
+  test('calls useTitle with correct title', () => {
+    renderComponent();
+    expect(mockUseTitle).toHaveBeenCalledWith('Dostępne oferty');
+  });
+
+  test('renders main UI elements', () => {
+    renderComponent();
+
+    expect(screen.getByText('Dostępne oferty')).toBeInTheDocument();
+    expect(screen.getByTestId('advanced-filter')).toBeInTheDocument();
+    expect(screen.getByTestId('comparison-bar')).toBeInTheDocument();
+  });
+
+  test('displays offers when search results are provided', async () => {
+    renderComponent();
+
+    // Trigger search from advanced filter
+    fireEvent.click(screen.getByTestId('search-button'));
+
+    await waitFor(() => {
+      expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
+      expect(screen.getByText('Audi Q7 2019')).toBeInTheDocument();
+      expect(screen.getByText('Tesla Model S 2021')).toBeInTheDocument();
+    });
+  });
+
+  test('shows loading state during search', async () => {
+    renderComponent();
+
+    fireEvent.click(screen.getByTestId('search-button'));
+
+    // Should show loading indicator
+    expect(screen.getByText('Ładowanie ofert...')).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.queryByText('Ładowanie ofert...')).not.toBeInTheDocument();
+    });
+  });
+
+  test('handles offer click navigation', async () => {
+    const mockNavigate = vi.fn();
+    mockUseNavigate.mockReturnValue(mockNavigate);
+
+    renderComponent();
+
+    fireEvent.click(screen.getByTestId('search-button'));
+
+    await waitFor(() => {
+      expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
     });
 
-    test('renders main UI elements', () => {
-        renderComponent();
+    // Find the clickable container for BMW offer
+    const offerCard = screen.getByText('BMW X5 2020').closest('.offer-clickable');
+    fireEvent.click(offerCard!);
 
-        expect(screen.getByText('Dostępne oferty')).toBeInTheDocument();
-        expect(screen.getByTestId('advanced-filter')).toBeInTheDocument();
-        expect(screen.getByTestId('comparison-bar')).toBeInTheDocument();
+    expect(mockNavigate).toHaveBeenCalledWith('/offer/1');
+  });
+
+  test('handles comparison checkbox toggle', async () => {
+    const mockAddToComparison = vi.fn();
+    const mockRemoveFromComparison = vi.fn();
+
+    mockUseComparison.mockReturnValue({
+      selectedOffers: [],
+      addToComparison: mockAddToComparison,
+      removeFromComparison: mockRemoveFromComparison,
+      isOfferSelected: vi.fn().mockReturnValue(false),
+      canAddMoreOffers: vi.fn().mockReturnValue(true),
     });
 
-    test('displays offers when search results are provided', async () => {
-        renderComponent();
+    renderComponent();
 
-        // Trigger search from advanced filter
-        fireEvent.click(screen.getByTestId('search-button'));
+    fireEvent.click(screen.getByTestId('search-button'));
 
-        await waitFor(() => {
-            expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
-            expect(screen.getByText('Audi Q7 2019')).toBeInTheDocument();
-            expect(screen.getByText('Tesla Model S 2021')).toBeInTheDocument();
-        });
+    await waitFor(() => {
+      expect(screen.getByTestId('compare-checkbox-1')).toBeInTheDocument();
     });
 
-    test('shows loading state during search', async () => {
-        renderComponent();
+    // Check the comparison checkbox
+    fireEvent.click(screen.getByTestId('compare-checkbox-1'));
 
-        fireEvent.click(screen.getByTestId('search-button'));
+    expect(mockAddToComparison).toHaveBeenCalledWith(mockOffers[0]);
+  });
 
-        // Should show loading indicator
-        expect(screen.getByText('Ładowanie ofert...')).toBeInTheDocument();
-
-        await waitFor(() => {
-            expect(screen.queryByText('Ładowanie ofert...')).not.toBeInTheDocument();
-        });
+  test('disables comparison checkbox when limit reached', async () => {
+    mockUseComparison.mockReturnValue({
+      selectedOffers: [mockOffers[0], mockOffers[1]],
+      addToComparison: vi.fn(),
+      removeFromComparison: vi.fn(),
+      isOfferSelected: (id: string) => id === '1' || id === '2',
+      canAddMoreOffers: vi.fn().mockReturnValue(false),
     });
 
-    test('handles offer click navigation', async () => {
-        const mockNavigate = vi.fn();
-        mockUseNavigate.mockReturnValue(mockNavigate);
+    renderComponent();
 
-        renderComponent();
+    fireEvent.click(screen.getByTestId('search-button'));
 
-        fireEvent.click(screen.getByTestId('search-button'));
+    await waitFor(() => {
+      const checkbox1 = screen.getByTestId('compare-checkbox-1');
+      const checkbox3 = screen.getByTestId('compare-checkbox-3');
 
-        await waitFor(() => {
-            expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
-        });
+      expect(checkbox1).not.toBeDisabled(); // Selected offer should not be disabled
+      expect(checkbox3).toBeDisabled(); // Unselected offer should be disabled when limit reached
+    });
+  });
 
-        // Find the clickable container for BMW offer
-        const offerCard = screen.getByText('BMW X5 2020').closest('.offer-clickable');
-        fireEvent.click(offerCard!);
+  test('displays fallback for offers without images', async () => {
+    const offerWithoutImage: MiniOffer = {
+      ...mockOffers[0],
+      mainImage: '',
+    };
 
-        expect(mockNavigate).toHaveBeenCalledWith('/offer/1');
+    renderComponent();
+
+    fireEvent.click(screen.getByTestId('search-button'));
+
+    await waitFor(() => {
+      // Component should handle empty mainImage gracefully
+      expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
+    });
+  });
+
+  test('shows no results message when no offers found', async () => {
+    const emptyResponse: SearchResponse<MiniOffer> = {
+      content: [],
+      totalPages: 0,
+      number: 0,
+      size: 10,
+      totalElements: 0,
+      empty: true,
+    };
+
+    renderComponent();
+
+    // We need to simulate the AdvancedFilter calling onSearch with empty results
+    // Since we can't easily access the callback, we'll test the no results state differently
+    // by ensuring the component handles empty arrays properly
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Brak ofert spełniających kryteria wyszukiwania')
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText('Spróbuj zmienić filtry lub rozszerzyć kryteria wyszukiwania')
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('disables pagination buttons appropriately', async () => {
+    const singlePageResponse: SearchResponse<MiniOffer> = {
+      content: mockOffers,
+      totalPages: 1,
+      number: 0,
+      size: 10,
+      totalElements: 3,
+      empty: false,
+    };
+
+    renderComponent();
+
+    fireEvent.click(screen.getByTestId('search-button'));
+
+    await waitFor(() => {
+      // With only one page, pagination should not be visible
+      expect(screen.queryByText('>')).not.toBeInTheDocument();
+      expect(screen.queryByText('<')).not.toBeInTheDocument();
+    });
+  });
+
+  test('truncates long titles on mobile', async () => {
+    Object.defineProperty(window, 'innerWidth', {
+      value: 600,
+      writable: true,
     });
 
-    test('handles comparison checkbox toggle', async () => {
-        const mockAddToComparison = vi.fn();
-        const mockRemoveFromComparison = vi.fn();
+    const longTitleOffer: MiniOffer = {
+      ...mockOffers[0],
+      title: 'This is a very very very very long title that should be truncated on mobile devices',
+    };
 
-        mockUseComparison.mockReturnValue({
-            selectedOffers: [],
-            addToComparison: mockAddToComparison,
-            removeFromComparison: mockRemoveFromComparison,
-            isOfferSelected: vi.fn().mockReturnValue(false),
-            canAddMoreOffers: vi.fn().mockReturnValue(true)
-        });
+    const longTitleResponse: SearchResponse<MiniOffer> = {
+      content: [longTitleOffer],
+      totalPages: 1,
+      number: 0,
+      size: 10,
+      totalElements: 1,
+      empty: false,
+    };
 
-        renderComponent();
+    renderComponent();
 
-        fireEvent.click(screen.getByTestId('search-button'));
+    // The truncation logic is tested implicitly when offers are rendered
+    // The actual truncation happens in the component's truncateText function
 
-        await waitFor(() => {
-            expect(screen.getByTestId('compare-checkbox-1')).toBeInTheDocument();
-        });
-
-        // Check the comparison checkbox
-        fireEvent.click(screen.getByTestId('compare-checkbox-1'));
-
-        expect(mockAddToComparison).toHaveBeenCalledWith(mockOffers[0]);
+    await waitFor(() => {
+      expect(screen.getByTestId('advanced-filter')).toBeInTheDocument();
     });
 
-    test('disables comparison checkbox when limit reached', async () => {
-        mockUseComparison.mockReturnValue({
-            selectedOffers: [mockOffers[0], mockOffers[1]],
-            addToComparison: vi.fn(),
-            removeFromComparison: vi.fn(),
-            isOfferSelected: (id: string) => id === '1' || id === '2',
-            canAddMoreOffers: vi.fn().mockReturnValue(false)
-        });
-
-        renderComponent();
-
-        fireEvent.click(screen.getByTestId('search-button'));
-
-        await waitFor(() => {
-            const checkbox1 = screen.getByTestId('compare-checkbox-1');
-            const checkbox3 = screen.getByTestId('compare-checkbox-3');
-
-            expect(checkbox1).not.toBeDisabled(); // Selected offer should not be disabled
-            expect(checkbox3).toBeDisabled(); // Unselected offer should be disabled when limit reached
-        });
+    // Reset to desktop width
+    Object.defineProperty(window, 'innerWidth', {
+      value: 1024,
+      writable: true,
     });
+  });
 
-    test('displays fallback for offers without images', async () => {
-        const offerWithoutImage: MiniOffer = {
-            ...mockOffers[0],
-            mainImage: ''
-        };
+  test('formats fuel types correctly', async () => {
+    renderComponent();
 
-        renderComponent();
+    fireEvent.click(screen.getByTestId('search-button'));
 
-        fireEvent.click(screen.getByTestId('search-button'));
-
-        await waitFor(() => {
-            // Component should handle empty mainImage gracefully
-            expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
-        });
+    await waitFor(() => {
+      expect(screen.getByText('Benzyna')).toBeInTheDocument();
+      expect(screen.getByText('Diesel')).toBeInTheDocument();
+      expect(screen.getByText('Elektryczny')).toBeInTheDocument();
     });
+  });
 
-    test('shows no results message when no offers found', async () => {
-        const emptyResponse: SearchResponse<MiniOffer> = {
-            content: [],
-            totalPages: 0,
-            number: 0,
-            size: 10,
-            totalElements: 0,
-            empty: true
-        };
+  test('handles missing data gracefully', async () => {
+    const incompleteOffer: MiniOffer = {
+      id: '4',
+      title: 'Incomplete Car',
+      price: 100000,
+      mainImage: '',
+      year: 0,
+      mileage: 0,
+      fuelType: '',
+      enginePower: 0,
+      displacement: '',
+    };
 
-        renderComponent();
+    const incompleteResponse: SearchResponse<MiniOffer> = {
+      content: [incompleteOffer],
+      totalPages: 1,
+      number: 0,
+      size: 10,
+      totalElements: 1,
+      empty: false,
+    };
 
-        // We need to simulate the AdvancedFilter calling onSearch with empty results
-        // Since we can't easily access the callback, we'll test the no results state differently
-        // by ensuring the component handles empty arrays properly
+    renderComponent();
 
-        await waitFor(() => {
-            expect(screen.getByText('Brak ofert spełniających kryteria wyszukiwania')).toBeInTheDocument();
-            expect(screen.getByText('Spróbuj zmienić filtry lub rozszerzyć kryteria wyszukiwania')).toBeInTheDocument();
-        });
+    // The component should handle missing/empty data by showing "Brak danych"
+    await waitFor(() => {
+      expect(screen.getByTestId('advanced-filter')).toBeInTheDocument();
     });
+  });
 
-    test('disables pagination buttons appropriately', async () => {
-        const singlePageResponse: SearchResponse<MiniOffer> = {
-            content: mockOffers,
-            totalPages: 1,
-            number: 0,
-            size: 10,
-            totalElements: 3,
-            empty: false
-        };
+  test('handles invalid search results gracefully', () => {
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-        renderComponent();
+    renderComponent();
 
-        fireEvent.click(screen.getByTestId('search-button'));
+    // Test that component handles invalid results gracefully
+    expect(screen.getByTestId('advanced-filter')).toBeInTheDocument();
 
-        await waitFor(() => {
-            // With only one page, pagination should not be visible
-            expect(screen.queryByText('>')).not.toBeInTheDocument();
-            expect(screen.queryByText('<')).not.toBeInTheDocument();
-        });
-    });
-
-    test('truncates long titles on mobile', async () => {
-        // Mock mobile screen width
-        Object.defineProperty(window, 'innerWidth', {
-            value: 600,
-            writable: true
-        });
-
-        const longTitleOffer: MiniOffer = {
-            ...mockOffers[0],
-            title: 'This is a very very very very long title that should be truncated on mobile devices'
-        };
-
-        const longTitleResponse: SearchResponse<MiniOffer> = {
-            content: [longTitleOffer],
-            totalPages: 1,
-            number: 0,
-            size: 10,
-            totalElements: 1,
-            empty: false
-        };
-
-        renderComponent();
-
-        // The truncation logic is tested implicitly when offers are rendered
-        // The actual truncation happens in the component's truncateText function
-
-        await waitFor(() => {
-            expect(screen.getByTestId('advanced-filter')).toBeInTheDocument();
-        });
-
-        // Reset to desktop width
-        Object.defineProperty(window, 'innerWidth', {
-            value: 1024,
-            writable: true
-        });
-    });
-
-    test('formats fuel types correctly', async () => {
-        renderComponent();
-
-        fireEvent.click(screen.getByTestId('search-button'));
-
-        await waitFor(() => {
-            expect(screen.getByText('Benzyna')).toBeInTheDocument();
-            expect(screen.getByText('Diesel')).toBeInTheDocument();
-            expect(screen.getByText('Elektryczny')).toBeInTheDocument();
-        });
-    });
-
-    test('handles missing data gracefully', async () => {
-        const incompleteOffer: MiniOffer = {
-            id: '4',
-            title: 'Incomplete Car',
-            price: 100000,
-            mainImage: '',
-            year: 0,
-            mileage: 0,
-            fuelType: '',
-            enginePower: 0,
-            displacement: ''
-        };
-
-        const incompleteResponse: SearchResponse<MiniOffer> = {
-            content: [incompleteOffer],
-            totalPages: 1,
-            number: 0,
-            size: 10,
-            totalElements: 1,
-            empty: false
-        };
-
-        renderComponent();
-
-        // The component should handle missing/empty data by showing "Brak danych"
-        await waitFor(() => {
-            expect(screen.getByTestId('advanced-filter')).toBeInTheDocument();
-        });
-    });
-
-    test('handles invalid search results gracefully', () => {
-        const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {
-        });
-
-        renderComponent();
-
-        // Test that component handles invalid results gracefully
-        expect(screen.getByTestId('advanced-filter')).toBeInTheDocument();
-
-        consoleSpy.mockRestore();
-    });
+    consoleSpy.mockRestore();
+  });
 });

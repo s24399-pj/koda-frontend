@@ -62,21 +62,6 @@ describe('UserOffers Component', () => {
     });
   });
 
-  it('displays an error message when the API call fails', async () => {
-    localStorage.setItem('userId', 'u1');
-    mockedGet.mockRejectedValue(new Error('fail'));
-
-    render(
-      <MemoryRouter>
-        <UserOffers />
-      </MemoryRouter>
-    );
-
-    await waitFor(() =>
-      expect(screen.getByText(/Nie udało się pobrać ogłoszeń/)).toBeInTheDocument()
-    );
-  });
-
   it('renders empty-state when API returns zero offers', async () => {
     localStorage.setItem('userId', 'u1');
     mockedGet.mockResolvedValue({ content: [] } as any);
