@@ -1,0 +1,65 @@
+{
+  "name": "Koda - Portal Motoryzacyjny",
+  "short_name": "Koda",
+  "description": "Nowoczesny portal do kupna i sprzedaży samochodów",
+  "id": "/",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0066cc",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "pl",
+  "categories": ["automotive", "marketplace", "shopping"],
+  "icons": [
+    {
+      "src": "/icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/favicon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/home_page.png",
+      "sizes": "1919x1079",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Strona główna portalu Koda"
+    },
+    {
+      "src": "/screenshots/create_offer_page.png",
+      "sizes": "395x856",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Tworzenie ogłoszenia samochodu"
+    }
+  ],
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+koda",
+      "url": "/%s"
+    }
+  ]
+}
