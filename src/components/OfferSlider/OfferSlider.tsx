@@ -7,7 +7,7 @@ import { MiniOffer } from '../../types/miniOfferTypes';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import './offerslider.scss';
-import {DEFAULT_CAR_IMAGE} from "../../util/constants.tsx";
+import { DEFAULT_CAR_IMAGE } from '../../util/constants.tsx';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -133,11 +133,7 @@ const OfferSlider: React.FC = () => {
             <div className="vehicle-card">
               <div className="vehicle-image-container">
                 <img
-                  src={
-                    offer.mainImage
-                      ? `${API_URL}${offer.mainImage}`
-                      : DEFAULT_CAR_IMAGE
-                  }
+                  src={offer.mainImage ? `${API_URL}${offer.mainImage}` : DEFAULT_CAR_IMAGE}
                   alt={offer.title}
                   className="vehicle-image"
                   onError={handleImageError}

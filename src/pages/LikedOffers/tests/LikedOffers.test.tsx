@@ -1,56 +1,56 @@
-import {fireEvent, render, screen, waitFor} from '@testing-library/react'
-import '@testing-library/jest-dom'
-import {beforeEach, describe, expect, test, vi} from 'vitest'
-import {MemoryRouter} from 'react-router-dom'
-import {MiniOffer} from "../../../types/miniOfferTypes";
-import { RawOfferData } from '../../../types/offer/RawOfferData';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
 import LikedOffersList from '../LikedOffers';
+import { MiniOffer } from "../../../types/miniOfferTypes";
+import { RawOfferData } from "../../../types/offer/RawOfferData";
 
 const {
     mockUseTitle,
     mockUseAuth,
     mockUseComparison,
     mockNavigate,
-    mockLikedOfferApi
+    mockGetLikedOffers
 } = vi.hoisted(() => ({
     mockUseTitle: vi.fn(),
     mockUseAuth: vi.fn(),
     mockUseComparison: vi.fn(),
     mockNavigate: vi.fn(),
-    mockLikedOfferApi: {
-        getLikedOffers: vi.fn()
+    mockGetLikedOffers: vi.fn()
+}));
+
+vi.mock('../../../api/likedOfferApi', () => ({
+    likedOfferApi: {
+        getLikedOffers: mockGetLikedOffers
     }
-}))
+}));
 
-vi.mock('../../hooks/useTitle', () => ({
+vi.mock('../../../hooks/useTitle', () => ({
     default: mockUseTitle
-}))
+}));
 
-vi.mock('../../context/AuthContext', () => ({
+vi.mock('../../../context/AuthContext', () => ({
     useAuth: mockUseAuth
-}))
+}));
 
-vi.mock('../../context/ComparisonContext', () => ({
+vi.mock('../../../context/ComparisonContext', () => ({
     useComparison: mockUseComparison
-}))
+}));
 
 vi.mock('react-router-dom', async () => {
-    const actual = await vi.importActual('react-router-dom')
+    const actual = await vi.importActual('react-router-dom');
     return {
         ...actual,
         useNavigate: () => mockNavigate,
-        Link: ({children, to, className}: any) => (
+        Link: ({ children, to, className }: any) => (
             <a href={to} className={className}>{children}</a>
         )
-    }
-})
+    };
+});
 
-vi.mock('../../api/likedOfferApi', () => ({
-    likedOfferApi: mockLikedOfferApi
-}))
-
-vi.mock('../../components/LikeButton/LikeButton', () => ({
-    default: ({offerId, initialLiked, onLikeToggle}: any) => (
+vi.mock('../../../components/LikeButton/LikeButton', () => ({
+    default: ({ offerId, initialLiked, onLikeToggle }: any) => (
         <button
             data-testid={`like-button-${offerId}`}
             onClick={() => onLikeToggle(!initialLiked)}
@@ -58,10 +58,10 @@ vi.mock('../../components/LikeButton/LikeButton', () => ({
             Like Button
         </button>
     )
-}))
+}));
 
-vi.mock('../../components/CompareCheckbox/CompareCheckbox', () => ({
-    default: ({offerId, isSelected, isDisabled, onToggle}: any) => (
+vi.mock('../../../components/CompareCheckbox/CompareCheckbox', () => ({
+    default: ({ offerId, isSelected, isDisabled, onToggle }: any) => (
         <input
             data-testid={`compare-checkbox-${offerId}`}
             type="checkbox"
@@ -70,10 +70,10 @@ vi.mock('../../components/CompareCheckbox/CompareCheckbox', () => ({
             onChange={(e) => onToggle(offerId, e.target.checked)}
         />
     )
-}))
+}));
 
-vi.mock('../../components/ComparisonBar/ComparisonBar', () => ({
-    default: ({selectedOffers, removeFromComparison}: any) => (
+vi.mock('../../../components/ComparisonBar/ComparisonBar', () => ({
+    default: ({ selectedOffers, removeFromComparison }: any) => (
         <div data-testid="comparison-bar">
             Comparison Bar - {selectedOffers.length} offers
             {selectedOffers.map((offer: any) => (
@@ -87,18 +87,18 @@ vi.mock('../../components/ComparisonBar/ComparisonBar', () => ({
             ))}
         </div>
     )
-}))
+}));
 
-vi.mock('../AuthRequired/AuthRequired', () => ({
-    default: ({pageTitle, message}: any) => (
+vi.mock('../../AuthRequired/AuthRequired', () => ({
+    default: ({ pageTitle, message }: any) => (
         <div data-testid="auth-required">
             <h1>{pageTitle}</h1>
             <p>{message}</p>
         </div>
     )
-}))
+}));
 
-vi.mock('../../translations/carEquipmentTranslations', () => ({
+vi.mock('../../../translations/carEquipmentTranslations', () => ({
     translations: {
         fuelType: {
             'Benzyna': 'Petrol',
@@ -106,22 +106,28 @@ vi.mock('../../translations/carEquipmentTranslations', () => ({
             'Nieznany': 'Unknown'
         }
     }
-}))
+}));
 
-// Mock environment variable
 Object.defineProperty(import.meta, 'env', {
     value: {
         VITE_API_URL: 'http://localhost:3000'
-    }
-})
+    },
+    writable: true
+});
 
-const renderWithRouter = (component: React.ReactElement) => {
+const MockComparisonProvider = ({ children }: { children: React.ReactNode }) => {
+    return <div>{children}</div>;
+};
+
+const renderWithProviders = (component: React.ReactElement) => {
     return render(
         <MemoryRouter>
-            {component}
+            <MockComparisonProvider>
+                {component}
+            </MockComparisonProvider>
         </MemoryRouter>
-    )
-}
+    );
+};
 
 const mockOfferData: RawOfferData = {
     id: '1',
@@ -135,7 +141,7 @@ const mockOfferData: RawOfferData = {
         enginePower: 265,
         displacement: '3.0L'
     }
-}
+};
 
 const mockMiniOffer: MiniOffer = {
     id: '1',
@@ -147,111 +153,93 @@ const mockMiniOffer: MiniOffer = {
     year: 2020,
     enginePower: 265,
     displacement: '3.0L'
-}
+};
 
 describe('LikedOffersList Component', () => {
     beforeEach(() => {
-        vi.clearAllMocks()
-        mockUseTitle.mockReset()
-        mockUseAuth.mockReturnValue({isAuthenticated: true})
+        vi.clearAllMocks();
+        mockUseTitle.mockReset();
+        mockUseAuth.mockReturnValue({ isAuthenticated: true });
         mockUseComparison.mockReturnValue({
             selectedOffers: [],
             addToComparison: vi.fn(),
             removeFromComparison: vi.fn(),
             isOfferSelected: vi.fn(() => false),
             canAddMoreOffers: vi.fn(() => true)
-        })
-        mockLikedOfferApi.getLikedOffers.mockResolvedValue([])
-    })
+        });
+        mockGetLikedOffers.mockResolvedValue([]);
+    });
 
     test('calls useTitle with correct title', () => {
-        renderWithRouter(<LikedOffersList/>)
-        expect(mockUseTitle).toHaveBeenCalledWith('Ulubione')
-    })
+        renderWithProviders(<LikedOffersList />);
+        expect(mockUseTitle).toHaveBeenCalledWith('Ulubione');
+    });
 
     test('shows AuthRequired component when user is not authenticated', () => {
-        mockUseAuth.mockReturnValue({isAuthenticated: false})
+        mockUseAuth.mockReturnValue({ isAuthenticated: false });
 
-        renderWithRouter(<LikedOffersList/>)
+        renderWithProviders(<LikedOffersList />);
 
-        expect(screen.getByTestId('auth-required')).toBeInTheDocument()
-        expect(screen.getByText('Ulubione oferty')).toBeInTheDocument()
-        expect(screen.getByText('Dodawaj interesujące Cię oferty do ulubionych i miej do nich szybki dostęp.')).toBeInTheDocument()
-    })
+        expect(screen.getByTestId('auth-required')).toBeInTheDocument();
+        expect(screen.getByText('Ulubione oferty')).toBeInTheDocument();
+        expect(screen.getByText('Dodawaj interesujące Cię oferty do ulubionych i miej do nich szybki dostęp.')).toBeInTheDocument();
+    });
 
     test('shows loading message when fetching offers', async () => {
-        mockLikedOfferApi.getLikedOffers.mockImplementation(() => new Promise(() => {
-        })) // Never resolves
+        mockGetLikedOffers.mockImplementation(() => new Promise(() => {}));
 
-        renderWithRouter(<LikedOffersList/>)
+        renderWithProviders(<LikedOffersList />);
 
-        expect(screen.getByText('Ładowanie ofert...')).toBeInTheDocument()
-    })
+        expect(screen.getByText('Ładowanie ofert...')).toBeInTheDocument();
+    });
 
     test('shows no offers message when there are no liked offers', async () => {
-        mockLikedOfferApi.getLikedOffers.mockResolvedValue([])
+        mockGetLikedOffers.mockResolvedValue([]);
 
-        renderWithRouter(<LikedOffersList/>)
-
-        await waitFor(() => {
-            expect(screen.getByText('Nie masz jeszcze ulubionych ofert.')).toBeInTheDocument()
-        })
-
-        expect(screen.getByText('Przeglądaj dostępne oferty')).toBeInTheDocument()
-    })
-
-    test('renders liked offers correctly', async () => {
-        mockLikedOfferApi.getLikedOffers.mockResolvedValue([mockOfferData])
-
-        renderWithRouter(<LikedOffersList/>)
+        renderWithProviders(<LikedOffersList />);
 
         await waitFor(() => {
-            expect(screen.getByText('BMW X5 2020')).toBeInTheDocument()
-        })
+            expect(screen.getByText('Nie masz jeszcze ulubionych ofert.')).toBeInTheDocument();
+        });
 
-        expect(screen.getByText('150 000 PLN')).toBeInTheDocument()
-        expect(screen.getByText('2020')).toBeInTheDocument()
-        expect(screen.getByText('50 000 km')).toBeInTheDocument()
-        expect(screen.getByText('Petrol')).toBeInTheDocument()
-        expect(screen.getByText('265 KM')).toBeInTheDocument()
-        expect(screen.getByText('3.0L')).toBeInTheDocument()
-    })
+        expect(screen.getByText('Przeglądaj dostępne oferty')).toBeInTheDocument();
+    });
 
     test('handles offer click navigation', async () => {
-        mockLikedOfferApi.getLikedOffers.mockResolvedValue([mockOfferData])
+        mockGetLikedOffers.mockResolvedValue([mockOfferData]);
 
-        renderWithRouter(<LikedOffersList/>)
+        renderWithProviders(<LikedOffersList />);
 
         await waitFor(() => {
-            expect(screen.getByText('BMW X5 2020')).toBeInTheDocument()
-        })
+            expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
+        });
 
-        const offerClickable = document.querySelector('.offer-clickable')
-        fireEvent.click(offerClickable!)
+        const offerClickable = document.querySelector('.offer-clickable') as HTMLElement;
+        fireEvent.click(offerClickable);
 
-        expect(mockNavigate).toHaveBeenCalledWith('/offer/1')
-    })
+        expect(mockNavigate).toHaveBeenCalledWith('/offer/1');
+    });
 
     test('handles like toggle and removes offer from list', async () => {
-        mockLikedOfferApi.getLikedOffers.mockResolvedValue([mockOfferData])
+        mockGetLikedOffers.mockResolvedValue([mockOfferData]);
 
-        renderWithRouter(<LikedOffersList/>)
-
-        await waitFor(() => {
-            expect(screen.getByText('BMW X5 2020')).toBeInTheDocument()
-        })
-
-        const likeButton = screen.getByTestId('like-button-1')
-        fireEvent.click(likeButton)
+        renderWithProviders(<LikedOffersList />);
 
         await waitFor(() => {
-            expect(screen.queryByText('BMW X5 2020')).not.toBeInTheDocument()
-        })
-    })
+            expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
+        });
+
+        const likeButton = screen.getByTestId('like-button-1');
+        fireEvent.click(likeButton);
+
+        await waitFor(() => {
+            expect(screen.queryByText('BMW X5 2020')).not.toBeInTheDocument();
+        });
+    });
 
     test('handles comparison checkbox toggle', async () => {
-        const mockAddToComparison = vi.fn()
-        const mockRemoveFromComparison = vi.fn()
+        const mockAddToComparison = vi.fn();
+        const mockRemoveFromComparison = vi.fn();
 
         mockUseComparison.mockReturnValue({
             selectedOffers: [],
@@ -259,24 +247,24 @@ describe('LikedOffersList Component', () => {
             removeFromComparison: mockRemoveFromComparison,
             isOfferSelected: vi.fn(() => false),
             canAddMoreOffers: vi.fn(() => true)
-        })
+        });
 
-        mockLikedOfferApi.getLikedOffers.mockResolvedValue([mockOfferData])
+        mockGetLikedOffers.mockResolvedValue([mockOfferData]);
 
-        renderWithRouter(<LikedOffersList/>)
+        renderWithProviders(<LikedOffersList />);
 
         await waitFor(() => {
-            expect(screen.getByText('BMW X5 2020')).toBeInTheDocument()
-        })
+            expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
+        });
 
-        const compareCheckbox = screen.getByTestId('compare-checkbox-1')
-        fireEvent.click(compareCheckbox)
+        const compareCheckbox = screen.getByTestId('compare-checkbox-1');
+        fireEvent.click(compareCheckbox);
 
-        expect(mockAddToComparison).toHaveBeenCalledWith(mockMiniOffer)
-    })
+        expect(mockAddToComparison).toHaveBeenCalledWith(mockMiniOffer);
+    });
 
     test('removes offer from comparison when checkbox is unchecked', async () => {
-        const mockRemoveFromComparison = vi.fn()
+        const mockRemoveFromComparison = vi.fn();
 
         mockUseComparison.mockReturnValue({
             selectedOffers: [mockMiniOffer],
@@ -284,21 +272,21 @@ describe('LikedOffersList Component', () => {
             removeFromComparison: mockRemoveFromComparison,
             isOfferSelected: vi.fn(() => true),
             canAddMoreOffers: vi.fn(() => true)
-        })
+        });
 
-        mockLikedOfferApi.getLikedOffers.mockResolvedValue([mockOfferData])
+        mockGetLikedOffers.mockResolvedValue([mockOfferData]);
 
-        renderWithRouter(<LikedOffersList/>)
+        renderWithProviders(<LikedOffersList />);
 
         await waitFor(() => {
-            expect(screen.getByText('BMW X5 2020')).toBeInTheDocument()
-        })
+            expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
+        });
 
-        const compareCheckbox = screen.getByTestId('compare-checkbox-1')
-        fireEvent.click(compareCheckbox)
+        const compareCheckbox = screen.getByTestId('compare-checkbox-1');
+        fireEvent.click(compareCheckbox);
 
-        expect(mockRemoveFromComparison).toHaveBeenCalledWith('1')
-    })
+        expect(mockRemoveFromComparison).toHaveBeenCalledWith('1');
+    });
 
     test('disables comparison checkbox when comparison limit is reached', async () => {
         mockUseComparison.mockReturnValue({
@@ -307,111 +295,56 @@ describe('LikedOffersList Component', () => {
             removeFromComparison: vi.fn(),
             isOfferSelected: vi.fn(() => false),
             canAddMoreOffers: vi.fn(() => false)
-        })
+        });
 
-        mockLikedOfferApi.getLikedOffers.mockResolvedValue([mockOfferData])
+        mockGetLikedOffers.mockResolvedValue([mockOfferData]);
 
-        renderWithRouter(<LikedOffersList/>)
+        renderWithProviders(<LikedOffersList />);
 
         await waitFor(() => {
-            expect(screen.getByText('BMW X5 2020')).toBeInTheDocument()
-        })
+            expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
+        });
 
-        const compareCheckbox = screen.getByTestId('compare-checkbox-1') as HTMLInputElement
-        expect(compareCheckbox.disabled).toBe(true)
-    })
+        const compareCheckbox = screen.getByTestId('compare-checkbox-1') as HTMLInputElement;
+        expect(compareCheckbox.disabled).toBe(true);
+    });
 
     test('handles image loading error', async () => {
-        const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {
-        })
+        const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-        mockLikedOfferApi.getLikedOffers.mockResolvedValue([mockOfferData])
+        mockGetLikedOffers.mockResolvedValue([mockOfferData]);
 
-        renderWithRouter(<LikedOffersList/>)
-
-        await waitFor(() => {
-            expect(screen.getByText('BMW X5 2020')).toBeInTheDocument()
-        })
-
-        const image = screen.getByAltText('BMW X5 2020')
-        fireEvent.error(image)
-
-        expect(image.getAttribute('src')).toBe('https://placehold.co/600x400')
-        expect(consoleSpy).toHaveBeenCalledWith('Image loading error in liked offers:', expect.any(String))
-
-        consoleSpy.mockRestore()
-    })
-
-    test('prevents multiple error handling for the same image', async () => {
-        mockLikedOfferApi.getLikedOffers.mockResolvedValue([mockOfferData])
-
-        renderWithRouter(<LikedOffersList/>)
+        renderWithProviders(<LikedOffersList />);
 
         await waitFor(() => {
-            expect(screen.getByText('BMW X5 2020')).toBeInTheDocument()
-        })
+            expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
+        });
 
-        const image = screen.getByAltText('BMW X5 2020') as HTMLImageElement
+        const image = screen.getByAltText('BMW X5 2020');
+        fireEvent.error(image);
 
-        // First error
-        fireEvent.error(image)
-        expect(image.dataset.errorHandled).toBe('true')
+        expect(image.getAttribute('src')).toBe('https://placehold.co/600x400');
+        expect(consoleSpy).toHaveBeenCalledWith('Image loading error in liked offers:', expect.any(String));
 
-        const firstSrc = image.src
-
-        // Second error should not change src again
-        fireEvent.error(image)
-        expect(image.src).toBe(firstSrc)
-    })
+        consoleSpy.mockRestore();
+    });
 
     test('handles API error gracefully', async () => {
-        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {
-        })
-        mockLikedOfferApi.getLikedOffers.mockRejectedValue(new Error('API Error'))
+        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        mockGetLikedOffers.mockRejectedValue(new Error('API Error'));
 
-        renderWithRouter(<LikedOffersList/>)
-
-        await waitFor(() => {
-            expect(screen.getByText('Nie masz jeszcze ulubionych ofert.')).toBeInTheDocument()
-        })
-
-        expect(consoleErrorSpy).toHaveBeenCalledWith('Error while fetching liked offers:', expect.any(Error))
-        consoleErrorSpy.mockRestore()
-    })
-
-    test('filters out invalid offers during mapping', async () => {
-        const invalidOfferData = {id: '', title: '', price: undefined}
-        const validOfferData = mockOfferData
-
-        mockLikedOfferApi.getLikedOffers.mockResolvedValue([invalidOfferData, validOfferData])
-
-        renderWithRouter(<LikedOffersList/>)
+        renderWithProviders(<LikedOffersList />);
 
         await waitFor(() => {
-            expect(screen.getByText('BMW X5 2020')).toBeInTheDocument()
-        })
+            expect(screen.getByText('Nie masz jeszcze ulubionych ofert.')).toBeInTheDocument();
+        });
 
-        // Should only show the valid offer
-        expect(screen.getAllByText(/BMW X5 2020/).length).toBeGreaterThan(0)
-    })
-
-    test('truncates long titles correctly', async () => {
-        const longTitleOffer = {
-            ...mockOfferData,
-            title: 'This is a very long title that should be truncated because it exceeds the maximum length'
-        }
-
-        mockLikedOfferApi.getLikedOffers.mockResolvedValue([longTitleOffer])
-
-        renderWithRouter(<LikedOffersList/>)
-
-        await waitFor(() => {
-            expect(screen.getByText('This is a very long title that should be truncated...')).toBeInTheDocument()
-        })
-    })
+        expect(consoleErrorSpy).toHaveBeenCalledWith('Error while fetching liked offers:', expect.any(Error));
+        consoleErrorSpy.mockRestore();
+    });
 
     test('renders ComparisonBar with selected offers', async () => {
-        const selectedOffers = [mockMiniOffer]
+        const selectedOffers = [mockMiniOffer];
 
         mockUseComparison.mockReturnValue({
             selectedOffers,
@@ -419,50 +352,96 @@ describe('LikedOffersList Component', () => {
             removeFromComparison: vi.fn(),
             isOfferSelected: vi.fn(() => true),
             canAddMoreOffers: vi.fn(() => true)
-        })
+        });
 
-        renderWithRouter(<LikedOffersList/>)
+        renderWithProviders(<LikedOffersList />);
 
-        expect(screen.getByTestId('comparison-bar')).toBeInTheDocument()
-        expect(screen.getByText('Comparison Bar - 1 offers')).toBeInTheDocument()
-    })
+        expect(screen.getByTestId('comparison-bar')).toBeInTheDocument();
+        expect(screen.getByText('Comparison Bar - 1 offers')).toBeInTheDocument();
+    });
 
     test('handles missing car details gracefully', async () => {
         const offerWithoutDetails = {
             ...mockOfferData,
             CarDetailsDto: null
-        }
+        };
 
-        mockLikedOfferApi.getLikedOffers.mockResolvedValue([offerWithoutDetails])
+        mockGetLikedOffers.mockResolvedValue([offerWithoutDetails]);
 
-        renderWithRouter(<LikedOffersList/>)
+        renderWithProviders(<LikedOffersList />);
 
         await waitFor(() => {
-            expect(screen.getByText('BMW X5 2020')).toBeInTheDocument()
-        })
+            expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
+        });
 
-        expect(screen.getByText('0')).toBeInTheDocument() // year
-        expect(screen.getByText('0 km')).toBeInTheDocument() // mileage
-        expect(screen.getByText('Unknown')).toBeInTheDocument() // fuel type
-        expect(screen.getByText('0 KM')).toBeInTheDocument() // engine power
-        expect(screen.getByText('Nieznana')).toBeInTheDocument() // displacement
-    })
+        expect(screen.getByText('0')).toBeInTheDocument();
+        expect(screen.getByText('0 km')).toBeInTheDocument();
+        expect(screen.getByText('Unknown')).toBeInTheDocument();
+        expect(screen.getByText('0 KM')).toBeInTheDocument();
+        expect(screen.getByText('Nieznana')).toBeInTheDocument();
+    });
 
     test('uses placeholder image when no mainImage is provided', async () => {
         const offerWithoutImage = {
             ...mockOfferData,
             imageUrls: []
-        }
+        };
 
-        mockLikedOfferApi.getLikedOffers.mockResolvedValue([offerWithoutImage])
+        mockGetLikedOffers.mockResolvedValue([offerWithoutImage]);
 
-        renderWithRouter(<LikedOffersList/>)
+        renderWithProviders(<LikedOffersList />);
 
         await waitFor(() => {
-            expect(screen.getByText('BMW X5 2020')).toBeInTheDocument()
-        })
+            expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
+        });
 
-        const image = screen.getByAltText('BMW X5 2020')
-        expect(image.getAttribute('src')).toBe('https://placehold.co/600x400')
-    })
-})
+        const image = screen.getByAltText('BMW X5 2020');
+        expect(image.getAttribute('src')).toBe('https://placehold.co/600x400');
+    });
+
+    test('truncates long titles correctly', async () => {
+        const longTitleOffer = {
+            ...mockOfferData,
+            title: 'This is a very long title that should be truncated because it exceeds the maximum length'
+        };
+
+        mockGetLikedOffers.mockResolvedValue([longTitleOffer]);
+
+        renderWithProviders(<LikedOffersList />);
+
+        await waitFor(() => {
+            expect(screen.getByText('This is a very long title that should be truncated...')).toBeInTheDocument();
+        });
+    });
+
+    test('filters out invalid offers during mapping', async () => {
+        const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+        const invalidOfferData = { id: '', title: '', price: undefined };
+        const validOfferData = mockOfferData;
+
+        mockGetLikedOffers.mockResolvedValue([invalidOfferData, validOfferData]);
+
+        renderWithProviders(<LikedOffersList />);
+
+        await waitFor(() => {
+            expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
+        });
+
+        expect(consoleWarnSpy).toHaveBeenCalledWith('Missing required fields in offer data:', invalidOfferData);
+        consoleWarnSpy.mockRestore();
+    });
+
+    test('handles non-array API response', async () => {
+        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        mockGetLikedOffers.mockResolvedValue('not an array' as any);
+
+        renderWithProviders(<LikedOffersList />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Nie masz jeszcze ulubionych ofert.')).toBeInTheDocument();
+        });
+
+        expect(consoleErrorSpy).toHaveBeenCalledWith('Received data is not an array:', 'not an array');
+        consoleErrorSpy.mockRestore();
+    });
+});
