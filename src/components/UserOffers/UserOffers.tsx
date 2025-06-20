@@ -4,7 +4,7 @@ import './UserOffers.scss';
 import { getUserOffers, deleteOffer } from '../../api/offerApi';
 import { ApiOffer, OfferData } from '../../types/offerTypes.ts';
 import { translations } from '../../translations/carEquipmentTranslations';
-import {DEFAULT_CAR_IMAGE} from "../../util/constants.tsx";
+import { DEFAULT_CAR_IMAGE } from '../../util/constants.tsx';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
