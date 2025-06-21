@@ -104,7 +104,7 @@ describe('<RegisterPage />', () => {
     fireEvent.change(screen.getByLabelText('Imię'), { target: { value: 'A' } });
     fireEvent.change(screen.getByLabelText('Nazwisko'), { target: { value: 'B' } });
     fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'a@b.com' } });
-    fireEvent.change(screen.getByLabelText('Numer telefonu'), { target: { value: '123' } });
+    fireEvent.change(screen.getByLabelText('Numer telefonu'), { target: { value: '123456789' } }); // ← 9 cyfr
     fireEvent.change(screen.getByLabelText('Hasło'), { target: { value: 'pass1' } });
     fireEvent.change(screen.getByLabelText('Powtórz hasło'), { target: { value: 'pass2' } });
     fireEvent.click(screen.getByRole('checkbox', { name: /Akceptuję.*politykę prywatności/ }));
@@ -124,9 +124,9 @@ describe('<RegisterPage />', () => {
     fireEvent.change(screen.getByLabelText('Imię'), { target: { value: 'A' } });
     fireEvent.change(screen.getByLabelText('Nazwisko'), { target: { value: 'B' } });
     fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'a@b.com' } });
-    fireEvent.change(screen.getByLabelText('Numer telefonu'), { target: { value: '123' } });
-    fireEvent.change(screen.getByLabelText('Hasło'), { target: { value: 'pass1' } });
-    fireEvent.change(screen.getByLabelText('Powtórz hasło'), { target: { value: 'pass1' } });
+    fireEvent.change(screen.getByLabelText('Numer telefonu'), { target: { value: '123456789' } }); // ← 9 cyfr
+    fireEvent.change(screen.getByLabelText('Hasło'), { target: { value: 'pass1234' } }); // ← 8+ znaków
+    fireEvent.change(screen.getByLabelText('Powtórz hasło'), { target: { value: 'pass1234' } });
     fireEvent.click(screen.getByRole('button', { name: 'Zarejestruj się' }));
 
     await waitFor(() => {
@@ -147,7 +147,7 @@ describe('<RegisterPage />', () => {
     fireEvent.change(screen.getByLabelText('Imię'), { target: { value: 'A' } });
     fireEvent.change(screen.getByLabelText('Nazwisko'), { target: { value: 'B' } });
     fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'a@b.com' } });
-    fireEvent.change(screen.getByLabelText('Numer telefonu'), { target: { value: '123' } });
+    fireEvent.change(screen.getByLabelText('Numer telefonu'), { target: { value: '123456789' } }); // ← 9 cyfr!
     fireEvent.change(screen.getByLabelText('Hasło'), { target: { value: 'pass1234' } });
     fireEvent.change(screen.getByLabelText('Powtórz hasło'), { target: { value: 'pass1234' } });
     fireEvent.click(screen.getByRole('checkbox', { name: /Akceptuję.*politykę prywatności/ }));
@@ -157,6 +157,7 @@ describe('<RegisterPage />', () => {
       expect(register).toHaveBeenCalledWith({
         email: 'a@b.com',
         password: 'pass1234',
+        phoneNumber: '123456789', // ← Dodaj phoneNumber!
         firstName: 'A',
         lastName: 'B',
       });
@@ -180,7 +181,7 @@ describe('<RegisterPage />', () => {
     fireEvent.change(screen.getByLabelText('Imię'), { target: { value: 'A' } });
     fireEvent.change(screen.getByLabelText('Nazwisko'), { target: { value: 'B' } });
     fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'a@b.com' } });
-    fireEvent.change(screen.getByLabelText('Numer telefonu'), { target: { value: '123' } });
+    fireEvent.change(screen.getByLabelText('Numer telefonu'), { target: { value: '123456789' } }); // ← 9 cyfr!
     fireEvent.change(screen.getByLabelText('Hasło'), { target: { value: 'pass1234' } });
     fireEvent.change(screen.getByLabelText('Powtórz hasło'), { target: { value: 'pass1234' } });
     fireEvent.click(screen.getByRole('checkbox', { name: /Akceptuję.*politykę prywatności/ }));
