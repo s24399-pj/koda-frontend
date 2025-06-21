@@ -292,14 +292,13 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
                 disabled={!filters.brand || modelsLoading}
               >
                 <option value="">
-                  {!filters.brand 
-                    ? 'Najpierw wybierz markę' 
-                    : modelsLoading 
-                    ? 'Ładowanie modeli...' 
-                    : models.length === 0
-                    ? 'Brak dostępnych modeli'
-                    : 'Wszystkie modele'
-                  }
+                  {!filters.brand
+                    ? 'Najpierw wybierz markę'
+                    : modelsLoading
+                      ? 'Ładowanie modeli...'
+                      : models.length === 0
+                        ? 'Brak dostępnych modeli'
+                        : 'Wszystkie modele'}
                 </option>
                 {models.map(model => (
                   <option key={model} value={model}>
