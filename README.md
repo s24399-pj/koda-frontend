@@ -96,6 +96,15 @@ npm run format:check
 npm run lint
 # or fix linting issues
 npm run lint:fix
+
+# run SonarQube analysis
+
+# launch docker image
+docker-compose up -d
+
+# launch analysis
+npx sonar-scanner
+
 ```
 
 ## Project Structure
