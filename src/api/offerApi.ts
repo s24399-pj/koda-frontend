@@ -268,6 +268,18 @@ export const searchBrands = (phrase: string) => {
     });
 };
 
+export const getModelsByBrand = (brand: string) => {
+  return apiClient
+    .get<{ content: string[] }>('/api/v1/offers/search/models', {
+      params: { brand },
+    })
+    .then(response => response.data.content || [])
+    .catch(error => {
+      console.error('Error fetching models for brand:', error);
+      return [];
+    });
+};
+
 export const getOfferById = (id: string) => {
   return apiClient
     .get(`/api/v1/offers/${id}`)
@@ -287,6 +299,7 @@ const offerApi = {
   searchOffers,
   getBrands,
   searchBrands,
+  getModelsByBrand,
   getOfferById,
   adaptToMiniOffer,
 };

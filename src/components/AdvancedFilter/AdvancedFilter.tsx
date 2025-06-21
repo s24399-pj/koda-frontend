@@ -32,7 +32,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [brands, setBrands] = useState<string[]>([]);
   const [models, setModels] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [modelsLoading, setModelsLoading] = useState(false);
 
   const [filters, setFilters] = useState<AdvancedSearchParams>({
     phrase: '',
@@ -73,32 +73,17 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
   const driveTypeOptions = enumToOptions(DriveType);
   const conditionOptions = enumToOptions(VehicleCondition);
 
-  const popularBrands = [
+  const defaultBrands = [
     'Audi',
     'BMW',
-    'Chevrolet',
-    'Dacia',
     'Fiat',
     'Ford',
     'Honda',
-    'Hyundai',
-    'Jaguar',
-    'Jeep',
-    'Kia',
-    'Land Rover',
-    'Lexus',
     'Mazda',
     'Mercedes-Benz',
-    'Mitsubishi',
     'Nissan',
-    'Opel',
     'Peugeot',
-    'Porsche',
-    'Renault',
-    'Seat',
     'Skoda',
-    'Subaru',
-    'Suzuki',
     'Toyota',
     'Volkswagen',
     'Volvo',
@@ -117,12 +102,12 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
           if (brandsList.length > 0) {
             setBrands(brandsList);
           } else {
-            setBrands(popularBrands);
+            setBrands(defaultBrands);
           }
         })
         .catch(error => {
           console.error('Error fetching brands:', error);
-          setBrands(popularBrands);
+          setBrands(defaultBrands);
         });
     };
 
@@ -136,23 +121,30 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
         return;
       }
 
-      setLoading(true);
+      setModelsLoading(true);
 
       offerApiService
-        .searchBrands(filters.brand)
+        .getModelsByBrand(filters.brand)
         .then(modelsList => {
+          console.log(`Fetched models for ${filters.brand}:`, modelsList);
           setModels(modelsList);
         })
         .catch(error => {
-          console.error('Error fetching models:', error);
+          console.error('Error fetching models for brand:', error);
           setModels([]);
         })
         .finally(() => {
-          setLoading(false);
+          setModelsLoading(false);
         });
     };
 
     fetchModels();
+  }, [filters.brand]);
+
+  useEffect(() => {
+    if (filters.brand) {
+      setFilters(prev => ({ ...prev, model: '' }));
+    }
   }, [filters.brand]);
 
   const fetchAllOffers = () => {
@@ -244,6 +236,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
       ledLights: null,
     });
 
+    setModels([]);
     fetchAllOffers();
   };
 
@@ -257,7 +250,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
 
   return (
     <div className="advanced-filter">
-      <form onSubmit={searchOffers}>
+      <div onSubmit={searchOffers}>
         <div className="filter-section basic-filters">
           <div className="filter-row">
             <div className="filter-field">
@@ -296,9 +289,18 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
                 name="model"
                 value={filters.model || ''}
                 onChange={handleInputChange}
-                disabled={!filters.brand || loading}
+                disabled={!filters.brand || modelsLoading}
               >
-                <option value="">Wszystkie modele</option>
+                <option value="">
+                  {!filters.brand 
+                    ? 'Najpierw wybierz markę' 
+                    : modelsLoading 
+                    ? 'Ładowanie modeli...' 
+                    : models.length === 0
+                    ? 'Brak dostępnych modeli'
+                    : 'Wszystkie modele'
+                  }
+                </option>
                 {models.map(model => (
                   <option key={model} value={model}>
                     {model}
@@ -682,11 +684,11 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onSearch, onLoading }) 
             Wyczyść filtry
           </button>
 
-          <button type="submit" className="apply-button">
+          <button type="button" className="apply-button" onClick={searchOffers}>
             Szukaj
           </button>
         </div>
-      </form>
+      </div>
     </div>
   );
 };
