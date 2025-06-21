@@ -70,6 +70,7 @@ const UserPanel: React.FC = () => {
             {userProfile?.firstName} {userProfile?.lastName}
           </h2>
           <p className="user-email">{userProfile?.email}</p>
+          <p className="user-phone">{userProfile?.phoneNumber}</p>
         </div>
 
         <nav className="user-navigation">
@@ -112,6 +113,8 @@ const UserPanel: React.FC = () => {
               <div className="detail-group">
                 <label>Email:</label>
                 <p>{userProfile?.email}</p>
+                <label>Numer telefonu:</label>
+                <p>{userProfile?.phoneNumber}</p>
               </div>
             </div>
             <button className="edit-profile-btn">Edytuj profil</button>

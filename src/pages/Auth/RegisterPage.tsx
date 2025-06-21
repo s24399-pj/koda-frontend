@@ -20,7 +20,9 @@ const RegisterSchema = Yup.object().shape({
   firstName: Yup.string().required('Imię jest wymagane'),
   lastName: Yup.string().required('Nazwisko jest wymagane'),
   email: Yup.string().email('Niepoprawny format adresu email').required('Email jest wymagany'),
-  phoneNumber: Yup.string().required('Numer telefonu jest wymagany'),
+  phoneNumber: Yup.string()
+    .matches(/^[0-9]{9}$/, 'Numer telefonu musi składać się z dokładnie 9 cyfr')
+    .required('Numer telefonu jest wymagany'),
   password: Yup.string()
     .min(8, 'Hasło musi zawierać co najmniej 8 znaków')
     .required('Hasło jest wymagane'),
@@ -58,6 +60,7 @@ const RegisterPage: React.FC = () => {
       await register({
         email: values.email,
         password: values.password,
+        phoneNumber: values.phoneNumber,
         firstName: values.firstName,
         lastName: values.lastName,
       });
