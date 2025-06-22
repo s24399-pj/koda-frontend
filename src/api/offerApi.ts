@@ -2,6 +2,7 @@ import axiosAuthClient from './axiosAuthClient';
 import axios from 'axios';
 import { CreateOfferCommand, OfferResponse } from '../types/offer/OfferTypes';
 import { MiniOffer } from '../types/miniOfferTypes';
+import { OfferData } from '../types/offerTypes';
 
 const API_URL = import.meta.env.VITE_API_URL;
 const OFFERS_ENDPOINT = '/api/v1/offers';
@@ -81,6 +82,22 @@ export interface PaginationParams {
   page: number;
   size: number;
   sort?: string;
+}
+
+export interface GeocodeResult {
+  lat: string;
+  lon: string;
+  address: {
+    city?: string;
+    town?: string;
+    village?: string;
+    [key: string]: any;
+  };
+}
+
+export interface LocationCoordinates {
+  lat: number;
+  lng: number;
 }
 
 const cleanSearchParams = (params: AdvancedSearchParams): Record<string, any> => {
@@ -269,24 +286,164 @@ export const searchBrands = (phrase: string) => {
 };
 
 export const getModelsByBrand = (brand: string) => {
+    return apiClient
+        .get<{ content: string[] }>('/api/v1/offers/search/models', {
+            params: { brand },
+        })
+        .then(response => response.data.content || [])
+        .catch(error => {
+            console.error('Error fetching models for brand:', error);
+            return [];
+        });
+};
+
+export const getOfferById = (id: string): Promise<OfferData> => {
+  console.log(`Fetching offer with ID: ${id}`);
+
   return apiClient
-    .get<{ content: string[] }>('/api/v1/offers/search/models', {
-      params: { brand },
+    .get<OfferData>(`${OFFERS_ENDPOINT}/${id}`)
+    .then(response => {
+      console.log('Offer data received');
+      return response.data;
     })
-    .then(response => response.data.content || [])
     .catch(error => {
-      console.error('Error fetching models for brand:', error);
+      console.error(`Error fetching offer ${id}:`, error);
+      throw error;
+    });
+};
+
+export const geocodeLocation = async (location: string): Promise<LocationCoordinates | null> => {
+  console.log(`Geocoding location: ${location}`);
+
+  try {
+    const response = await axios.get<GeocodeResult[]>(
+      'https://nominatim.openstreetmap.org/search',
+      {
+        params: {
+          q: `${location}, Poland`,
+          format: 'json',
+          limit: 5,
+          addressdetails: 1,
+        },
+      }
+    );
+
+    if (response.data.length > 0) {
+      const validLocation = response.data.find(
+        (result: GeocodeResult) =>
+          result.address.city || result.address.town || result.address.village
+      );
+
+      if (validLocation) {
+        console.log('Valid location found:', validLocation);
+        return {
+          lat: parseFloat(validLocation.lat),
+          lng: parseFloat(validLocation.lon),
+        };
+      } else {
+        console.error('Exact location not found');
+        throw new Error('Failed to find exact location.');
+      }
+    } else {
+      console.error('No results for this location');
+      throw new Error('Failed to find location.');
+    }
+  } catch (error) {
+    console.error('Error geocoding location:', error);
+    throw error;
+  }
+};
+
+export const searchOffersByPhrase = (phrase: string, size: number = 5): Promise<OfferData[]> => {
+  console.log(`Searching offers by phrase: ${phrase}`);
+
+  return apiClient
+    .get<OffersResponse>(OFFERS_ENDPOINT, {
+      params: {
+        phrase,
+        size,
+      },
+    })
+    .then(response => {
+      console.log('Search by phrase results received');
+      return response.data.content || [];
+    })
+    .catch(error => {
+      console.error('Error searching offers by phrase:', error);
       return [];
     });
 };
 
-export const getOfferById = (id: string) => {
+export const getAllOffers = (): Promise<MiniOffer[]> => {
+  console.log('Fetching all offers');
+
   return apiClient
-    .get(`/api/v1/offers/${id}`)
-    .then(response => response.data)
+    .get<OffersResponse>(OFFERS_ENDPOINT)
+    .then(response => {
+      console.log('All offers received');
+      const offers = response.data.content || [];
+      return offers.map(adaptToMiniOffer);
+    })
     .catch(error => {
-      console.error(`Error fetching offer ${id}:`, error);
-      throw error;
+      console.error('Error fetching all offers:', error);
+      return [];
+    });
+};
+
+export const getMaxPrice = async (): Promise<number> => {
+  console.log('Fetching max price from offers');
+
+  try {
+    const response = await apiClient.get<OffersResponse>(OFFERS_ENDPOINT, {
+      params: {
+        page: 0,
+        size: 100,
+      },
+    });
+
+    const offers = response.data.content || [];
+    const maxPrice = offers.reduce((max: number, offer: any) => {
+      const price = typeof offer.price === 'number' ? offer.price : parseFloat(offer.price) || 0;
+      return price > max ? price : max;
+    }, 0);
+
+    console.log('Max price calculated:', maxPrice);
+    return maxPrice || 1000000;
+  } catch (error) {
+    console.error('Error fetching max price:', error);
+    return 1000000;
+  }
+};
+
+export const getAllBrands = (): Promise<string[]> => {
+  console.log('Fetching all brands');
+
+  return apiClient
+    .get<string[]>('/api/v1/brands')
+    .then(response => {
+      console.log('All brands received');
+      return response.data || [];
+    })
+    .catch(error => {
+      console.error('Error fetching all brands:', error);
+      return [];
+    });
+};
+
+export const searchBrandsByPhrase = (phrase: string): Promise<string[]> => {
+  console.log(`Searching brands by phrase: ${phrase}`);
+
+  return apiClient
+    .get<string[]>('/api/v1/brands/find', {
+      params: { phrase },
+    })
+    .then(response => {
+      console.log('Brand search results received');
+      return response.data || [];
+    })
+    .catch(error => {
+      console.error('Error searching brands by phrase:', error);
+      return [];
     });
 };
 
@@ -301,6 +458,12 @@ const offerApi = {
   searchBrands,
   getModelsByBrand,
   getOfferById,
+  geocodeLocation,
+  searchOffersByPhrase,
+  getAllOffers,
+  getMaxPrice,
+  getAllBrands,
+  searchBrandsByPhrase,
   adaptToMiniOffer,
 };
 

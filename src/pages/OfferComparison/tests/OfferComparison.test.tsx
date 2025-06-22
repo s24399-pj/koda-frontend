@@ -5,12 +5,17 @@ import OfferComparison from '../OfferComparison';
 import { OfferData } from '../../../types/offerTypes';
 import { MiniOffer } from '../../../types/miniOfferTypes';
 
-const { mockUseTitle, mockUseComparison, mockAxios, mockSessionStorage } = vi.hoisted(() => ({
+const {
+  mockUseTitle,
+  mockUseComparison,
+  mockSearchOffersByPhrase,
+  mockGetOfferById,
+  mockSessionStorage,
+} = vi.hoisted(() => ({
   mockUseTitle: vi.fn(),
   mockUseComparison: vi.fn(),
-  mockAxios: {
-    get: vi.fn(),
-  },
+  mockSearchOffersByPhrase: vi.fn(),
+  mockGetOfferById: vi.fn(),
   mockSessionStorage: {
     getItem: vi.fn(),
     setItem: vi.fn(),
@@ -26,8 +31,9 @@ vi.mock('../../../context/ComparisonContext', () => ({
   useComparison: mockUseComparison,
 }));
 
-vi.mock('axios', () => ({
-  default: mockAxios,
+vi.mock('../../../api/offerApi', () => ({
+  searchOffersByPhrase: mockSearchOffersByPhrase,
+  getOfferById: mockGetOfferById,
 }));
 
 vi.mock('../../../util/constants.tsx', () => ({
@@ -152,11 +158,7 @@ const mockOfferB: OfferData = {
   },
 };
 
-const mockSearchResults = {
-  data: {
-    content: [mockOfferA, mockOfferB],
-  },
-};
+const mockSearchResults = [mockOfferA, mockOfferB];
 
 const renderComponent = () => {
   return render(<OfferComparison />);
@@ -170,7 +172,8 @@ describe('OfferComparison Component', () => {
       clearComparison: vi.fn(),
     });
     mockSessionStorage.getItem.mockReturnValue(null);
-    mockAxios.get.mockResolvedValue(mockSearchResults);
+    mockSearchOffersByPhrase.mockResolvedValue(mockSearchResults);
+    mockGetOfferById.mockResolvedValue(mockOfferA);
   });
 
   test('calls useTitle with correct title', () => {
@@ -189,7 +192,7 @@ describe('OfferComparison Component', () => {
   });
 
   test('shows loading state when searching', async () => {
-    mockAxios.get.mockImplementation(() => new Promise(() => {}));
+    mockSearchOffersByPhrase.mockImplementation(() => new Promise(() => {}));
 
     renderComponent();
 
@@ -208,9 +211,7 @@ describe('OfferComparison Component', () => {
     fireEvent.change(input1, { target: { value: 'BMW' } });
 
     await waitFor(() => {
-      expect(mockAxios.get).toHaveBeenCalledWith('http://localhost:8137/api/v1/offers', {
-        params: expect.any(URLSearchParams),
-      });
+      expect(mockSearchOffersByPhrase).toHaveBeenCalledWith('BMW', 5);
     });
   });
 
@@ -228,12 +229,7 @@ describe('OfferComparison Component', () => {
   });
 
   test('selects offer from suggestions', async () => {
-    mockAxios.get.mockImplementation(url => {
-      if (url.includes('/api/v1/offers/1')) {
-        return Promise.resolve({ data: mockOfferA });
-      }
-      return Promise.resolve(mockSearchResults);
-    });
+    mockGetOfferById.mockResolvedValue(mockOfferA);
 
     renderComponent();
 
@@ -249,19 +245,15 @@ describe('OfferComparison Component', () => {
     fireEvent.click(suggestions[0]);
 
     await waitFor(() => {
-      expect(mockAxios.get).toHaveBeenCalledWith('http://localhost:8137/api/v1/offers/1');
+      expect(mockGetOfferById).toHaveBeenCalledWith('1');
     });
   });
 
   test('shows comparison table when both offers selected', async () => {
-    mockAxios.get.mockImplementation(url => {
-      if (url.includes('/api/v1/offers/1')) {
-        return Promise.resolve({ data: mockOfferA });
-      }
-      if (url.includes('/api/v1/offers/2')) {
-        return Promise.resolve({ data: mockOfferB });
-      }
-      return Promise.resolve(mockSearchResults);
+    mockGetOfferById.mockImplementation(id => {
+      if (id === '1') return Promise.resolve(mockOfferA);
+      if (id === '2') return Promise.resolve(mockOfferB);
+      return Promise.resolve(mockOfferA);
     });
 
     renderComponent();
@@ -304,14 +296,10 @@ describe('OfferComparison Component', () => {
   });
 
   test('highlights better values in comparison', async () => {
-    mockAxios.get.mockImplementation(url => {
-      if (url.includes('/api/v1/offers/1')) {
-        return Promise.resolve({ data: mockOfferA });
-      }
-      if (url.includes('/api/v1/offers/2')) {
-        return Promise.resolve({ data: mockOfferB });
-      }
-      return Promise.resolve(mockSearchResults);
+    mockGetOfferById.mockImplementation(id => {
+      if (id === '1') return Promise.resolve(mockOfferA);
+      if (id === '2') return Promise.resolve(mockOfferB);
+      return Promise.resolve(mockOfferA);
     });
 
     renderComponent();
@@ -351,14 +339,10 @@ describe('OfferComparison Component', () => {
   });
 
   test('resets comparison when reset button clicked', async () => {
-    mockAxios.get.mockImplementation(url => {
-      if (url.includes('/api/v1/offers/1')) {
-        return Promise.resolve({ data: mockOfferA });
-      }
-      if (url.includes('/api/v1/offers/2')) {
-        return Promise.resolve({ data: mockOfferB });
-      }
-      return Promise.resolve(mockSearchResults);
+    mockGetOfferById.mockImplementation(id => {
+      if (id === '1') return Promise.resolve(mockOfferA);
+      if (id === '2') return Promise.resolve(mockOfferB);
+      return Promise.resolve(mockOfferA);
     });
 
     renderComponent();
@@ -429,14 +413,10 @@ describe('OfferComparison Component', () => {
     ];
 
     mockSessionStorage.getItem.mockReturnValue(JSON.stringify(storedOffers));
-    mockAxios.get.mockImplementation(url => {
-      if (url.includes('/api/v1/offers/1')) {
-        return Promise.resolve({ data: mockOfferA });
-      }
-      if (url.includes('/api/v1/offers/2')) {
-        return Promise.resolve({ data: mockOfferB });
-      }
-      return Promise.resolve(mockSearchResults);
+    mockGetOfferById.mockImplementation(id => {
+      if (id === '1') return Promise.resolve(mockOfferA);
+      if (id === '2') return Promise.resolve(mockOfferB);
+      return Promise.resolve(mockOfferA);
     });
 
     renderComponent();
@@ -453,7 +433,7 @@ describe('OfferComparison Component', () => {
   });
 
   test('handles search error gracefully', async () => {
-    mockAxios.get.mockRejectedValue(new Error('Search failed'));
+    mockSearchOffersByPhrase.mockRejectedValue(new Error('Search failed'));
 
     renderComponent();
 
@@ -466,12 +446,7 @@ describe('OfferComparison Component', () => {
   });
 
   test('handles offer details fetch error', async () => {
-    mockAxios.get.mockImplementation(url => {
-      if (url.includes('/api/v1/offers/1')) {
-        return Promise.reject(new Error('Failed to fetch details'));
-      }
-      return Promise.resolve(mockSearchResults);
-    });
+    mockGetOfferById.mockRejectedValue(new Error('Failed to fetch details'));
 
     renderComponent();
 
@@ -503,7 +478,6 @@ describe('OfferComparison Component', () => {
       expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
     });
 
-    // Click outside
     fireEvent.mouseDown(document.body);
 
     await waitFor(() => {
@@ -566,7 +540,7 @@ describe('OfferComparison Component', () => {
 
     await new Promise(resolve => setTimeout(resolve, 400));
 
-    expect(mockAxios.get).not.toHaveBeenCalled();
+    expect(mockSearchOffersByPhrase).not.toHaveBeenCalled();
   });
 
   test('calls clearComparison on component unmount', () => {

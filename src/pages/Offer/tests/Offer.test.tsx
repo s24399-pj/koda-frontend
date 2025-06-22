@@ -6,21 +6,27 @@ import Offer from '../Offer';
 import { CarDetails, OfferData, SellerData } from '../../../types/offerTypes';
 import { CarEquipment, VehicleCondition } from '../../../types/offer/OfferTypes';
 
-const { mockUseTitle, mockUseAuth, mockUseNavigate, mockUseParams, mockAxios, mockLeaflet } =
-  vi.hoisted(() => ({
-    mockUseTitle: vi.fn(),
-    mockUseAuth: vi.fn(),
-    mockUseNavigate: vi.fn(),
-    mockUseParams: vi.fn(),
-    mockAxios: {
-      get: vi.fn(),
-    },
-    mockLeaflet: {
-      map: vi.fn(),
-      tileLayer: vi.fn(),
-      circle: vi.fn(),
-    },
-  }));
+const {
+  mockUseTitle,
+  mockUseAuth,
+  mockUseNavigate,
+  mockUseParams,
+  mockGetOfferById,
+  mockGeocodeLocation,
+  mockLeaflet,
+} = vi.hoisted(() => ({
+  mockUseTitle: vi.fn(),
+  mockUseAuth: vi.fn(),
+  mockUseNavigate: vi.fn(),
+  mockUseParams: vi.fn(),
+  mockGetOfferById: vi.fn(),
+  mockGeocodeLocation: vi.fn(),
+  mockLeaflet: {
+    map: vi.fn(),
+    tileLayer: vi.fn(),
+    circle: vi.fn(),
+  },
+}));
 
 vi.mock('../../../hooks/useTitle', () => ({
   default: mockUseTitle,
@@ -39,8 +45,13 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-vi.mock('axios', () => ({
-  default: mockAxios,
+vi.mock('../../../api/offerApi', () => ({
+  getOfferById: mockGetOfferById,
+  geocodeLocation: mockGeocodeLocation,
+  default: {
+    getOfferById: mockGetOfferById,
+    geocodeLocation: mockGeocodeLocation,
+  },
 }));
 
 vi.mock('leaflet', () => ({
@@ -158,6 +169,11 @@ const mockOfferData: OfferData = {
   CarDetailsDto: mockCarDetails,
 };
 
+const mockLocationCoordinates = {
+  lat: 52.2297,
+  lng: 21.0122,
+};
+
 const mockMapInstance = {
   setView: vi.fn().mockReturnThis(),
   remove: vi.fn(),
@@ -195,24 +211,8 @@ describe('Offer Component', () => {
 
     Element.prototype.scrollTo = vi.fn();
 
-    const mockGeocodeResponse = {
-      data: [
-        {
-          lat: '52.2297',
-          lon: '21.0122',
-          address: { city: 'Warsaw' },
-        },
-      ],
-    };
-
-    mockAxios.get.mockReset();
-
-    mockAxios.get.mockImplementation(url => {
-      if (url.includes('nominatim')) {
-        return Promise.resolve(mockGeocodeResponse);
-      }
-      return Promise.resolve({ data: mockOfferData });
-    });
+    mockGetOfferById.mockResolvedValue(mockOfferData);
+    mockGeocodeLocation.mockResolvedValue(mockLocationCoordinates);
   });
 
   test('calls useTitle with correct title', () => {
@@ -221,18 +221,27 @@ describe('Offer Component', () => {
   });
 
   test('shows loading state initially', () => {
-    mockAxios.get.mockImplementation(() => new Promise(() => {}));
+    mockGetOfferById.mockImplementation(() => new Promise(() => {}));
     renderWithRouter(<Offer />);
     expect(screen.getByText('Ładowanie...')).toBeInTheDocument();
   });
 
   test('shows error message when API call fails', async () => {
-    mockAxios.get.mockRejectedValueOnce(new Error('API Error'));
+    mockGetOfferById.mockRejectedValueOnce(new Error('API Error'));
 
     renderWithRouter(<Offer />);
 
     await waitFor(() => {
       expect(screen.getByText('Failed to load offer.')).toBeInTheDocument();
+    });
+  });
+
+  test('fetches offer data correctly', async () => {
+    renderWithRouter(<Offer />);
+
+    await waitFor(() => {
+      expect(mockGetOfferById).toHaveBeenCalledWith('1');
+      expect(mockGeocodeLocation).toHaveBeenCalledWith('Warsaw');
     });
   });
 
@@ -472,20 +481,7 @@ describe('Offer Component', () => {
       },
     };
 
-    mockAxios.get.mockImplementation(url => {
-      if (url.includes('nominatim')) {
-        return Promise.resolve({
-          data: [
-            {
-              lat: '52.2297',
-              lon: '21.0122',
-              address: { city: 'Warsaw' },
-            },
-          ],
-        });
-      }
-      return Promise.resolve({ data: offerWithoutOptionalFields });
-    });
+    mockGetOfferById.mockResolvedValueOnce(offerWithoutOptionalFields);
 
     renderWithRouter(<Offer />);
 
@@ -502,20 +498,7 @@ describe('Offer Component', () => {
       seller: undefined,
     };
 
-    mockAxios.get.mockImplementation(url => {
-      if (url.includes('nominatim')) {
-        return Promise.resolve({
-          data: [
-            {
-              lat: '52.2297',
-              lon: '21.0122',
-              address: { city: 'Warsaw' },
-            },
-          ],
-        });
-      }
-      return Promise.resolve({ data: offerWithoutSeller });
-    });
+    mockGetOfferById.mockResolvedValueOnce(offerWithoutSeller as OfferData);
 
     renderWithRouter(<Offer />);
 
@@ -535,20 +518,7 @@ describe('Offer Component', () => {
       },
     };
 
-    mockAxios.get.mockImplementation(url => {
-      if (url.includes('nominatim')) {
-        return Promise.resolve({
-          data: [
-            {
-              lat: '52.2297',
-              lon: '21.0122',
-              address: { city: 'Warsaw' },
-            },
-          ],
-        });
-      }
-      return Promise.resolve({ data: offerWithoutEquipment });
-    });
+    mockGetOfferById.mockResolvedValueOnce(offerWithoutEquipment);
 
     renderWithRouter(<Offer />);
 
@@ -565,20 +535,7 @@ describe('Offer Component', () => {
       seller: undefined,
     };
 
-    mockAxios.get.mockImplementation(url => {
-      if (url.includes('nominatim')) {
-        return Promise.resolve({
-          data: [
-            {
-              lat: '52.2297',
-              lon: '21.0122',
-              address: { city: 'Warsaw' },
-            },
-          ],
-        });
-      }
-      return Promise.resolve({ data: offerWithoutSeller });
-    });
+    mockGetOfferById.mockResolvedValueOnce(offerWithoutSeller as OfferData);
 
     const originalLocation = window.location;
     delete (window as any).location;
@@ -598,35 +555,19 @@ describe('Offer Component', () => {
     window.location = originalLocation;
   });
 
-  test('renders no data message when offer is missing CarDetailsDto', async () => {
-    const offerWithoutCarDetails = {
-      ...mockOfferData,
-      CarDetailsDto: null,
-    };
-
-    mockAxios.get.mockImplementation(url => {
-      if (url.includes('nominatim')) {
-        return Promise.resolve({
-          data: [
-            {
-              lat: '52.2297',
-              lon: '21.0122',
-              address: { city: 'Warsaw' },
-            },
-          ],
-        });
-      }
-      return Promise.resolve({ data: offerWithoutCarDetails });
-    });
+  test('handles missing offer ID', async () => {
+    mockUseParams.mockReturnValue({ id: undefined });
 
     renderWithRouter(<Offer />);
 
     await waitFor(() => {
-      expect(screen.getByText('Brak danych oferty.')).toBeInTheDocument();
+      expect(screen.getByText('Brak ID oferty')).toBeInTheDocument();
     });
+
+    expect(mockGetOfferById).not.toHaveBeenCalled();
   });
 
-  test('disables chat button when unauthenticated', async () => {
+  test('handles unauthenticated contact navigation', async () => {
     mockUseAuth.mockReturnValue({ isAuthenticated: false });
 
     renderWithRouter(<Offer />);
@@ -635,8 +576,11 @@ describe('Offer Component', () => {
       expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
     });
 
-    const chatButton = screen.getByText('Rozpocznij czat');
-    expect(chatButton).toBeDisabled();
-    expect(chatButton.getAttribute('title')).toBe('Musisz być zalogowany!');
+    const contactButton = screen.getByText('Kontakt');
+    fireEvent.click(contactButton);
+
+    expect(mockUseNavigate).toHaveBeenCalledWith('/user/login', {
+      state: { returnUrl: '/offer/1' },
+    });
   });
 });

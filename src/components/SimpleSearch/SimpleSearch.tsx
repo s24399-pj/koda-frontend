@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import './SimpleSearch.scss';
-import { OfferData } from '../../types/offerTypes';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { getMaxPrice, getAllBrands, searchBrandsByPhrase } from '../../api/offerApi';
 
 const SimpleSearch: React.FC = () => {
   const navigate = useNavigate();
@@ -49,16 +46,8 @@ const SimpleSearch: React.FC = () => {
     const fetchMaxPrice = async () => {
       try {
         setIsLoading(true);
-        const params = new URLSearchParams();
-        params.set('page', '0');
-        params.set('size', '100');
-
-        const response = await axios.get(`${API_URL}/api/v1/offers`, { params });
-        const offers: OfferData[] = response.data.content || [];
-
-        const maxPrice = offers.reduce((max, offer) => (offer.price > max ? offer.price : max), 0);
-
-        setMaxPriceValue(maxPrice || 1000000);
+        const maxPrice = await getMaxPrice();
+        setMaxPriceValue(maxPrice);
       } catch (error) {
         console.error('Error fetching price data:', error);
       } finally {
@@ -74,9 +63,9 @@ const SimpleSearch: React.FC = () => {
       try {
         setIsLoadingBrands(true);
         console.log('Fetching all brands');
-        const response = await axios.get(`${API_URL}/api/v1/brands`);
-        console.log('All brands response:', response.data);
-        setAvailableBrands(response.data || []);
+        const brands = await getAllBrands();
+        console.log('All brands response:', brands);
+        setAvailableBrands(brands);
       } catch (error) {
         console.error('Error fetching brands:', error);
       } finally {
@@ -94,10 +83,10 @@ const SimpleSearch: React.FC = () => {
       try {
         setIsLoadingBrands(true);
         console.log('Showing all brands');
-        const response = await axios.get(`${API_URL}/api/v1/brands`);
-        setFilteredBrands(response.data || []);
+        const brands = await getAllBrands();
+        setFilteredBrands(brands);
 
-        if (response.data.length === 0) {
+        if (brands.length === 0) {
           setNoResults(true);
         }
       } catch (error) {
@@ -110,13 +99,11 @@ const SimpleSearch: React.FC = () => {
       try {
         setIsLoadingBrands(true);
         console.log(`Fetching brands with phrase: "${searchPhrase}"`);
-        const response = await axios.get(`${API_URL}/api/v1/brands/find`, {
-          params: { phrase: searchPhrase },
-        });
-        console.log('Brand suggestions response:', response.data);
-        setFilteredBrands(response.data || []);
+        const brands = await searchBrandsByPhrase(searchPhrase);
+        console.log('Brand suggestions response:', brands);
+        setFilteredBrands(brands);
 
-        if (response.data.length === 0) {
+        if (brands.length === 0) {
           setNoResults(true);
         }
       } catch (error) {

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import './OfferComparison.scss';
 import { OfferData } from '../../types/offerTypes';
 import { MiniOffer } from '../../types/miniOfferTypes';
@@ -11,6 +10,7 @@ import {
   Feature,
 } from '../../types/offer/comparisionFeatures.ts';
 import { DEFAULT_CAR_IMAGE } from '../../util/constants.tsx';
+import { searchOffersByPhrase, getOfferById } from '../../api/offerApi';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -86,12 +86,9 @@ const OfferComparison: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      const params = new URLSearchParams();
-      params.set('phrase', query);
-      params.set('size', '5');
 
-      const response = await axios.get(`${API_URL}/api/v1/offers`, { params });
-      setSuggestions(response.data.content || []);
+      const results = await searchOffersByPhrase(query, 5);
+      setSuggestions(results);
     } catch (error) {
       console.error('Error searching offers:', error);
       setError('Wystąpił błąd podczas wyszukiwania ofert.');
@@ -103,9 +100,7 @@ const OfferComparison: React.FC = () => {
 
   const fetchOfferDetails = async (id: string): Promise<OfferData | null> => {
     try {
-      const response = await axios.get<OfferData>(`${API_URL}/api/v1/offers/${id}`);
-
-      const offer = response.data;
+      const offer = await getOfferById(id);
 
       if (offer) {
         if (!offer.imageUrls || offer.imageUrls.length === 0) {
