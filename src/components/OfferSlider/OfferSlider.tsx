@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import Slider from 'react-slick';
 import { MiniOffer } from '../../types/miniOfferTypes';
+import { getAllOffers } from '../../api/offerApi';
 
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -31,19 +31,21 @@ const OfferSlider: React.FC = () => {
   };
 
   useEffect(() => {
-    setLoading(true);
-    axios
-      .get(`${API_URL}/api/v1/offers`)
-      .then(response => {
-        console.log('Data from API:', response.data);
-        setOffers(response.data.content || []);
-        setLoading(false);
-      })
-      .catch(error => {
+    const fetchOffers = async () => {
+      try {
+        setLoading(true);
+        const data = await getAllOffers();
+        console.log('Data from API:', data);
+        setOffers(data);
+      } catch (error) {
         console.error('Error fetching data:', error);
         setError('Failed to fetch offers');
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchOffers();
   }, []);
 
   const settings = {

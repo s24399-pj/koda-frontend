@@ -11,7 +11,7 @@ const {
   mockUseTitle,
   mockUseComparison,
   mockGetOffersBySeller,
-  mockAxios,
+  mockGetOfferById,
   mockSessionStorage,
   mockScrollTo,
 } = vi.hoisted(() => ({
@@ -20,9 +20,7 @@ const {
   mockUseTitle: vi.fn(),
   mockUseComparison: vi.fn(),
   mockGetOffersBySeller: vi.fn(),
-  mockAxios: {
-    get: vi.fn(),
-  },
+  mockGetOfferById: vi.fn(),
   mockSessionStorage: {
     getItem: vi.fn(),
     setItem: vi.fn(),
@@ -46,10 +44,7 @@ vi.mock('../../../context/ComparisonContext', () => ({
 
 vi.mock('../../../api/offerApi', () => ({
   getOffersBySeller: mockGetOffersBySeller,
-}));
-
-vi.mock('axios', () => ({
-  default: mockAxios,
+  getOfferById: mockGetOfferById,
 }));
 
 vi.mock('../../../components/LikeButton/LikeButton', () => ({
@@ -215,12 +210,19 @@ const mockSellerResponse = {
   totalElements: 2,
 };
 
-const mockSellerDetails = {
-  data: {
-    seller: {
-      firstName: 'John',
-      lastName: 'Doe',
-    },
+const mockOfferDetails = {
+  id: '1',
+  title: 'BMW X5 2020',
+  seller: {
+    firstName: 'John',
+    lastName: 'Doe',
+    id: 'seller-1',
+    email: 'john.doe@example.com',
+  },
+  CarDetailsDto: {
+    brand: 'BMW',
+    model: 'X5',
+    year: 2020,
   },
 };
 
@@ -246,7 +248,7 @@ describe('SellerOffers Component', () => {
     });
 
     mockGetOffersBySeller.mockResolvedValue(mockSellerResponse);
-    mockAxios.get.mockResolvedValue(mockSellerDetails);
+    mockGetOfferById.mockResolvedValue(mockOfferDetails);
     mockSessionStorage.getItem.mockReturnValue(null);
   });
 
@@ -284,7 +286,7 @@ describe('SellerOffers Component', () => {
     renderComponent();
 
     await waitFor(() => {
-      expect(mockAxios.get).toHaveBeenCalledWith('http://localhost:8137/api/v1/offers/1');
+      expect(mockGetOfferById).toHaveBeenCalledWith('1');
       expect(mockUseTitle).toHaveBeenLastCalledWith('Oferty sprzedającego - John Doe');
     });
   });
@@ -293,7 +295,6 @@ describe('SellerOffers Component', () => {
     renderComponent();
 
     await waitFor(() => {
-      // Check BMW offer details
       expect(screen.getByText('BMW X5 2020')).toBeInTheDocument();
       expect(screen.getByText('150 000 PLN')).toBeInTheDocument();
       expect(screen.getByText('2020')).toBeInTheDocument();
@@ -310,7 +311,7 @@ describe('SellerOffers Component', () => {
     renderComponent();
 
     await waitFor(() => {
-      expect(screen.getByText('Znaleziono 2 oferty dla użytkownika: John Doe')).toBeInTheDocument();
+      expect(screen.getByText(/Znaleziono 2 oferty dla użytkownika: John Doe/)).toBeInTheDocument();
     });
   });
 
@@ -483,7 +484,7 @@ describe('SellerOffers Component', () => {
 
   test('handles seller details fetch error gracefully', async () => {
     const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    mockAxios.get.mockRejectedValue(new Error('Seller details error'));
+    mockGetOfferById.mockRejectedValue(new Error('Seller details error'));
 
     renderComponent();
 

@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import './SellerOffers.scss';
-import { getOffersBySeller } from '../../api/offerApi';
+import { getOfferById, getOffersBySeller } from '../../api/offerApi';
 import { ApiOffer, OfferData } from '../../types/offerTypes.ts';
 import useTitle from '../../hooks/useTitle';
-import axios from 'axios';
 import LikeButton from '../../components/LikeButton/LikeButton';
 import CompareCheckbox from '../../components/CompareCheckbox/CompareCheckbox';
 import ComparisonBar from '../../components/ComparisonBar/ComparisonBar';
@@ -162,13 +161,11 @@ const SellerOffers: React.FC = () => {
           const firstOffer = data.content[0];
           if (firstOffer) {
             try {
-              const offerResponse = await axios.get(
-                `${import.meta.env.VITE_API_URL}/api/v1/offers/${firstOffer.id}`
-              );
-              if (offerResponse.data.seller) {
+              const offerResponse = await getOfferById(firstOffer.id);
+              if (offerResponse.seller) {
                 setSellerInfo({
-                  firstName: offerResponse.data.seller.firstName,
-                  lastName: offerResponse.data.seller.lastName,
+                  firstName: offerResponse.seller.firstName,
+                  lastName: offerResponse.seller.lastName,
                 });
               }
             } catch (err) {

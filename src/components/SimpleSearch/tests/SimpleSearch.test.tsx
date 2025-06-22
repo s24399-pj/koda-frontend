@@ -1,11 +1,18 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import axios from 'axios';
 import SimpleSearch from '../SimpleSearch';
 
-vi.mock('axios');
-const mockedGet = vi.mocked(axios.get);
+const { mockGetMaxPrice, mockGetAllBrands, mockSearchBrandsByPhrase } = vi.hoisted(() => ({
+  mockGetMaxPrice: vi.fn(),
+  mockGetAllBrands: vi.fn(),
+  mockSearchBrandsByPhrase: vi.fn(),
+}));
+
+vi.mock('../../../api/offerApi', () => ({
+  getMaxPrice: mockGetMaxPrice,
+  getAllBrands: mockGetAllBrands,
+  searchBrandsByPhrase: mockSearchBrandsByPhrase,
+}));
 
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', () => ({ useNavigate: () => mockNavigate }));
@@ -14,20 +21,26 @@ const TEST_API = 'http://api.test';
 beforeAll(() => {
   vi.stubEnv('VITE_API_URL', TEST_API);
 });
-import.meta, 'env', { value: { VITE_API_URL: TEST_API }, writable: true };
+
+Object.defineProperty(import.meta, 'env', { value: { VITE_API_URL: TEST_API }, writable: true });
 
 describe('SimpleSearch Component', () => {
-  const priceOffers = [{ price: 5000 }, { price: 20000 }, { price: 75000 }];
   const brandList = ['Audi', 'BMW', 'Toyota'];
+  const maxPrice = 75000;
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockGetMaxPrice.mockResolvedValue(maxPrice);
+    mockGetAllBrands.mockResolvedValue(brandList);
+    mockSearchBrandsByPhrase.mockResolvedValue(brandList);
   });
 
   it('formats and validates price inputs', async () => {
-    mockedGet.mockResolvedValue({ data: { content: priceOffers } });
     render(<SimpleSearch />);
-    await waitFor(() => {});
+
+    await waitFor(() => {
+      expect(mockGetMaxPrice).toHaveBeenCalled();
+    });
 
     const minInput = screen.getByLabelText('Minimalna cena');
     const maxInput = screen.getByLabelText('Maksymalna cena');
@@ -44,16 +57,16 @@ describe('SimpleSearch Component', () => {
   });
 
   it('displays brand suggestions and allows selection', async () => {
-    mockedGet
-      .mockResolvedValueOnce({ data: { content: priceOffers } })
-      .mockResolvedValueOnce({ data: brandList })
-      .mockResolvedValueOnce({ data: brandList });
-
     render(<SimpleSearch />);
-    await waitFor(() => {});
+
+    await waitFor(() => {
+      expect(mockGetMaxPrice).toHaveBeenCalled();
+      expect(mockGetAllBrands).toHaveBeenCalled();
+    });
 
     const searchInput = screen.getByPlaceholderText('Wpisz markę lub model');
     fireEvent.focus(searchInput);
+
     await waitFor(() => expect(screen.getByText('Ładowanie...')).toBeInTheDocument());
     await waitFor(() => expect(screen.getByText('Audi')).toBeInTheDocument());
 
@@ -61,13 +74,42 @@ describe('SimpleSearch Component', () => {
     expect(searchInput).toHaveValue('BMW');
   });
 
-  it('submits valid search and navigates', async () => {
-    mockedGet.mockResolvedValue({ data: { content: priceOffers } });
+  it('searches brands when typing', async () => {
     render(<SimpleSearch />);
-    await waitFor(() => {});
+
+    await waitFor(() => {
+      expect(mockGetAllBrands).toHaveBeenCalled();
+    });
+
+    const searchInput = screen.getByPlaceholderText('Wpisz markę lub model');
+    fireEvent.change(searchInput, { target: { value: 'BMW' } });
+
+    await waitFor(() => {
+      expect(mockSearchBrandsByPhrase).toHaveBeenCalledWith('BMW');
+    });
+  });
+
+  it('shows all brands when input is empty and focused', async () => {
+    render(<SimpleSearch />);
+
+    const searchInput = screen.getByPlaceholderText('Wpisz markę lub model');
+    fireEvent.focus(searchInput);
+
+    await waitFor(() => {
+      expect(mockGetAllBrands).toHaveBeenCalled();
+    });
+  });
+
+  it('submits valid search and navigates', async () => {
+    render(<SimpleSearch />);
+
+    await waitFor(() => {
+      expect(mockGetMaxPrice).toHaveBeenCalled();
+    });
 
     const input = screen.getByPlaceholderText('Wpisz markę lub model');
     fireEvent.change(input, { target: { value: 'Audi' } });
+
     const minInput = screen.getByLabelText('Minimalna cena');
     const maxInput = screen.getByLabelText('Maksymalna cena');
     fireEvent.change(minInput, { target: { value: '1000' } });
@@ -75,5 +117,79 @@ describe('SimpleSearch Component', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Szukaj' }));
     expect(mockNavigate).toHaveBeenCalledWith('/offers?phrase=Audi&minPrice=1000&maxPrice=50000');
+  });
+
+  it('handles API errors gracefully', async () => {
+    mockGetMaxPrice.mockRejectedValue(new Error('API Error'));
+    mockGetAllBrands.mockRejectedValue(new Error('Brands Error'));
+
+    render(<SimpleSearch />);
+
+    await waitFor(() => {
+      expect(mockGetMaxPrice).toHaveBeenCalled();
+      expect(mockGetAllBrands).toHaveBeenCalled();
+    });
+
+    const input = screen.getByPlaceholderText('Wpisz markę lub model');
+    expect(input).toBeInTheDocument();
+  });
+
+  it('shows no results when brand search fails', async () => {
+    mockSearchBrandsByPhrase.mockResolvedValue([]);
+
+    render(<SimpleSearch />);
+
+    const searchInput = screen.getByPlaceholderText('Wpisz markę lub model');
+    fireEvent.change(searchInput, { target: { value: 'NonExistentBrand' } });
+    fireEvent.focus(searchInput);
+
+    await waitFor(() => {
+      expect(screen.getByText('Brak wyników wyszukiwania')).toBeInTheDocument();
+    });
+  });
+
+  it('handles price suggestion clicks', async () => {
+    render(<SimpleSearch />);
+
+    await waitFor(() => {
+      expect(mockGetMaxPrice).toHaveBeenCalled();
+    });
+
+    const minInput = screen.getByLabelText('Minimalna cena');
+    fireEvent.focus(minInput);
+
+    await waitFor(() => {
+      expect(screen.getByText('1 000 zł')).toBeInTheDocument();
+    });
+
+    fireEvent.mouseDown(screen.getByText('1 000 zł'));
+    expect(minInput).toHaveValue('1 000');
+  });
+
+  it('disables search when loading', async () => {
+    mockGetMaxPrice.mockImplementation(() => new Promise(() => {}));
+
+    render(<SimpleSearch />);
+
+    const searchButton = screen.getByRole('button', { name: 'Ładowanie...' });
+    expect(searchButton).toBeDisabled();
+  });
+
+  it('validates prices correctly', async () => {
+    render(<SimpleSearch />);
+
+    await waitFor(() => {
+      expect(mockGetMaxPrice).toHaveBeenCalled();
+    });
+
+    const minInput = screen.getByLabelText('Minimalna cena');
+    const maxInput = screen.getByLabelText('Maksymalna cena');
+
+    fireEvent.change(minInput, { target: { value: '50000' } });
+    fireEvent.change(maxInput, { target: { value: '30000' } });
+
+    await waitFor(() => {
+      expect(screen.getByText(/Cena maksymalna nie może być równa lub niższa/)).toBeInTheDocument();
+    });
   });
 });

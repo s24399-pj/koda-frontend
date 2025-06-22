@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import useTitle from '../../hooks/useTitle';
-import axios from 'axios';
 import L from 'leaflet';
 import { OfferData } from '../../types/offerTypes';
 import 'leaflet/dist/leaflet.css';
@@ -13,6 +12,7 @@ import { CarEquipment } from '../../types/offer/OfferTypes.ts';
 import { equipmentCategories } from '../../types/offer/carEquipmentCategories.ts';
 import { translations } from '../../translations/carEquipmentTranslations.ts';
 import { DEFAULT_CAR_IMAGE } from '../../util/constants.tsx';
+import offerApi from '../../api/offerApi';
 
 interface LightboxProps {
   images: string[];
@@ -186,18 +186,22 @@ const Offer: React.FC = () => {
 
   useEffect(() => {
     const fetchOffer = async () => {
+      if (!id) {
+        setError('Brak ID oferty');
+        setLoading(false);
+        return;
+      }
+
       try {
-        const response = await axios.get<OfferData>(
-          `${import.meta.env.VITE_API_URL}/api/v1/offers/${id}`
-        );
-        setOffer(response.data);
+        const offerData = await offerApi.getOfferById(id);
+        setOffer(offerData);
 
         const images: string[] = [];
-        if (response.data.mainImage) {
-          images.push(response.data.mainImage);
+        if (offerData.mainImage) {
+          images.push(offerData.mainImage);
         }
-        if (response.data.imageUrls && response.data.imageUrls.length > 0) {
-          response.data.imageUrls.forEach(img => {
+        if (offerData.imageUrls && offerData.imageUrls.length > 0) {
+          offerData.imageUrls.forEach(img => {
             if (!images.includes(img)) {
               images.push(img);
             }
@@ -209,35 +213,19 @@ const Offer: React.FC = () => {
           setSelectedImage(images[0]);
         }
 
-        if (response.data.seller?.profilePictureBase64) {
-          setProfileImage(response.data.seller.profilePictureBase64);
+        if (offerData.seller?.profilePictureBase64) {
+          setProfileImage(offerData.seller.profilePictureBase64);
         }
 
-        if (response.data.location) {
-          const geocodeResponse = await axios.get('https://nominatim.openstreetmap.org/search', {
-            params: {
-              q: `${response.data.location}, Poland`,
-              format: 'json',
-              limit: 5,
-              addressdetails: 1,
-            },
-          });
-
-          if (geocodeResponse.data.length > 0) {
-            const validLocation = geocodeResponse.data.find(
-              (result: any) => result.address.city || result.address.town || result.address.village
-            );
-
-            if (validLocation) {
-              const { lat, lon } = validLocation;
-              setMapLat(parseFloat(lat));
-              setMapLng(parseFloat(lon));
-            } else {
-              console.error('Exact location not found');
-              setError('Failed to find exact location.');
+        if (offerData.location) {
+          try {
+            const coordinates = await offerApi.geocodeLocation(offerData.location);
+            if (coordinates) {
+              setMapLat(coordinates.lat);
+              setMapLng(coordinates.lng);
             }
-          } else {
-            console.error('No results for this location');
+          } catch (geocodeError) {
+            console.error('Geocoding error:', geocodeError);
             setError('Failed to find location.');
           }
         }
