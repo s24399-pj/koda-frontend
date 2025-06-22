@@ -1,8 +1,8 @@
 import axiosAuthClient from './axiosAuthClient';
 import axios from 'axios';
-import { CreateOfferCommand, OfferResponse } from '../types/offer/OfferTypes';
-import { MiniOffer } from '../types/miniOfferTypes';
-import { OfferData } from '../types/offerTypes';
+import {CreateOfferCommand, OfferResponse} from '../types/offer/OfferTypes';
+import {MiniOffer} from '../types/miniOfferTypes';
+import {OfferData} from '../types/offerTypes';
 
 const API_URL = import.meta.env.VITE_API_URL;
 const OFFERS_ENDPOINT = '/api/v1/offers';
@@ -381,8 +381,7 @@ export const getAllOffers = (): Promise<MiniOffer[]> => {
     .get<OffersResponse>(OFFERS_ENDPOINT)
     .then(response => {
       console.log('All offers received');
-      const offers = response.data.content || [];
-      return offers.map(adaptToMiniOffer);
+      return response.data.content || [];
     })
     .catch(error => {
       console.error('Error fetching all offers:', error);
