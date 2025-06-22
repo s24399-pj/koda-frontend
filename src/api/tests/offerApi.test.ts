@@ -10,6 +10,7 @@ import offerApi, {
   getUserOffers,
   PaginationParams,
   searchBrands,
+  getModelsByBrand,
   searchOffers,
   updateOffer,
 } from '../offerApi';
@@ -487,6 +488,83 @@ describe('offerApi', () => {
       expect(console.error).toHaveBeenCalledWith('Error searching brands:', error);
     });
   });
+
+  describe('getModelsByBrand', () => {
+  it('should fetch models for brand successfully', async () => {
+    const mockResponse = {
+      data: {
+        content: ['M3', 'M5', 'X5', '3 Series', 'X3'],
+      },
+    };
+
+    mockApiClient.get.mockResolvedValueOnce(mockResponse);
+
+    const result = await getModelsByBrand('BMW');
+
+    expect(mockApiClient.get).toHaveBeenCalledWith('/api/v1/offers/search/models', {
+      params: { brand: 'BMW' },
+    });
+    expect(result).toEqual(['M3', 'M5', 'X5', '3 Series', 'X3']);
+  });
+
+  it('should return empty array when content is null', async () => {
+    const mockResponse = {
+      data: {
+        content: null,
+      },
+    };
+
+    mockApiClient.get.mockResolvedValueOnce(mockResponse);
+
+    const result = await getModelsByBrand('BMW');
+
+    expect(result).toEqual([]);
+  });
+
+  it('should return empty array when fetch fails', async () => {
+    const error = new Error('Models fetch failed');
+    mockApiClient.get.mockRejectedValueOnce(error);
+
+    const result = await getModelsByBrand('BMW');
+
+    expect(result).toEqual([]);
+    expect(console.error).toHaveBeenCalledWith('Error fetching models for brand:', error);
+  });
+
+  it('should handle different brand names', async () => {
+    const mockResponse = {
+      data: {
+        content: ['A3', 'A4', 'A6', 'Q5', 'Q7'],
+      },
+    };
+
+    mockApiClient.get.mockResolvedValueOnce(mockResponse);
+
+    const result = await getModelsByBrand('Audi');
+
+    expect(mockApiClient.get).toHaveBeenCalledWith('/api/v1/offers/search/models', {
+      params: { brand: 'Audi' },
+    });
+    expect(result).toEqual(['A3', 'A4', 'A6', 'Q5', 'Q7']);
+  });
+
+  it('should handle empty brand string', async () => {
+    const mockResponse = {
+      data: {
+        content: [],
+      },
+    };
+
+    mockApiClient.get.mockResolvedValueOnce(mockResponse);
+
+    const result = await getModelsByBrand('');
+
+    expect(mockApiClient.get).toHaveBeenCalledWith('/api/v1/offers/search/models', {
+      params: { brand: '' },
+    });
+    expect(result).toEqual([]);
+  });
+});
 
   describe('getOfferById', () => {
     it('should fetch offer by id successfully', async () => {
