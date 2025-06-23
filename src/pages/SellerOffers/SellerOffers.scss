@@ -184,10 +184,6 @@
           transition: transform var(--transition-medium);
         }
 
-        &:hover img {
-          transform: scale(1.05);
-        }
-
         .no-image {
           color: var(--text-tertiary);
           font-size: 14px;

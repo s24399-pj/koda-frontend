@@ -17,6 +17,27 @@ vi.mock('../../../api/offerApi', () => ({
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', () => ({ useNavigate: () => mockNavigate }));
 
+const sessionStorageMock = (() => {
+  let store: Record<string, string> = {};
+  return {
+    getItem: vi.fn((key: string) => store[key] || null),
+    setItem: vi.fn((key: string, value: string) => {
+      store[key] = value.toString();
+    }),
+    removeItem: vi.fn((key: string) => {
+      delete store[key];
+    }),
+    clear: vi.fn(() => {
+      store = {};
+    }),
+  };
+})();
+
+Object.defineProperty(window, 'sessionStorage', {
+  value: sessionStorageMock,
+  writable: true,
+});
+
 const TEST_API = 'http://api.test';
 beforeAll(() => {
   vi.stubEnv('VITE_API_URL', TEST_API);
@@ -30,6 +51,7 @@ describe('SimpleSearch Component', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    sessionStorageMock.clear();
     mockGetMaxPrice.mockResolvedValue(maxPrice);
     mockGetAllBrands.mockResolvedValue(brandList);
     mockSearchBrandsByPhrase.mockResolvedValue(brandList);
@@ -100,7 +122,7 @@ describe('SimpleSearch Component', () => {
     });
   });
 
-  it('submits valid search and navigates', async () => {
+  it('submits valid search, saves to sessionStorage and navigates', async () => {
     render(<SimpleSearch />);
 
     await waitFor(() => {
@@ -116,7 +138,16 @@ describe('SimpleSearch Component', () => {
     fireEvent.change(maxInput, { target: { value: '50000' } });
 
     fireEvent.click(screen.getByRole('button', { name: 'Szukaj' }));
-    expect(mockNavigate).toHaveBeenCalledWith('/offers?phrase=Audi&minPrice=1000&maxPrice=50000');
+
+    expect(sessionStorageMock.setItem).toHaveBeenCalledWith(
+      'simpleSearchParams',
+      JSON.stringify({
+        phrase: 'Audi',
+        minPrice: 1000,
+        maxPrice: 50000
+      })
+    );
+    expect(mockNavigate).toHaveBeenCalledWith('/offers');
   });
 
   it('handles API errors gracefully', async () => {

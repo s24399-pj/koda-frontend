@@ -202,9 +202,27 @@ const SimpleSearch: React.FC = () => {
     const isValid = validatePrices(minPrice, maxPrice);
     if (!isValid) return;
 
-    navigate(
-      `/offers?phrase=${encodeURIComponent(phrase)}&minPrice=${cleanNumber(minPrice)}&maxPrice=${cleanNumber(maxPrice)}`
-    );
+    const searchParams: Record<string, any> = {};
+    
+    if (phrase && phrase.trim() !== '') {
+      searchParams.phrase = phrase.trim();
+    }
+    
+    if (minPrice && cleanNumber(minPrice) !== '') {
+      searchParams.minPrice = parseInt(cleanNumber(minPrice), 10);
+    }
+
+    if (maxPrice && cleanNumber(maxPrice) !== '') {
+      searchParams.maxPrice = parseInt(cleanNumber(maxPrice), 10);
+    }
+    
+    console.log('Saving search parameters to sessionStorage:', searchParams);
+    
+    if (Object.keys(searchParams).length > 0) {
+      sessionStorage.setItem('simpleSearchParams', JSON.stringify(searchParams));
+    }
+    
+    navigate('/offers');
   };
 
   const getFilteredPrices = (pricePoints: number[]): number[] => {

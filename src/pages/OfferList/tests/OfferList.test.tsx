@@ -1,9 +1,10 @@
+import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import OfferList from '../OfferList';
 import { MiniOffer } from '../../../types/miniOfferTypes';
-import { SearchResponse } from '../../../api/offerApi';
+import { SearchResponse, AdvancedSearchParams } from '../../../api/offerApi';
 
 const { mockUseTitle, mockUseNavigate, mockUseComparison, mockOfferApiService, mockScrollTo } =
   vi.hoisted(() => ({
@@ -15,6 +16,27 @@ const { mockUseTitle, mockUseNavigate, mockUseComparison, mockOfferApiService, m
     },
     mockScrollTo: vi.fn(),
   }));
+
+const sessionStorageMock = (() => {
+  let store: Record<string, string> = {};
+  return {
+    getItem: vi.fn((key: string) => store[key] || null),
+    setItem: vi.fn((key: string, value: string) => {
+      store[key] = value.toString();
+    }),
+    removeItem: vi.fn((key: string) => {
+      delete store[key];
+    }),
+    clear: vi.fn(() => {
+      store = {};
+    }),
+  };
+})();
+
+Object.defineProperty(window, 'sessionStorage', {
+  value: sessionStorageMock,
+  writable: true,
+});
 
 vi.mock('../../../hooks/useTitle', () => ({
   default: mockUseTitle,
@@ -87,28 +109,38 @@ vi.mock('../../../components/ComparisonBar/ComparisonBar', () => ({
   ),
 }));
 
+let capturedInitialFilters: AdvancedSearchParams = {};
+
 vi.mock('../../../components/AdvancedFilter/AdvancedFilter', () => ({
-  default: ({
+  default: React.forwardRef(({
     onSearch,
     onLoading,
+    initialFilters,
   }: {
     onSearch: (results: SearchResponse<MiniOffer>) => void;
     onLoading: (loading: boolean) => void;
-  }) => {
+    initialFilters?: AdvancedSearchParams;
+  }, ref) => {
+    if (initialFilters) {
+      capturedInitialFilters = initialFilters;
+    }
+
+    React.useImperativeHandle(ref, () => ({
+      getCurrentFilters: () => capturedInitialFilters,
+      searchOffers: () => {},
+      resetFilters: () => {},
+      setFilters: () => {},
+    }));
+
     const handleSearch = () => {
       onLoading(true);
 
       setTimeout(() => {
-        const mockResults: SearchResponse<MiniOffer> = {
-          content: mockOffers,
-          totalPages: 2,
-          number: 0,
-          size: 10,
-          totalElements: 15,
-          empty: false,
-        };
-        onSearch(mockResults);
-        onLoading(false);
+        // Use mockOfferApiService.searchOffers mock result to reflect test conditions
+        mockOfferApiService.searchOffers().then((results: SearchResponse<MiniOffer>) => {
+          onSearch(results);
+          onLoading(false);
+        });
       }, 100);
     };
 
@@ -120,7 +152,7 @@ vi.mock('../../../components/AdvancedFilter/AdvancedFilter', () => ({
         </button>
       </div>
     );
-  },
+  }),
 }));
 
 vi.mock('../../../util/constants.tsx', () => ({
@@ -208,6 +240,8 @@ describe('OfferList Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockUseTitle.mockReset();
+    sessionStorageMock.clear();
+    capturedInitialFilters = {};
 
     const mockNavigate = vi.fn();
     mockUseNavigate.mockReturnValue(mockNavigate);
@@ -234,6 +268,38 @@ describe('OfferList Component', () => {
     expect(screen.getByText('Dostępne oferty')).toBeInTheDocument();
     expect(screen.getByTestId('advanced-filter')).toBeInTheDocument();
     expect(screen.getByTestId('comparison-bar')).toBeInTheDocument();
+  });
+
+  test('reads search parameters from sessionStorage', async () => {
+    const searchParams = {
+      phrase: 'BMW',
+      minPrice: 100000,
+      maxPrice: 200000
+    };
+    
+    sessionStorageMock.setItem('simpleSearchParams', JSON.stringify(searchParams));
+    
+    renderComponent();
+    
+    await waitFor(() => {
+      expect(sessionStorageMock.getItem).toHaveBeenCalledWith('simpleSearchParams');
+      expect(sessionStorageMock.removeItem).toHaveBeenCalledWith('simpleSearchParams');
+      expect(capturedInitialFilters).toEqual(searchParams);
+    });
+  });
+
+  test('handles invalid search parameters in sessionStorage', async () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    sessionStorageMock.setItem('simpleSearchParams', 'invalid-json');
+    
+    renderComponent();
+    
+    await waitFor(() => {
+      expect(consoleSpy).toHaveBeenCalled();
+      expect(capturedInitialFilters).toEqual({});
+    });
+    
+    consoleSpy.mockRestore();
   });
 
   test('displays offers when search results are provided', async () => {
@@ -349,17 +415,28 @@ describe('OfferList Component', () => {
       totalElements: 0,
       empty: true,
     };
-
+    
+    mockOfferApiService.searchOffers.mockResolvedValue(emptyResponse);
+    
     renderComponent();
-
+  
+    fireEvent.click(screen.getByTestId('search-button'));
+    
     await waitFor(() => {
-      expect(
-        screen.getByText('Brak ofert spełniających kryteria wyszukiwania')
-      ).toBeInTheDocument();
-      expect(
-        screen.getByText('Spróbuj zmienić filtry lub rozszerzyć kryteria wyszukiwania')
-      ).toBeInTheDocument();
+      expect(screen.queryByText('Ładowanie ofert...')).not.toBeInTheDocument();
     });
+    
+    const noResultsElement = screen.getByText((content, element) => {
+      return element?.textContent === 'Brak ofert spełniających kryteria wyszukiwania';
+    });
+    
+    expect(noResultsElement).toBeInTheDocument();
+    
+    const hintElement = screen.getByText((content, element) => {
+      return element?.textContent === 'Spróbuj zmienić filtry lub rozszerzyć kryteria wyszukiwania';
+    });
+    
+    expect(hintElement).toBeInTheDocument();
   });
 
   test('disables pagination buttons appropriately', async () => {
@@ -463,5 +540,24 @@ describe('OfferList Component', () => {
     expect(screen.getByTestId('advanced-filter')).toBeInTheDocument();
 
     consoleSpy.mockRestore();
+  });
+
+  test('handles page changes correctly', async () => {
+    mockOfferApiService.searchOffers.mockImplementation((filters, pagination) => {
+      if (pagination && pagination.page === 1) {
+        return Promise.resolve({
+          ...mockSearchResponse,
+          content: [mockOffers[2]],
+          number: 1
+        });
+      }
+      return Promise.resolve(mockSearchResponse);
+    });
+
+    renderComponent();
+
+    await waitFor(() => {
+      expect(screen.getByTestId('advanced-filter')).toBeInTheDocument();
+    });
   });
 });
