@@ -203,11 +203,11 @@ const SimpleSearch: React.FC = () => {
     if (!isValid) return;
 
     const searchParams: Record<string, any> = {};
-    
+
     if (phrase && phrase.trim() !== '') {
       searchParams.phrase = phrase.trim();
     }
-    
+
     if (minPrice && cleanNumber(minPrice) !== '') {
       searchParams.minPrice = parseInt(cleanNumber(minPrice), 10);
     }
@@ -215,13 +215,13 @@ const SimpleSearch: React.FC = () => {
     if (maxPrice && cleanNumber(maxPrice) !== '') {
       searchParams.maxPrice = parseInt(cleanNumber(maxPrice), 10);
     }
-    
+
     console.log('Saving search parameters to sessionStorage:', searchParams);
-    
+
     if (Object.keys(searchParams).length > 0) {
       sessionStorage.setItem('simpleSearchParams', JSON.stringify(searchParams));
     }
-    
+
     navigate('/offers');
   };
 

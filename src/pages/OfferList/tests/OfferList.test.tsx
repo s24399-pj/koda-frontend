@@ -112,47 +112,52 @@ vi.mock('../../../components/ComparisonBar/ComparisonBar', () => ({
 let capturedInitialFilters: AdvancedSearchParams = {};
 
 vi.mock('../../../components/AdvancedFilter/AdvancedFilter', () => ({
-  default: React.forwardRef(({
-    onSearch,
-    onLoading,
-    initialFilters,
-  }: {
-    onSearch: (results: SearchResponse<MiniOffer>) => void;
-    onLoading: (loading: boolean) => void;
-    initialFilters?: AdvancedSearchParams;
-  }, ref) => {
-    if (initialFilters) {
-      capturedInitialFilters = initialFilters;
+  default: React.forwardRef(
+    (
+      {
+        onSearch,
+        onLoading,
+        initialFilters,
+      }: {
+        onSearch: (results: SearchResponse<MiniOffer>) => void;
+        onLoading: (loading: boolean) => void;
+        initialFilters?: AdvancedSearchParams;
+      },
+      ref
+    ) => {
+      if (initialFilters) {
+        capturedInitialFilters = initialFilters;
+      }
+
+      React.useImperativeHandle(ref, () => ({
+        getCurrentFilters: () => capturedInitialFilters,
+        searchOffers: () => {},
+        resetFilters: () => {},
+        setFilters: () => {},
+      }));
+
+      const handleSearch = () => {
+        onLoading(true);
+
+        setTimeout(() => {
+          // Use mockOfferApiService.searchOffers mock result to reflect test conditions
+          mockOfferApiService.searchOffers().then((results: SearchResponse<MiniOffer>) => {
+            onSearch(results);
+            onLoading(false);
+          });
+        }, 100);
+      };
+
+      return (
+        <div data-testid="advanced-filter">
+          <input data-testid="filter-input" placeholder="Wyszukaj oferty" />
+          <button data-testid="search-button" onClick={handleSearch}>
+            Szukaj
+          </button>
+        </div>
+      );
     }
-
-    React.useImperativeHandle(ref, () => ({
-      getCurrentFilters: () => capturedInitialFilters,
-      searchOffers: () => {},
-      resetFilters: () => {},
-      setFilters: () => {},
-    }));
-
-    const handleSearch = () => {
-      onLoading(true);
-
-      setTimeout(() => {
-        // Use mockOfferApiService.searchOffers mock result to reflect test conditions
-        mockOfferApiService.searchOffers().then((results: SearchResponse<MiniOffer>) => {
-          onSearch(results);
-          onLoading(false);
-        });
-      }, 100);
-    };
-
-    return (
-      <div data-testid="advanced-filter">
-        <input data-testid="filter-input" placeholder="Wyszukaj oferty" />
-        <button data-testid="search-button" onClick={handleSearch}>
-          Szukaj
-        </button>
-      </div>
-    );
-  }),
+  ),
 }));
 
 vi.mock('../../../util/constants.tsx', () => ({
@@ -274,13 +279,13 @@ describe('OfferList Component', () => {
     const searchParams = {
       phrase: 'BMW',
       minPrice: 100000,
-      maxPrice: 200000
+      maxPrice: 200000,
     };
-    
+
     sessionStorageMock.setItem('simpleSearchParams', JSON.stringify(searchParams));
-    
+
     renderComponent();
-    
+
     await waitFor(() => {
       expect(sessionStorageMock.getItem).toHaveBeenCalledWith('simpleSearchParams');
       expect(sessionStorageMock.removeItem).toHaveBeenCalledWith('simpleSearchParams');
@@ -291,14 +296,14 @@ describe('OfferList Component', () => {
   test('handles invalid search parameters in sessionStorage', async () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     sessionStorageMock.setItem('simpleSearchParams', 'invalid-json');
-    
+
     renderComponent();
-    
+
     await waitFor(() => {
       expect(consoleSpy).toHaveBeenCalled();
       expect(capturedInitialFilters).toEqual({});
     });
-    
+
     consoleSpy.mockRestore();
   });
 
@@ -415,27 +420,27 @@ describe('OfferList Component', () => {
       totalElements: 0,
       empty: true,
     };
-    
+
     mockOfferApiService.searchOffers.mockResolvedValue(emptyResponse);
-    
+
     renderComponent();
-  
+
     fireEvent.click(screen.getByTestId('search-button'));
-    
+
     await waitFor(() => {
       expect(screen.queryByText('Ładowanie ofert...')).not.toBeInTheDocument();
     });
-    
+
     const noResultsElement = screen.getByText((content, element) => {
       return element?.textContent === 'Brak ofert spełniających kryteria wyszukiwania';
     });
-    
+
     expect(noResultsElement).toBeInTheDocument();
-    
+
     const hintElement = screen.getByText((content, element) => {
       return element?.textContent === 'Spróbuj zmienić filtry lub rozszerzyć kryteria wyszukiwania';
     });
-    
+
     expect(hintElement).toBeInTheDocument();
   });
 
@@ -548,7 +553,7 @@ describe('OfferList Component', () => {
         return Promise.resolve({
           ...mockSearchResponse,
           content: [mockOffers[2]],
-          number: 1
+          number: 1,
         });
       }
       return Promise.resolve(mockSearchResponse);

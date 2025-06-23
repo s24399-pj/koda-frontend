@@ -41,27 +41,27 @@ const OfferList: React.FC = () => {
       if (paramsJson) {
         const params = JSON.parse(paramsJson);
         console.log('Found SimpleSearch parameters in sessionStorage:', params);
-        
+
         // Remove parameters from sessionStorage to avoid reusing them on page refresh
         sessionStorage.removeItem('simpleSearchParams');
-        
+
         if (typeof params === 'object') {
           const cleanParams: AdvancedSearchParams = {};
-          
+
           if (params.phrase && params.phrase.trim() !== '') {
             cleanParams.phrase = params.phrase.trim();
           }
-          
+
           if (params.minPrice && typeof params.minPrice === 'number') {
             cleanParams.minPrice = params.minPrice;
           }
-          
+
           if (params.maxPrice && typeof params.maxPrice === 'number') {
             cleanParams.maxPrice = params.maxPrice;
           }
-          
+
           console.log('Prepared parameters for AdvancedFilter:', cleanParams);
-          
+
           if (Object.keys(cleanParams).length > 0) {
             setInitialFilters(cleanParams);
           }
@@ -123,26 +123,29 @@ const OfferList: React.FC = () => {
 
   const handlePageChange = async (newPage: number) => {
     console.log(`Changing page to ${newPage}`);
-    
+
     let currentFilters = {};
-    if (advancedFilterRef.current && typeof advancedFilterRef.current.getCurrentFilters === 'function') {
+    if (
+      advancedFilterRef.current &&
+      typeof advancedFilterRef.current.getCurrentFilters === 'function'
+    ) {
       currentFilters = advancedFilterRef.current.getCurrentFilters();
       console.log('Current filters during page change:', currentFilters);
     }
-    
+
     setCurrentPage(newPage);
     setIsLoading(true);
-    
+
     const apiPage = newPage - 1;
-    
+
     try {
-      const results = await offerApiService.searchOffers(
-        currentFilters as AdvancedSearchParams,
-        { page: apiPage, size: 10 }
-      );
-      
+      const results = await offerApiService.searchOffers(currentFilters as AdvancedSearchParams, {
+        page: apiPage,
+        size: 10,
+      });
+
       console.log(`Results for page ${newPage}:`, results);
-      
+
       if (results && results.content) {
         setOffers(results.content);
         setTotalPages(results.totalPages || 1);
@@ -238,9 +241,9 @@ const OfferList: React.FC = () => {
     <div className="offer-list-container">
       <div className="offer-list-layout">
         <div className={`filter-panel ${showFilters ? 'show' : ''}`}>
-          <AdvancedFilter 
+          <AdvancedFilter
             ref={advancedFilterRef}
-            onSearch={handleSearchResults} 
+            onSearch={handleSearchResults}
             onLoading={handleLoading}
             initialFilters={initialFilters}
           />

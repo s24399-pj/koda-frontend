@@ -17,15 +17,17 @@ const enumToOptions = (enumObject: any, translationCategory: keyof typeof transl
       // Use type assertion to access the translations safely
       const translationObj = translations[translationCategory] as Record<string, string>;
       const translation = translationObj[key];
-      
+
       return {
         value: enumObject[key],
-        label: translation || key
-          .replace(/_/g, ' ')
-          .toLowerCase()
-          .split(' ')
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(' '),
+        label:
+          translation ||
+          key
+            .replace(/_/g, ' ')
+            .toLowerCase()
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' '),
       };
     });
 };
@@ -83,19 +85,19 @@ const AdvancedFilter = forwardRef<any, AdvancedFilterProps>(
     // Exposing methods for parent component via ref
     useImperativeHandle(ref, () => ({
       getCurrentFilters: () => filters,
-      
+
       searchOffers: () => {
         searchOffersWithFilters(filters);
       },
-      
+
       resetFilters: () => {
         resetFilters();
       },
-      
+
       setFilters: (newFilters: AdvancedSearchParams) => {
         console.log('Setting filters from outside:', newFilters);
         setFilters(prev => ({ ...prev, ...newFilters }));
-      }
+      },
     }));
 
     const fuelTypeOptions = enumToOptions(FuelType, 'fuelType');
@@ -123,7 +125,7 @@ const AdvancedFilter = forwardRef<any, AdvancedFilterProps>(
     useEffect(() => {
       if (isInitialSetup && Object.keys(initialFilters).length > 0) {
         console.log('Setting initial filters:', initialFilters);
-        
+
         setFilters(prev => {
           const newFilters = { ...prev };
           Object.keys(initialFilters).forEach(key => {
@@ -140,7 +142,7 @@ const AdvancedFilter = forwardRef<any, AdvancedFilterProps>(
             searchOffersWithFilters(initialFilters);
           }, 100);
         }
-        
+
         setIsInitialSetup(false);
       }
     }, [initialFilters, isInitialSetup, disableAutoSearch]);
@@ -153,7 +155,7 @@ const AdvancedFilter = forwardRef<any, AdvancedFilterProps>(
           console.log('Executing automatic search for all offers');
           fetchAllOffers();
         }
-        
+
         setInitialized(true);
       }
     }, [initialized, disableAutoSearch, initialFilters]);

@@ -144,7 +144,7 @@ describe('SimpleSearch Component', () => {
       JSON.stringify({
         phrase: 'Audi',
         minPrice: 1000,
-        maxPrice: 50000
+        maxPrice: 50000,
       })
     );
     expect(mockNavigate).toHaveBeenCalledWith('/offers');
