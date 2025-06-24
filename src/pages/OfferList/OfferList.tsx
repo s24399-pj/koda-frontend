@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './OfferList.scss';
 import useTitle from '../../hooks/useTitle';
@@ -9,21 +9,23 @@ import ComparisonBar from '../../components/ComparisonBar/ComparisonBar';
 import { useComparison } from '../../context/ComparisonContext';
 import AdvancedFilter from '../../components/AdvancedFilter/AdvancedFilter';
 import { translations } from '../../translations/carEquipmentTranslations';
-import offerApiService, { SearchResponse } from '../../api/offerApi';
+import offerApiService, { SearchResponse, AdvancedSearchParams } from '../../api/offerApi';
 import { DEFAULT_CAR_IMAGE } from '../../util/constants.tsx';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const OfferList: React.FC = () => {
   useTitle('Dostępne oferty');
+  const navigate = useNavigate();
+  const advancedFilterRef = useRef<any>(null);
 
   const [offers, setOffers] = useState<MiniOffer[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [showFilters] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
+  const [initialFilters, setInitialFilters] = useState<AdvancedSearchParams>({});
 
   const {
     selectedOffers,
@@ -32,6 +34,43 @@ const OfferList: React.FC = () => {
     isOfferSelected,
     canAddMoreOffers,
   } = useComparison();
+
+  useEffect(() => {
+    try {
+      const paramsJson = sessionStorage.getItem('simpleSearchParams');
+      if (paramsJson) {
+        const params = JSON.parse(paramsJson);
+        console.log('Found SimpleSearch parameters in sessionStorage:', params);
+
+        // Remove parameters from sessionStorage to avoid reusing them on page refresh
+        sessionStorage.removeItem('simpleSearchParams');
+
+        if (typeof params === 'object') {
+          const cleanParams: AdvancedSearchParams = {};
+
+          if (params.phrase && params.phrase.trim() !== '') {
+            cleanParams.phrase = params.phrase.trim();
+          }
+
+          if (params.minPrice && typeof params.minPrice === 'number') {
+            cleanParams.minPrice = params.minPrice;
+          }
+
+          if (params.maxPrice && typeof params.maxPrice === 'number') {
+            cleanParams.maxPrice = params.maxPrice;
+          }
+
+          console.log('Prepared parameters for AdvancedFilter:', cleanParams);
+
+          if (Object.keys(cleanParams).length > 0) {
+            setInitialFilters(cleanParams);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error reading parameters from sessionStorage:', error);
+    }
+  }, []);
 
   const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
     const target = event.target as HTMLImageElement;
@@ -46,7 +85,7 @@ const OfferList: React.FC = () => {
     setError(null);
 
     if (!results || !results.content) {
-      console.warn('Invalid search results received:', results);
+      console.warn('Invalid search results:', results);
       setOffers([]);
       setTotalPages(0);
       return;
@@ -55,10 +94,10 @@ const OfferList: React.FC = () => {
     try {
       setOffers(results.content);
       setTotalPages(results.totalPages || 1);
-      setCurrentPage(results.number ? results.number + 1 : 1);
+      setCurrentPage(results.number !== undefined ? results.number + 1 : 1);
     } catch (err) {
       console.error('Error processing search results:', err);
-      setError('An error occurred while processing the search results.');
+      setError('Wystąpił błąd podczas przetwarzania wyników wyszukiwania.');
       setOffers([]);
     }
   };
@@ -83,26 +122,46 @@ const OfferList: React.FC = () => {
   };
 
   const handlePageChange = async (newPage: number) => {
-    setIsLoading(true);
+    console.log(`Changing page to ${newPage}`);
+
+    let currentFilters = {};
+    if (
+      advancedFilterRef.current &&
+      typeof advancedFilterRef.current.getCurrentFilters === 'function'
+    ) {
+      currentFilters = advancedFilterRef.current.getCurrentFilters();
+      console.log('Current filters during page change:', currentFilters);
+    }
+
     setCurrentPage(newPage);
+    setIsLoading(true);
 
     const apiPage = newPage - 1;
 
-    offerApiService
-      .searchOffers({}, { page: apiPage, size: 10 })
-      .then(response => {
-        setOffers(response.content);
-        setTotalPages(response.totalPages || 1);
-        setError(null);
-      })
-      .catch(error => {
-        console.error('Error fetching page data:', error);
-        setError('Failed to fetch offers. Please try again.');
-        setOffers([]);
-      })
-      .finally(() => {
-        setIsLoading(false);
+    try {
+      const results = await offerApiService.searchOffers(currentFilters as AdvancedSearchParams, {
+        page: apiPage,
+        size: 10,
       });
+
+      console.log(`Results for page ${newPage}:`, results);
+
+      if (results && results.content) {
+        setOffers(results.content);
+        setTotalPages(results.totalPages || 1);
+        setError(null);
+      } else {
+        console.warn('Invalid response during page change:', results);
+        setOffers([]);
+        setError('Nie udało się załadować ofert. Nieprawidłowa odpowiedź z serwera.');
+      }
+    } catch (error) {
+      console.error('Error during page change:', error);
+      setError('Nie udało się załadować ofert. Spróbuj ponownie później.');
+      setOffers([]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const renderPaginationButtons = () => {
@@ -182,7 +241,12 @@ const OfferList: React.FC = () => {
     <div className="offer-list-container">
       <div className="offer-list-layout">
         <div className={`filter-panel ${showFilters ? 'show' : ''}`}>
-          <AdvancedFilter onSearch={handleSearchResults} onLoading={handleLoading} />
+          <AdvancedFilter
+            ref={advancedFilterRef}
+            onSearch={handleSearchResults}
+            onLoading={handleLoading}
+            initialFilters={initialFilters}
+          />
         </div>
 
         <div className="offers-panel">
