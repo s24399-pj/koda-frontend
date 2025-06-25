@@ -7,6 +7,7 @@ Complete E2E test suite for React applications using Playwright. Contains **68 f
 Functional tests verifying main user flows:
 
 ### Authentication Flow
+
 - Navigation to login page
 - New user registration with validation
 - Login - correct and incorrect credentials
@@ -16,6 +17,7 @@ Functional tests verifying main user flows:
 - Cross-browser compatibility testing
 
 ### Offers Flow
+
 - Display offer list with proper structure
 - Car technical data (year, mileage, fuel, power)
 - Like button functionality
@@ -27,6 +29,7 @@ Functional tests verifying main user flows:
 - Image loading error handling
 
 ### Single Offer Details
+
 - Offer header with image gallery and basic information
 - Image gallery with thumbnails and navigation
 - Lightbox - image zoom with full functionality
@@ -41,6 +44,7 @@ Functional tests verifying main user flows:
 ## Non-Functional Tests
 
 ### Chaos Testing
+
 - **Gremlins.js Integration**: Random UI interactions (300 actions in 15s)
 - **Multi-page Chaos**: Testing across different application pages
 - **Simple Chaos**: Clicking without external libraries
@@ -50,6 +54,7 @@ Functional tests verifying main user flows:
 - **Keyboard Chaos**: Random text input
 
 ### Stress Testing
+
 - **Safe Navigation Stress**: Fast navigation with error handling
 - **Form Interaction Stress**: Multiple form submissions
 - **Browser Navigation**: Back/forward button testing
@@ -61,6 +66,7 @@ Functional tests verifying main user flows:
 - **Memory Stress**: DOM memory management testing
 
 ### Network Chaos Testing
+
 - **Random API Failures**: 40% failure rate for requests
 - **Slow Network Simulation**: 0.5-2.5s delays
 - **Intermittent Connectivity**: Interrupted connection every 4 requests
@@ -68,6 +74,7 @@ Functional tests verifying main user flows:
 - **Error Code Variety**: 404, 500, network failures
 
 ### Memory Leak Detection
+
 - **Navigation Memory Monitoring**: 5 cycles × 4 pages
 - **Component Mounting**: 10× reload with memory monitoring
 - **Form Interactions**: 50 fill/clear cycles
@@ -75,6 +82,7 @@ Functional tests verifying main user flows:
 - **Garbage Collection**: Forced memory cleanup
 
 ### UI Chaos Testing
+
 - **Random Clicks**: Random clicking on interactive elements
 - **Random Scrolling**: Chaotic scrolling for 15s
 - **Keyboard Input Chaos**: Random character input
@@ -85,6 +93,7 @@ Functional tests verifying main user flows:
 ## Running Tests
 
 ### All Tests
+
 ```bash
 # All E2E tests with HTML report
 npm run test:e2e-ui
@@ -94,17 +103,19 @@ npm run test:e2e
 ```
 
 ### Functional Tests
+
 ```bash
 # All functional tests
 npm run test:functional-only
 
 # Specific categories only
 npx playwright test tests/functional/auth.spec.ts
-npx playwright test tests/functional/offers-precise.spec.ts  
+npx playwright test tests/functional/offers-precise.spec.ts
 npx playwright test tests/functional/single-offer-precise.spec.ts
 ```
 
 ### Monkey Tests (Non-functional)
+
 ```bash
 # All monkey tests
 npm run test:monkey-only
@@ -118,6 +129,7 @@ npm run test:ui-chaos
 ```
 
 ### Reports and Tools
+
 ```bash
 # Show HTML report
 npm run test:report
