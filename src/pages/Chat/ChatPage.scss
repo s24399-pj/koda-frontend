@@ -1,10 +1,8 @@
-// ChatPage.scss - Wersja standalone bez importów
-
 .chat-page {
   display: flex;
   height: calc(100vh - 70px);
   margin: 70px auto 0;
-  max-width: var(--desktop); // 1200px jak na stronie oferty
+  max-width: var(--desktop);
   background: linear-gradient(135deg, var(--background-color) 0%, #c3cfe2 100%);
   position: relative;
   overflow: hidden;
@@ -12,7 +10,7 @@
   box-shadow: var(--shadow-lg);
 
   @media (max-width: 768px) {
-    margin-top: 180px;
+    margin-top: 170px;
     height: calc(100vh - 180px);
     max-width: none;
     border-radius: 0;
@@ -39,7 +37,7 @@
 }
 
 .chat-sidebar {
-  width: 350px; // Zmniejszone z 400px dla lepszego balansu
+  width: 350px;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   border-right: 1px solid var(--border-color);
@@ -52,7 +50,7 @@
     position: fixed;
     top: 180px;
     left: 0;
-    height: calc(100vh - 180px);
+    height: calc(100vh - 190px);
     width: 85%;
     max-width: 320px;
     transform: translateX(-100%);
