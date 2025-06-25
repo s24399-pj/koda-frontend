@@ -115,11 +115,6 @@ const UserOffers: React.FC = () => {
     fetchUserOffers();
   }, []);
 
-  const handleEditOffer = (offerId: string, event: React.MouseEvent) => {
-    event.stopPropagation();
-    window.location.href = `/offer/edit/${offerId}`;
-  };
-
   const handleDeleteOffer = async (offerId: string, event: React.MouseEvent) => {
     event.stopPropagation();
 
@@ -204,9 +199,6 @@ const UserOffers: React.FC = () => {
           <div className="offer-price">{formatPrice(offer.price, offer.currency)}</div>
         </div>
         <div className="offer-actions">
-          <button className="edit-offer-btn" onClick={e => handleEditOffer(offer.id, e)}>
-            Edytuj
-          </button>
           <button className="delete-offer-btn" onClick={e => handleDeleteOffer(offer.id, e)}>
             Usuń
           </button>
