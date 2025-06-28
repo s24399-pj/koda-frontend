@@ -1,5 +1,6 @@
 const CACHE_NAME = 'koda-v1';
 const API_CACHE = 'koda-api-v1';
+const GEO_CACHE = 'koda-geo-v1';
 
 const STATIC_ASSETS = ['/', '/manifest.json'];
 
@@ -19,7 +20,7 @@ self.addEventListener('activate', event => {
       .then(cacheNames => {
         return Promise.all(
           cacheNames.map(cacheName => {
-            if (!['koda-v1', 'koda-api-v1'].includes(cacheName)) {
+            if (!['koda-v1', 'koda-api-v1', 'koda-geo-v1'].includes(cacheName)) {
               return caches.delete(cacheName);
             }
           })
@@ -33,12 +34,18 @@ self.addEventListener('fetch', event => {
   const { request } = event;
   const url = new URL(request.url);
 
-  if (isApiRequest(url)) {
+  if (isGeocodingRequest(url)) {
+    event.respondWith(handleGeocodingRequest(request));
+  } else if (isApiRequest(url)) {
     event.respondWith(handleApiRequest(request));
   } else if (isStaticAsset(request)) {
     event.respondWith(handleStaticAsset(request));
   }
 });
+
+function isGeocodingRequest(url) {
+  return url.hostname === 'nominatim.openstreetmap.org';
+}
 
 function isApiRequest(url) {
   console.log('SW checking URL:', url.href, 'pathname:', url.pathname);
@@ -67,6 +74,41 @@ function isStaticAsset(request) {
       request.destination === 'image' ||
       request.url.includes('/manifest.json'))
   );
+}
+
+async function handleGeocodingRequest(request) {
+  console.log('SW handling geocoding request:', request.url);
+
+  if (request.method !== 'GET') {
+    return fetch(request);
+  }
+
+  try {
+    console.log('SW trying network for geocoding:', request.url);
+    const networkResponse = await fetch(request);
+
+    if (networkResponse.ok) {
+      console.log('SW geocoding network success, caching response');
+      const cache = await caches.open(GEO_CACHE);
+      cache.put(request, networkResponse.clone());
+    }
+
+    return networkResponse;
+  } catch (error) {
+    console.log('SW geocoding network failed, checking cache:', request.url);
+    const cachedResponse = await caches.match(request);
+
+    if (cachedResponse) {
+      console.log('SW found cached geocoding response');
+      return cachedResponse;
+    }
+
+    console.log('SW no cached geocoding response found');
+    return new Response(JSON.stringify([]), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 }
 
 async function handleApiRequest(request) {
