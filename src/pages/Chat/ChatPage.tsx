@@ -15,6 +15,20 @@ import { Conversation } from '../../types/chat/Conversation.ts';
 import { chatService, isTokenValid } from '../../api/chatApi.ts';
 import { DEFAULT_PROFILE_IMAGE } from '../../assets/defaultProfilePicture.ts';
 
+/**
+ * Main chat page component that provides real-time messaging functionality.
+ * Manages WebSocket connections, conversations, messages, and user search.
+ * Supports both desktop and mobile layouts with responsive sidebar.
+ *
+ * Features:
+ * - Real-time messaging via WebSocket
+ * - Conversation management and history
+ * - User search and profile loading
+ * - Mobile-responsive design
+ * - Authentication handling and token validation
+ *
+ * @returns {JSX.Element} The rendered ChatPage component
+ */
 const ChatPage: React.FC = () => {
   const { recipientId } = useParams<{ recipientId: string }>();
   const navigate = useNavigate();
@@ -36,11 +50,20 @@ const ChatPage: React.FC = () => {
 
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
 
+  /**
+   * Redirects user to login page and clears authentication token.
+   * Preserves current location to return after successful login.
+   */
   const redirectToLogin = useCallback(() => {
     localStorage.removeItem('accessToken');
     navigate('/user/login', { state: { returnUrl: window.location.pathname } });
   }, [navigate]);
 
+  /**
+   * Establishes WebSocket connection for real-time messaging.
+   * Handles authentication validation and connection errors.
+   * Automatically redirects to login if token is invalid.
+   */
   const connectWebSocket = useCallback(async () => {
     if (!isTokenValid()) {
       setConnectionError('Authentication token missing. Log in again.');
@@ -63,6 +86,13 @@ const ChatPage: React.FC = () => {
     }
   }, [redirectToLogin]);
 
+  /**
+   * Loads and sorts all user conversations from the API.
+   * Sorts conversations by last message date in descending order.
+   * Handles authentication errors by redirecting to login.
+   *
+   * @returns {Promise<Conversation[]>} Array of sorted conversations or empty array on error
+   */
   const loadConversations = useCallback(async () => {
     try {
       const allConversations = await chatService.getAllConversations();
@@ -81,6 +111,13 @@ const ChatPage: React.FC = () => {
     }
   }, [redirectToLogin]);
 
+  /**
+   * Loads chat message history for a specific recipient.
+   * Sets loading state during API call and handles authentication errors.
+   *
+   * @param {string} recipientId - The ID of the message recipient
+   * @returns {Promise<ChatMessage[]>} Array of chat messages or empty array on error
+   */
   const loadMessages = useCallback(
     async (recipientId: string) => {
       setIsLoadingMessages(true);
@@ -103,6 +140,14 @@ const ChatPage: React.FC = () => {
     [redirectToLogin]
   );
 
+  /**
+   * Loads user profile for a recipient, with fallback to conversation data.
+   * First attempts to use cached conversation data, then falls back to API call.
+   * Creates basic profile object if all methods fail.
+   *
+   * @param {string} userId - The ID of the user whose profile to load
+   * @returns {Promise<UserProfile>} The loaded user profile
+   */
   const loadRecipientProfile = useCallback(
     async (userId: string) => {
       const conversation = conversations.find(conv => conv.userId === userId);
@@ -138,14 +183,25 @@ const ChatPage: React.FC = () => {
     [conversations]
   );
 
+  /**
+   * Toggles the mobile sidebar open/closed state.
+   */
   const toggleMobileSidebar = useCallback(() => {
     setIsMobileSidebarOpen(prev => !prev);
   }, []);
 
+  /**
+   * Closes the mobile sidebar.
+   */
   const closeMobileSidebar = useCallback(() => {
     setIsMobileSidebarOpen(false);
   }, []);
 
+  /**
+   * Effect hook to initialize chat functionality on component mount.
+   * Validates authentication, loads user profile, connects WebSocket,
+   * and handles new conversation creation from navigation state.
+   */
   useEffect(() => {
     if (!isTokenValid()) {
       setConnectionError('Authentication token missing. Log in again.');
@@ -215,6 +271,10 @@ const ChatPage: React.FC = () => {
     loadConversations,
   ]);
 
+  /**
+   * Effect hook to handle recipient changes from URL parameters.
+   * Loads recipient profile and messages when recipientId changes.
+   */
   useEffect(() => {
     if (recipientId && isInitialized) {
       if (recipientId !== activeRecipientId) {
@@ -225,6 +285,10 @@ const ChatPage: React.FC = () => {
     }
   }, [recipientId, isInitialized, activeRecipientId, loadRecipientProfile, loadMessages]);
 
+  /**
+   * Effect hook to update active recipient from conversation data.
+   * Updates recipient profile when conversations are loaded or active recipient changes.
+   */
   useEffect(() => {
     if (activeRecipientId && conversations.length > 0) {
       const conversation = conversations.find(conv => conv.userId === activeRecipientId);
@@ -245,6 +309,10 @@ const ChatPage: React.FC = () => {
     }
   }, [conversations, activeRecipientId]);
 
+  /**
+   * Effect hook to set up WebSocket message listener.
+   * Subscribes to incoming messages when WebSocket is connected.
+   */
   useEffect(() => {
     if (isWebSocketConnected) {
       const unsubscribe = chatService.onMessageReceived(handleNewMessage);
@@ -252,6 +320,12 @@ const ChatPage: React.FC = () => {
     }
   }, [isWebSocketConnected, currentUser, activeRecipientId]);
 
+  /**
+   * Handles incoming WebSocket messages.
+   * Updates or adds new messages to the message list and updates conversations.
+   *
+   * @param {ChatMessage} message - The received chat message
+   */
   const handleNewMessage = (message: ChatMessage) => {
     setMessages(prevMessages => {
       const exists = prevMessages.some(m => m.id === message.id);
@@ -265,6 +339,13 @@ const ChatPage: React.FC = () => {
     updateConversationsFromMessages([message]);
   };
 
+  /**
+   * Updates conversation list based on new messages.
+   * Creates new conversations for unknown users and updates last message data.
+   * Sorts conversations by most recent message date.
+   *
+   * @param {ChatMessage[]} newMessages - Array of new messages to process
+   */
   const updateConversationsFromMessages = (newMessages: ChatMessage[]) => {
     if (!currentUser) return;
 
@@ -305,6 +386,13 @@ const ChatPage: React.FC = () => {
     });
   };
 
+  /**
+   * Handles sending a new message via WebSocket.
+   * Validates connection state, creates temporary message, and sends via chat service.
+   * Updates conversations and refreshes conversation list after sending.
+   *
+   * @param {string} content - The message content to send
+   */
   const handleSendMessage = async (content: string) => {
     if (!activeRecipientId || !activeRecipient || !currentUser || !currentUser.id) return;
 
@@ -335,6 +423,13 @@ const ChatPage: React.FC = () => {
     }, 1000);
   };
 
+  /**
+   * Handles conversation selection from the conversation list.
+   * Clears search state, updates active recipient, navigates to conversation,
+   * loads recipient profile and messages, and closes mobile sidebar.
+   *
+   * @param {string} userId - The ID of the user to start conversation with
+   */
   const handleSelectConversation = (userId: string) => {
     setIsSearching(false);
     setSearchQuery('');
@@ -351,6 +446,11 @@ const ChatPage: React.FC = () => {
     }, 300);
   };
 
+  /**
+   * Handles user search functionality.
+   * Clears results if query is empty, otherwise searches users via API.
+   * Filters out current user from search results.
+   */
   const handleSearch = async () => {
     if (!searchQuery.trim()) {
       setSearchResults([]);

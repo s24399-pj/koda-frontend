@@ -14,6 +14,10 @@ import { DEFAULT_CAR_IMAGE } from '../../util/constants.tsx';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+/**
+ * Functional component that displays a list of offers.
+ * It allows users to filter, compare, and navigate through different offers.
+ */
 const OfferList: React.FC = () => {
   useTitle('Dostępne oferty');
   const navigate = useNavigate();
@@ -35,6 +39,9 @@ const OfferList: React.FC = () => {
     canAddMoreOffers,
   } = useComparison();
 
+  /**
+   * Effect hook to read and process search parameters from sessionStorage on component mount.
+   */
   useEffect(() => {
     try {
       const paramsJson = sessionStorage.getItem('simpleSearchParams');
@@ -42,7 +49,6 @@ const OfferList: React.FC = () => {
         const params = JSON.parse(paramsJson);
         console.log('Found SimpleSearch parameters in sessionStorage:', params);
 
-        // Remove parameters from sessionStorage to avoid reusing them on page refresh
         sessionStorage.removeItem('simpleSearchParams');
 
         if (typeof params === 'object') {
@@ -72,6 +78,10 @@ const OfferList: React.FC = () => {
     }
   }, []);
 
+  /**
+   * Handles image loading errors by setting a default image.
+   * @param {React.SyntheticEvent<HTMLImageElement>} event - The event object from the image error.
+   */
   const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
     const target = event.target as HTMLImageElement;
     if (!target.dataset.errorHandled) {
@@ -81,6 +91,10 @@ const OfferList: React.FC = () => {
     }
   };
 
+  /**
+   * Processes and sets the search results.
+   * @param {SearchResponse<MiniOffer>} results - The search results to handle.
+   */
   const handleSearchResults = (results: SearchResponse<MiniOffer>) => {
     setError(null);
 
@@ -102,14 +116,27 @@ const OfferList: React.FC = () => {
     }
   };
 
+  /**
+   * Sets the loading state.
+   * @param {boolean} loading - The loading state to set.
+   */
   const handleLoading = (loading: boolean) => {
     setIsLoading(loading);
   };
 
+  /**
+   * Navigates to the offer details page.
+   * @param {string} id - The ID of the offer to navigate to.
+   */
   const handleOfferClick = (id: string) => {
     navigate(`/offer/${id}`);
   };
 
+  /**
+   * Toggles the comparison state of an offer.
+   * @param {string} id - The ID of the offer to toggle.
+   * @param {boolean} checked - The comparison state to set.
+   */
   const handleToggleComparison = (id: string, checked: boolean) => {
     const offer = offers.find(o => o.id === id);
     if (!offer) return;
@@ -121,6 +148,10 @@ const OfferList: React.FC = () => {
     }
   };
 
+  /**
+   * Handles page change events and fetches the corresponding offers.
+   * @param {number} newPage - The new page number to navigate to.
+   */
   const handlePageChange = async (newPage: number) => {
     console.log(`Changing page to ${newPage}`);
 
@@ -164,6 +195,10 @@ const OfferList: React.FC = () => {
     }
   };
 
+  /**
+   * Renders pagination buttons based on the current page and total pages.
+   * @returns {Array} An array of pagination button elements.
+   */
   const renderPaginationButtons = () => {
     const isMobile = window.innerWidth <= 768;
     const maxButtonsToShow = isMobile ? 3 : 5;
@@ -222,6 +257,12 @@ const OfferList: React.FC = () => {
     return pages;
   };
 
+  /**
+   * Truncates text to a specified maximum length.
+   * @param {string} text - The text to truncate.
+   * @param {number} maxLength - The maximum length of the text.
+   * @returns {string} The truncated text.
+   */
   const truncateText = (text: string, maxLength: number) => {
     const isMobile = window.innerWidth <= 768;
     const actualMaxLength = isMobile ? Math.min(maxLength, 30) : maxLength;
@@ -229,6 +270,11 @@ const OfferList: React.FC = () => {
     return text.length > actualMaxLength ? `${text.substring(0, actualMaxLength)}...` : text;
   };
 
+  /**
+   * Formats the fuel type text.
+   * @param {string} fuelType - The fuel type to format.
+   * @returns {string} The formatted fuel type.
+   */
   const formatFuelType = (fuelType: string): string => {
     return (
       translations.fuelType[fuelType as keyof typeof translations.fuelType] ||

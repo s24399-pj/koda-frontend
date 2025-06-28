@@ -1,9 +1,19 @@
+/**
+ * Module for handling real-time chat functionality
+ * @module services/chatService
+ */
+
 import { Client, IMessage } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import axiosAuthClient from './axiosAuthClient.ts';
 import { ChatMessage } from '../types/chat/ChatMessage.ts';
 import { Conversation } from '../types/chat/Conversation.ts';
 
+/**
+ * Checks if the current access token is valid
+ * @function isTokenValid
+ * @returns {boolean} Whether the token is valid and not expired
+ */
 const isTokenValid = (): boolean => {
   const token = localStorage.getItem('accessToken');
   if (!token) return false;
@@ -19,12 +29,30 @@ const isTokenValid = (): boolean => {
   }
 };
 
+/**
+ * Service for handling real-time chat functionality
+ * @class ChatService
+ */
 class ChatService {
+  /** STOMP client for WebSocket communication */
   client: Client | null = null;
+
+  /** Array of message handler callbacks */
   private messageHandlers: ((message: ChatMessage) => void)[] = [];
+
+  /** Flag indicating if a connection attempt is in progress */
   private isConnecting: boolean = false;
+
+  /** Number of connection attempts made */
   private connectionAttempts: number = 0;
 
+  /**
+   * Fetches all conversations for the current user
+   * @async
+   * @method getAllConversations
+   * @returns {Promise<Conversation[]>} List of conversations
+   * @throws {Error} Error fetching conversations
+   */
   async getAllConversations(): Promise<Conversation[]> {
     try {
       console.log('Fetching all conversations...');
@@ -37,6 +65,13 @@ class ChatService {
     }
   }
 
+  /**
+   * Establishes WebSocket connection for real-time messaging
+   * @async
+   * @method connect
+   * @returns {Promise<void>} Promise resolved when connected
+   * @throws {Error} Connection error
+   */
   async connect(): Promise<void> {
     const token = localStorage.getItem('accessToken');
     if (!token || !isTokenValid()) {
@@ -111,6 +146,10 @@ class ChatService {
     });
   }
 
+  /**
+   * Disconnects the WebSocket connection
+   * @method disconnect
+   */
   disconnect(): void {
     if (this.client) {
       console.log('Disconnecting WebSocket...');
@@ -120,6 +159,11 @@ class ChatService {
     }
   }
 
+  /**
+   * Subscribes to the personal message queue
+   * @private
+   * @method subscribeToPersonalQueue
+   */
   private subscribeToPersonalQueue(): void {
     if (!this.client || !this.client.connected) {
       console.error('Attempting to subscribe without WebSocket connection');
@@ -143,6 +187,15 @@ class ChatService {
     }
   }
 
+  /**
+   * Sends a message to another user
+   * @async
+   * @method sendMessage
+   * @param {string} recipientId - ID of the message recipient
+   * @param {string} content - Message content
+   * @returns {Promise<void>} Promise resolved when the message is sent
+   * @throws {Error} Error sending message
+   */
   async sendMessage(recipientId: string, content: string): Promise<void> {
     if (!this.client || !this.client.connected) {
       console.error('Not connected to WebSocket, attempting to reconnect...');
@@ -167,6 +220,12 @@ class ChatService {
     });
   }
 
+  /**
+   * Registers a handler for incoming messages
+   * @method onMessageReceived
+   * @param {function} handler - Function to call when a message is received
+   * @returns {function} Function to unregister the handler
+   */
   onMessageReceived(handler: (message: ChatMessage) => void): () => void {
     this.messageHandlers.push(handler);
 
@@ -175,6 +234,14 @@ class ChatService {
     };
   }
 
+  /**
+   * Gets chat history with a specific user
+   * @async
+   * @method getChatHistory
+   * @param {string} recipientId - ID of the other user
+   * @returns {Promise<ChatMessage[]>} Chat history
+   * @throws {Error} Error fetching chat history
+   */
   async getChatHistory(recipientId: string): Promise<ChatMessage[]> {
     try {
       console.log(`Fetching chat history with ${recipientId}...`);
@@ -194,10 +261,20 @@ class ChatService {
     }
   }
 
+  /**
+   * Checks if the WebSocket is currently connected
+   * @method isConnected
+   * @returns {boolean} Connection status
+   */
   isConnected(): boolean {
     return this.client?.connected || false;
   }
 }
 
+/**
+ * Singleton instance of the ChatService
+ * @const chatService
+ */
 export const chatService = new ChatService();
+
 export { isTokenValid };

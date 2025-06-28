@@ -1,3 +1,8 @@
+/**
+ * Component for entering detailed vehicle information in the offer creation process
+ * @module components/OfferCreation/VehicleDetailsStep
+ */
+
 import React from 'react';
 import { FormikProps, Field, ErrorMessage, FieldInputProps } from 'formik';
 import {
@@ -9,20 +14,46 @@ import {
   VehicleCondition,
 } from '../../types/offer/OfferTypes';
 
+/**
+ * Props for VehicleDetailsStep component
+ * @interface VehicleDetailsStepProps
+ */
 interface VehicleDetailsStepProps {
+  /** Formik props object for form handling */
   formik: FormikProps<OfferFormValues>;
+  /** Function to proceed to the next step */
   onNext: () => void;
+  /** Function to go back to the previous step */
   onPrevious: () => void;
 }
 
+/**
+ * Props for Formik field render functions
+ * @interface FieldRenderProps
+ */
 interface FieldRenderProps {
+  /** Formik field input props */
   field: FieldInputProps<any>;
+  /** Formik form object */
   form: FormikProps<OfferFormValues>;
 }
 
+/**
+ * Component for entering technical details and specifications of a vehicle
+ * This is the second step in the multi-step form process
+ * @component
+ * @param {VehicleDetailsStepProps} props - Component props
+ * @returns {JSX.Element} The VehicleDetailsStep component
+ */
 const VehicleDetailsStep: React.FC<VehicleDetailsStepProps> = ({ formik, onNext, onPrevious }) => {
+  /** Current year for year input validation */
   const currentYear = new Date().getFullYear();
 
+  /**
+   * Validates the current step and proceeds to the next step if validation passes
+   * Otherwise, scrolls to the first field with an error
+   * @function handleNext
+   */
   const handleNext = () => {
     formik.validateForm().then(errors => {
       formik.setTouched({

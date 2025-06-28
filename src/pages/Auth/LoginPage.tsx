@@ -7,21 +7,53 @@ import { login } from '../../api/authApi';
 import { useAuth } from '../../context/AuthContext.tsx';
 import './LoginPage.scss';
 
+/**
+ * Interface defining the structure of login form values.
+ */
 interface LoginFormValues {
+  /** User's email address */
   email: string;
+  /** User's password */
   password: string;
+  /** Whether to remember the user's login session */
   rememberMe: boolean;
 }
 
+/**
+ * Yup validation schema for the login form.
+ * Defines validation rules for login fields including:
+ * - Email format validation
+ * - Required field validation for email and password
+ */
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email('Niepoprawny format adresu email').required('Email jest wymagany'),
   password: Yup.string().required('Hasło jest wymagane'),
 });
 
+/**
+ * Interface for navigation state passed from other pages.
+ * Used to display success messages after operations like registration.
+ */
 interface LocationState {
+  /** Optional success message to display */
   successMessage?: string;
 }
 
+/**
+ * Login page component that provides user authentication functionality.
+ * Features a simple login form with email/password validation and success message handling.
+ *
+ * Key features:
+ * - Form validation using Yup schema
+ * - Password visibility toggle
+ * - Success message display from navigation state
+ * - Error handling and display
+ * - Remember me checkbox
+ * - Links to registration and password reset
+ * - Automatic navigation to home page on successful login
+ *
+ * @returns {JSX.Element} The rendered LoginPage component
+ */
 const LoginPage: React.FC = () => {
   useTitle('Logowanie');
 
@@ -34,18 +66,35 @@ const LoginPage: React.FC = () => {
 
   const state = location.state as LocationState;
 
+  /**
+   * Effect hook to handle success messages passed via navigation state.
+   * Typically used to show registration success messages.
+   */
   useEffect(() => {
     if (state && state.successMessage) {
       setSuccessMessage(state.successMessage);
     }
   }, [state]);
 
+  /**
+   * Initial values for the login form.
+   * All fields start as empty strings or false for the remember me checkbox.
+   */
   const initialValues: LoginFormValues = {
     email: '',
     password: '',
     rememberMe: false,
   };
 
+  /**
+   * Handles form submission for user authentication.
+   * Sends login credentials to the API and handles success/error responses.
+   * On success, updates authentication state and navigates to home page.
+   * On error, displays appropriate error message to the user.
+   *
+   * @param {LoginFormValues} values - The form values from Formik
+   * @param {FormikHelpers<LoginFormValues>} helpers - Formik helper methods including setSubmitting
+   */
   const handleSubmit = async (
     values: LoginFormValues,
     { setSubmitting }: FormikHelpers<LoginFormValues>
@@ -64,6 +113,10 @@ const LoginPage: React.FC = () => {
     }
   };
 
+  /**
+   * Toggles the visibility of the password field.
+   * Switches between password and text input types for better user experience.
+   */
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };

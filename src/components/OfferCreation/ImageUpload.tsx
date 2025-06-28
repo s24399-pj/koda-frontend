@@ -1,16 +1,38 @@
+/**
+ * Component for uploading and managing images in the offer creation process
+ * @module components/OfferCreation/ImageUpload
+ */
+
 import React, { useState, useCallback, useRef } from 'react';
 import { validateImageFile, compressImage } from '../../api/imageApi';
 import './ImageUpload.scss';
 import { ImageUploadProps } from '../../types/image/ImageUploadProps.ts';
 
+/**
+ * Component for uploading, compressing and previewing images
+ * Supports drag and drop, file selection and camera capture
+ * @component
+ * @param {ImageUploadProps} props - Component props
+ * @returns {JSX.Element} The ImageUpload component
+ */
 const ImageUpload: React.FC<ImageUploadProps> = ({ formik }) => {
+  /** State to track if a drag operation is active */
   const [dragActive, setDragActive] = useState(false);
+  /** State to track if files are currently being processed */
   const [uploading, setUploading] = useState(false);
+  /** State to control visibility of camera/gallery selection modal */
   const [showCameraOptions, setShowCameraOptions] = useState(false);
 
+  /** Reference to the hidden file input element */
   const fileInputRef = useRef<HTMLInputElement>(null);
+  /** Reference to the hidden camera input element */
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
+  /**
+   * Processes files, validates them, compresses them and adds valid ones to formik values
+   * @function handleFiles
+   * @param {FileList} files - Files to process
+   */
   const handleFiles = useCallback(
     async (files: FileList) => {
       setUploading(true);
@@ -54,6 +76,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ formik }) => {
     [formik]
   );
 
+  /**
+   * Handles drag events to update UI state
+   * @function handleDrag
+   * @param {React.DragEvent} e - Drag event
+   */
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -64,6 +91,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ formik }) => {
     }
   }, []);
 
+  /**
+   * Handles file drop events
+   * @function handleDrop
+   * @param {React.DragEvent} e - Drop event
+   */
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
@@ -77,6 +109,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ formik }) => {
     [handleFiles]
   );
 
+  /**
+   * Handles file input change events
+   * @function handleInputChange
+   * @param {React.ChangeEvent<HTMLInputElement>} e - Input change event
+   */
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files && e.target.files[0]) {
@@ -86,20 +123,37 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ formik }) => {
     [handleFiles]
   );
 
+  /**
+   * Opens the camera options modal when upload area is clicked
+   * @function handleUploadAreaClick
+   */
   const handleUploadAreaClick = useCallback(() => {
     setShowCameraOptions(true);
   }, []);
 
+  /**
+   * Triggers file selection dialog when gallery option is clicked
+   * @function handleGalleryClick
+   */
   const handleGalleryClick = useCallback(() => {
     fileInputRef.current?.click();
     setShowCameraOptions(false);
   }, []);
 
+  /**
+   * Triggers camera capture dialog when camera option is clicked
+   * @function handleCameraClick
+   */
   const handleCameraClick = useCallback(() => {
     cameraInputRef.current?.click();
     setShowCameraOptions(false);
   }, []);
 
+  /**
+   * Removes an image from the selected images array
+   * @function removeImage
+   * @param {number} index - Index of the image to remove
+   */
   const removeImage = useCallback(
     (index: number) => {
       const currentFiles = formik.values.imageFiles || [];
@@ -109,6 +163,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ formik }) => {
     [formik]
   );
 
+  /** Array of currently selected image files */
   const currentImages = formik.values.imageFiles || [];
 
   return (

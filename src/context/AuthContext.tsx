@@ -2,6 +2,9 @@ import React, { createContext, useState, useContext, useEffect, ReactNode } from
 import { AuthContextType } from '../types/auth/AuthContextType.ts';
 import authClient, { setLogoutFunction } from '../api/axiosAuthClient';
 
+/**
+ * Creates a context to provide authentication state and utilities throughout the app.
+ */
 const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   setIsAuthenticated: () => {},
@@ -10,6 +13,11 @@ const AuthContext = createContext<AuthContextType>({
   validateToken: () => Promise.resolve(false),
 });
 
+/**
+ * Custom hook to access authentication context.
+ *
+ * @returns {AuthContextType} The current authentication context value.
+ */
 export const useAuth = () => useContext(AuthContext);
 
 interface AuthProviderProps {
@@ -17,7 +25,10 @@ interface AuthProviderProps {
 }
 
 /**
- * Decodes JWT token and checks if it's not expired
+ * Checks if a JWT token is valid by decoding and verifying its expiration time.
+ *
+ * @param {string} token - The JWT token to validate.
+ * @returns {boolean} True if the token is not expired and properly formatted.
  */
 const isTokenValid = (token: string): boolean => {
   try {
@@ -41,7 +52,10 @@ const isTokenValid = (token: string): boolean => {
 };
 
 /**
- * Get token expiration time in milliseconds
+ * Extracts the expiration timestamp from a JWT token.
+ *
+ * @param {string} token - The JWT token to decode.
+ * @returns {number | null} Expiration time in milliseconds, or null if parsing fails.
  */
 const getTokenExpirationTime = (token: string): number | null => {
   try {
@@ -63,7 +77,19 @@ const getTokenExpirationTime = (token: string): number | null => {
   }
 };
 
+/**
+ * AuthProvider component manages authentication state and makes it available
+ * to all child components via React Context.
+ *
+ * @param {AuthProviderProps} props - React children elements.
+ * @returns {JSX.Element | null} Auth context provider, or null while initializing.
+ */
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  /**
+   * Checks if the user is authenticated based on token presence and validity.
+   *
+   * @returns {boolean} True if the user has a valid token.
+   */
   const checkIsAuthenticated = (): boolean => {
     const token = localStorage.getItem('accessToken');
 
@@ -71,7 +97,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return false;
     }
 
-    // Local validation before making API calls
     const valid = isTokenValid(token);
     if (!valid) {
       localStorage.removeItem('accessToken');
@@ -84,6 +109,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(checkIsAuthenticated());
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
+  /**
+   * Sends a request to the backend to validate the access token.
+   *
+   * @returns {Promise<boolean>} True if the token is valid according to the server.
+   */
   const validateToken = async (): Promise<boolean> => {
     if (!checkIsAuthenticated()) {
       return false;
@@ -94,11 +124,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return response.status === 200;
     } catch (error) {
       console.error('Token validation failed:', error);
-      // Don't auto-logout here - let axiosAuthClient handle it
       return false;
     }
   };
 
+  /**
+   * Logs the user out by notifying the backend and clearing local storage.
+   */
   const logout = async (): Promise<void> => {
     try {
       if (checkIsAuthenticated()) {
@@ -110,10 +142,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     localStorage.removeItem('accessToken');
     setIsAuthenticated(false);
-
     window.location.href = '/';
   };
 
+  /**
+   * Handles logout triggered by token expiration or authentication errors.
+   */
   const handleAuthError = () => {
     localStorage.removeItem('accessToken');
     setIsAuthenticated(false);
@@ -121,7 +155,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   useEffect(() => {
-    // Register the auth error handler with axiosAuthClient
+    // Register logout handler to be triggered from axios interceptors
     setLogoutFunction(handleAuthError);
 
     const initializeAuth = () => {
@@ -152,7 +186,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         window.clearTimeout(tokenExpirationTimeout);
       }
 
-      // Time until token expires (minus 30 seconds buffer)
+      // Check 30 seconds before expiration
       const timeUntilExpiry = Math.max(0, expirationTime - Date.now() - 30000);
 
       tokenExpirationTimeout = window.setTimeout(() => {
@@ -161,7 +195,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }, timeUntilExpiry);
     };
 
-    // Setup expiration check only if we have a valid token
     if (checkIsAuthenticated()) {
       setupExpirationCheck();
     }
@@ -176,12 +209,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
   }, []);
 
-  // Don't render until we've initialized
+  // Avoid rendering children until auth status is initialized
   if (!isInitialized) {
     return null;
   }
 
-  const value = {
+  const value: AuthContextType = {
     isAuthenticated,
     setIsAuthenticated,
     checkIsAuthenticated,

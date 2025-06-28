@@ -1,7 +1,17 @@
+/**
+ * Module for handling image uploads and processing
+ * @module services/imageService
+ */
+
 import axios from 'axios';
 
+/** Base API URL for image-related endpoints */
 const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api/v1`;
 
+/**
+ * Interface for image upload response
+ * @interface ImageUploadResponse
+ */
 export interface ImageUploadResponse {
   id: string;
   url: string;
@@ -11,6 +21,11 @@ export interface ImageUploadResponse {
   sortOrder: number;
 }
 
+/**
+ * Gets the authentication token from local storage
+ * @function getAuthToken
+ * @returns {string|null} Authentication token or null if not found
+ */
 const getAuthToken = (): string | null => {
   if (typeof window !== 'undefined' && window.localStorage) {
     const possibleKeys = ['accessToken', 'authToken', 'token', 'auth_token'];
@@ -27,6 +42,15 @@ const getAuthToken = (): string | null => {
   return null;
 };
 
+/**
+ * Uploads multiple images for an offer
+ * @async
+ * @function uploadMultipleImages
+ * @param {string} offerId - ID of the offer
+ * @param {File[]} files - Array of image files to upload
+ * @returns {Promise<ImageUploadResponse[]>} Upload responses
+ * @throws {Error} Upload error
+ */
 export const uploadMultipleImages = async (
   offerId: string,
   files: File[]
@@ -51,7 +75,7 @@ export const uploadMultipleImages = async (
       onUploadProgress: progressEvent => {
         if (progressEvent.total) {
           const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          console.log(`📊 Upload progress: ${percentCompleted}%`);
+          console.log(`Upload progress: ${percentCompleted}%`);
         }
       },
     });
@@ -76,6 +100,14 @@ export const uploadMultipleImages = async (
   }
 };
 
+/**
+ * Uploads multiple images without associating them with an offer
+ * @async
+ * @function uploadMultipleImagesWithoutOffer
+ * @param {File[]} files - Array of image files to upload
+ * @returns {Promise<ImageUploadResponse[]>} Upload responses
+ * @throws {Error} Upload error
+ */
 export const uploadMultipleImagesWithoutOffer = async (
   files: File[]
 ): Promise<ImageUploadResponse[]> => {
@@ -99,7 +131,7 @@ export const uploadMultipleImagesWithoutOffer = async (
       onUploadProgress: progressEvent => {
         if (progressEvent.total) {
           const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          console.log(`📊 Upload progress: ${percentCompleted}%`);
+          console.log(`Upload progress: ${percentCompleted}%`);
         }
       },
     });
@@ -124,6 +156,14 @@ export const uploadMultipleImagesWithoutOffer = async (
   }
 };
 
+/**
+ * Deletes an image by ID
+ * @async
+ * @function deleteImage
+ * @param {string} imageId - ID of the image to delete
+ * @returns {Promise<void>} Promise resolved when the image is deleted
+ * @throws {Error} Deletion error
+ */
 export const deleteImage = async (imageId: string): Promise<void> => {
   try {
     const token = getAuthToken();
@@ -144,6 +184,12 @@ export const deleteImage = async (imageId: string): Promise<void> => {
   }
 };
 
+/**
+ * Validates an image file for upload
+ * @function validateImageFile
+ * @param {File} file - File to validate
+ * @returns {string|null} Error message or null if valid
+ */
 export const validateImageFile = (file: File): string | null => {
   const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
   const maxSizeInMB = 5;
@@ -160,6 +206,16 @@ export const validateImageFile = (file: File): string | null => {
   return null;
 };
 
+/**
+ * Compresses an image file
+ * @async
+ * @function compressImage
+ * @param {File} file - Image file to compress
+ * @param {number} [maxWidth=1920] - Maximum width of the compressed image
+ * @param {number} [quality=0.8] - Compression quality (0-1)
+ * @returns {Promise<File>} Compressed image file
+ * @throws {Error} Compression error
+ */
 export const compressImage = (
   file: File,
   maxWidth: number = 1920,

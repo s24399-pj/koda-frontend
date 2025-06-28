@@ -1,14 +1,37 @@
+/**
+ * First step component in the offer creation process focusing on basic offer details
+ * @module components/OfferCreation/BasicInfoStep
+ */
+
 import React from 'react';
 import { FormikProps, Field, ErrorMessage } from 'formik';
 import { OfferFormValues } from '../../types/offer/OfferTypes';
 import ImageUpload from './ImageUpload';
 
+/**
+ * Props for BasicInfoStep component
+ * @interface BasicInfoStepProps
+ */
 interface BasicInfoStepProps {
+  /** Formik props object for form handling */
   formik: FormikProps<OfferFormValues>;
+  /** Function to proceed to the next step */
   onNext: () => void;
 }
 
+/**
+ * Component for entering basic information about an offer (first step in multi-step form)
+ * Includes title, description, price, currency and image upload
+ * @component
+ * @param {BasicInfoStepProps} props - Component props
+ * @returns {JSX.Element} The BasicInfoStep component
+ */
 const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ formik, onNext }) => {
+  /**
+   * Validates the current step and proceeds to the next step if validation passes
+   * Otherwise, scrolls to the first field with an error
+   * @function handleNext
+   */
   const handleNext = () => {
     formik.validateForm().then(errors => {
       formik.setTouched({
@@ -35,7 +58,18 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ formik, onNext }) => {
     });
   };
 
+  /**
+   * Calculates the number of characters in the title
+   * @function calculateTitleChars
+   * @returns {number} Number of characters in the title
+   */
   const calculateTitleChars = () => formik.values.title?.length || 0;
+
+  /**
+   * Calculates the number of characters in the description
+   * @function calculateDescriptionChars
+   * @returns {number} Number of characters in the description
+   */
   const calculateDescriptionChars = () => formik.values.description?.length || 0;
 
   return (

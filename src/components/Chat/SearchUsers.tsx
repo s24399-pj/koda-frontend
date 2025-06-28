@@ -1,8 +1,19 @@
+/**
+ * Component for searching and displaying user search results in a chat interface
+ * @module components/chat/SearchUsers
+ */
+
 import React from 'react';
 import './SearchUsers.scss';
 import { DEFAULT_PROFILE_IMAGE } from '../../assets/defaultProfilePicture.ts';
 import { SearchUsersProps } from '../../types/chat/SearchUsersProps.ts';
 
+/**
+ * Component for searching users and displaying search results
+ * @component
+ * @param {SearchUsersProps} props - Component props
+ * @returns {JSX.Element} The SearchUsers component
+ */
 const SearchUsers: React.FC<SearchUsersProps> = ({
   searchQuery,
   onSearchQueryChange,
@@ -13,6 +24,11 @@ const SearchUsers: React.FC<SearchUsersProps> = ({
   isSearching,
   activeUserId,
 }) => {
+  /**
+   * Handles keyboard events for the search input
+   * @function handleKeyDown
+   * @param {React.KeyboardEvent} e - Keyboard event
+   */
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -57,7 +73,6 @@ const SearchUsers: React.FC<SearchUsersProps> = ({
           </svg>
         </button>
       </div>
-
       {isSearching && (
         <div className="search-results">
           <div className="search-header">
@@ -66,7 +81,6 @@ const SearchUsers: React.FC<SearchUsersProps> = ({
               ✕
             </button>
           </div>
-
           {searchResults.length > 0 ? (
             <ul>
               {searchResults.map(user => (
@@ -80,6 +94,10 @@ const SearchUsers: React.FC<SearchUsersProps> = ({
                       src={DEFAULT_PROFILE_IMAGE}
                       alt={user.fullName}
                       onError={e => {
+                        /**
+                         * Handles image loading error by setting default profile image
+                         * @param {React.SyntheticEvent<HTMLImageElement, Event>} e - Image error event
+                         */
                         const target = e.currentTarget as HTMLImageElement;
                         target.src = DEFAULT_PROFILE_IMAGE;
                       }}
@@ -101,7 +119,6 @@ const SearchUsers: React.FC<SearchUsersProps> = ({
               <p>Nie znaleziono użytkowników dla "{searchQuery}"</p>
             </div>
           )}
-
           <button className="back-button" onClick={onCancel}>
             ← Powrót do konwersacji
           </button>

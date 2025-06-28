@@ -1,7 +1,19 @@
+/**
+ * Component for displaying a list of conversations in a chat interface
+ * @module components/chat/ConversationList
+ */
+
 import React, { useMemo } from 'react';
 import { DEFAULT_PROFILE_IMAGE } from '../../assets/defaultProfilePicture.ts';
 import { ConversationListProps } from '../../types/chat/ConversationListProps.ts';
 
+/**
+ * Formats a date string for display in conversation list
+ * @function formatConversationDate
+ * @param {string|undefined} dateString - ISO date string to format
+ * @returns {string} Formatted date string: time for today, "Yesterday" for yesterday,
+ *                   day and month for this year, or full date for previous years
+ */
 const formatConversationDate = (dateString: string | undefined) => {
   if (!dateString) return '';
 
@@ -24,16 +36,33 @@ const formatConversationDate = (dateString: string | undefined) => {
   }
 };
 
+/**
+ * Truncates a message to specified length and adds ellipsis if needed
+ * @function truncateMessage
+ * @param {string} message - The message to truncate
+ * @param {number} [maxLength=45] - Maximum length before truncation
+ * @returns {string} Truncated message with ellipsis if needed
+ */
 const truncateMessage = (message: string, maxLength: number = 45) => {
   if (!message) return '';
   return message.length > maxLength ? message.substring(0, maxLength) + '...' : message;
 };
 
+/**
+ * Component displaying a list of conversations with users
+ * @component
+ * @param {ConversationListProps} props - Component props
+ * @returns {JSX.Element} The ConversationList component
+ */
 const ConversationList: React.FC<ConversationListProps> = ({
   conversations,
   activeRecipientId,
   onSelectConversation,
 }) => {
+  /**
+   * Memoized sorted conversations with most recent first
+   * @type {Array}
+   */
   const sortedConversations = useMemo(() => {
     return [...conversations].sort((a, b) => {
       if (!a.lastMessageDate && !b.lastMessageDate) return 0;
@@ -44,6 +73,12 @@ const ConversationList: React.FC<ConversationListProps> = ({
     });
   }, [conversations]);
 
+  /**
+   * Handles clicking on a conversation item
+   * @function handleConversationClick
+   * @param {string} userId - ID of the selected user
+   * @param {React.MouseEvent} event - Click event
+   */
   const handleConversationClick = (userId: string, event: React.MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
@@ -51,6 +86,11 @@ const ConversationList: React.FC<ConversationListProps> = ({
     onSelectConversation(userId);
   };
 
+  /**
+   * Handles image loading errors by replacing with default image
+   * @function handleImageError
+   * @param {React.SyntheticEvent<HTMLImageElement>} event - Image error event
+   */
   const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
     const target = event.currentTarget;
     target.src = DEFAULT_PROFILE_IMAGE;

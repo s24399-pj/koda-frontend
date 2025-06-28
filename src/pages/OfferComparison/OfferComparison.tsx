@@ -14,6 +14,12 @@ import { searchOffersByPhrase, getOfferById } from '../../api/offerApi';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+/**
+ * Component rendering the offer comparison tool.
+ * Users can select two offers and view their features side-by-side.
+ *
+ * @component
+ */
 const OfferComparison: React.FC = () => {
   useTitle('Porównaj');
 
@@ -26,12 +32,14 @@ const OfferComparison: React.FC = () => {
   const [isLoadingA, setIsLoadingA] = useState(false);
   const [isLoadingB, setIsLoadingB] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
   const [focusA, setFocusA] = useState(false);
   const [focusB, setFocusB] = useState(false);
 
   const { clearComparison } = useComparison();
 
+  /**
+   * Handles image loading errors and falls back to a default image.
+   */
   const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
     const target = event.target as HTMLImageElement;
     if (!target.dataset.errorHandled) {
@@ -41,23 +49,22 @@ const OfferComparison: React.FC = () => {
     }
   };
 
+  /**
+   * Loads offers from sessionStorage if available (e.g. redirected from another page).
+   */
   useEffect(() => {
     const loadOffersFromSession = async () => {
       try {
         const storedOffers = sessionStorage.getItem('comparisonOffers');
         if (storedOffers) {
           const parsedOffers: MiniOffer[] = JSON.parse(storedOffers);
-
           if (parsedOffers.length === 2) {
             setInputA(parsedOffers[0].title);
             setInputB(parsedOffers[1].title);
-
             const detailedOfferA = await fetchOfferDetails(parsedOffers[0].id);
             const detailedOfferB = await fetchOfferDetails(parsedOffers[1].id);
-
             if (detailedOfferA) setOfferA(detailedOfferA);
             if (detailedOfferB) setOfferB(detailedOfferB);
-
             sessionStorage.removeItem('comparisonOffers');
           }
         }
@@ -67,12 +74,14 @@ const OfferComparison: React.FC = () => {
     };
 
     loadOffersFromSession();
-
     return () => {
       clearComparison();
     };
   }, []);
 
+  /**
+   * Performs a search and populates suggestions based on query input.
+   */
   const searchOffers = async (
     query: string,
     setLoading: React.Dispatch<React.SetStateAction<boolean>>,
@@ -86,7 +95,6 @@ const OfferComparison: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-
       const results = await searchOffersByPhrase(query, 5);
       setSuggestions(results);
     } catch (error) {
@@ -98,16 +106,17 @@ const OfferComparison: React.FC = () => {
     }
   };
 
+  /**
+   * Retrieves detailed offer data by ID.
+   */
   const fetchOfferDetails = async (id: string): Promise<OfferData | null> => {
     try {
       const offer = await getOfferById(id);
 
-      if (offer) {
-        if (!offer.imageUrls || offer.imageUrls.length === 0) {
-          const imagesField = (offer as any)['images'];
-          if (imagesField && Array.isArray(imagesField) && imagesField.length > 0) {
-            offer.imageUrls = imagesField;
-          }
+      if (offer && (!offer.imageUrls || offer.imageUrls.length === 0)) {
+        const imagesField = (offer as any)['images'];
+        if (Array.isArray(imagesField) && imagesField.length > 0) {
+          offer.imageUrls = imagesField;
         }
       }
 
@@ -119,6 +128,7 @@ const OfferComparison: React.FC = () => {
     }
   };
 
+  // Debounced search for inputA
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (inputA) {
@@ -130,6 +140,7 @@ const OfferComparison: React.FC = () => {
     return () => clearTimeout(timeoutId);
   }, [inputA]);
 
+  // Debounced search for inputB
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (inputB) {
@@ -141,6 +152,9 @@ const OfferComparison: React.FC = () => {
     return () => clearTimeout(timeoutId);
   }, [inputB]);
 
+  /**
+   * Dismisses suggestion dropdowns when clicking outside.
+   */
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
@@ -158,6 +172,9 @@ const OfferComparison: React.FC = () => {
     };
   }, []);
 
+  /**
+   * Sets selected offer and fetches detailed data.
+   */
   const selectOffer = async (
     offer: OfferData,
     setOffer: React.Dispatch<React.SetStateAction<OfferData | null>>,
@@ -166,13 +183,15 @@ const OfferComparison: React.FC = () => {
   ) => {
     setInput(offer.title);
     setSuggestions([]);
-
     const detailedOffer = await fetchOfferDetails(offer.id);
     if (detailedOffer) {
       setOffer(detailedOffer);
     }
   };
 
+  /**
+   * Resets both selections and errors.
+   */
   const handleReset = () => {
     setInputA('');
     setInputB('');
@@ -183,60 +202,56 @@ const OfferComparison: React.FC = () => {
     setError(null);
   };
 
+  /**
+   * Formats a value with optional units.
+   */
   const format = (value: any, unit = ''): string => {
     if (value === null || value === undefined) return '—';
-
-    if (typeof value === 'number') {
-      return `${value.toLocaleString('pl-PL')} ${unit}`.trim();
-    }
-
-    return `${value} ${unit}`.trim();
+    return typeof value === 'number'
+      ? `${value.toLocaleString('pl-PL')} ${unit}`.trim()
+      : `${value} ${unit}`.trim();
   };
 
+  /**
+   * Determines which offer is better based on feature comparison type.
+   */
   const getBetterOffer = (keyA: any, keyB: any, type?: ComparisonType): string => {
-    if (keyA === null || keyB === null || keyA === undefined || keyB === undefined) return '';
+    if (keyA == null || keyB == null) return '';
     if (type === 'higher') return keyA > keyB ? 'A' : keyA < keyB ? 'B' : '';
     if (type === 'lower') return keyA < keyB ? 'A' : keyA > keyB ? 'B' : '';
     return '';
   };
 
+  /**
+   * Returns the main image URL for a given offer.
+   */
   const getMainImageUrl = (offer: OfferData): string | null => {
     if (!offer) return null;
-
-    if (offer.imageUrls && offer.imageUrls.length > 0) {
-      return `${API_URL}${offer.imageUrls[0]}`;
-    }
-
-    if (offer.mainImage) {
-      return `${API_URL}${offer.mainImage}`;
-    }
-
+    if (offer.imageUrls?.length) return `${API_URL}${offer.imageUrls[0]}`;
+    if (offer.mainImage) return `${API_URL}${offer.mainImage}`;
     const imagesField = (offer as any)['images'];
-    if (imagesField && Array.isArray(imagesField) && imagesField.length > 0) {
-      return `${API_URL}${imagesField[0]}`;
-    }
+    return Array.isArray(imagesField) && imagesField.length ? `${API_URL}${imagesField[0]}` : null;
+  };
 
-    return null;
+  /**
+   * Retrieves the value for a feature from an offer.
+   */
+  const getValue = (offer: OfferData | null, feature: Feature): any => {
+    if (!offer) return null;
+    if (feature.carDetails) {
+      return offer.CarDetailsDto?.[feature.key as keyof typeof offer.CarDetailsDto] ?? null;
+    }
+    return offer[feature.key as keyof OfferData];
   };
 
   const features: Feature[] = comparisonFeatures;
-
-  const getValue = (offer: OfferData | null, feature: Feature): any => {
-    if (!offer) return null;
-
-    if (feature.carDetails) {
-      if (!offer.CarDetailsDto) return null;
-      return offer.CarDetailsDto[feature.key as keyof typeof offer.CarDetailsDto];
-    }
-
-    return offer[feature.key as keyof OfferData];
-  };
 
   return (
     <div className="offer-comparison-page">
       <h1>Porównywarka ofert</h1>
 
       <div className="compare-inputs">
+        {/* Offer Input A */}
         <div className="input-group">
           <label>Pojazd 1</label>
           <input
@@ -272,6 +287,7 @@ const OfferComparison: React.FC = () => {
           )}
         </div>
 
+        {/* Offer Input B */}
         <div className="input-group">
           <label>Pojazd 2</label>
           <input

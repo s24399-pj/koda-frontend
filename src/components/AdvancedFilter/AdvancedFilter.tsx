@@ -1,3 +1,8 @@
+/**
+ * Module for advanced search filtering of vehicle offers
+ * @module components/AdvancedFilter
+ */
+
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import {
   FuelType,
@@ -10,6 +15,13 @@ import './AdvancedFilter.scss';
 import offerApiService, { AdvancedSearchParams } from '../../api/offerApi';
 import { translations } from '../../translations/carEquipmentTranslations';
 
+/**
+ * Converts an enum object to a set of dropdown options with translations
+ * @function enumToOptions
+ * @param {Object} enumObject - The enum object to convert
+ * @param {keyof typeof translations} translationCategory - The category of translations to use
+ * @returns {Array<{value: string, label: string}>} Array of options for select dropdown
+ */
 const enumToOptions = (enumObject: any, translationCategory: keyof typeof translations) => {
   return Object.keys(enumObject)
     .filter(key => isNaN(Number(key)))
@@ -32,23 +44,47 @@ const enumToOptions = (enumObject: any, translationCategory: keyof typeof transl
     });
 };
 
+/**
+ * Props for AdvancedFilter component
+ * @interface AdvancedFilterProps
+ */
 interface AdvancedFilterProps {
+  /** Callback when search results are available */
   onSearch: (results: any) => void;
+  /** Callback to indicate loading state */
   onLoading: (isLoading: boolean) => void;
+  /** Initial filter values */
   initialFilters?: AdvancedSearchParams;
+  /** Whether to disable automatic search on mount */
   disableAutoSearch?: boolean;
 }
 
-// Using forwardRef to allow parent component to access AdvancedFilter methods
+/**
+ * Advanced filter component for searching vehicle offers
+ * Provides filter controls for searching offers by various criteria
+ * @component
+ * @param {AdvancedFilterProps} props - Component props
+ * @returns {JSX.Element} The AdvancedFilter component
+ */
 const AdvancedFilter = forwardRef<any, AdvancedFilterProps>(
   ({ onSearch, onLoading, initialFilters = {}, disableAutoSearch = false }, ref) => {
+    /** Toggle for showing advanced filter options */
     const [showAdvanced, setShowAdvanced] = useState(false);
+    /** List of available car brands */
     const [brands, setBrands] = useState<string[]>([]);
+    /** List of available car models for selected brand */
     const [models, setModels] = useState<string[]>([]);
+    /** Loading state for models dropdown */
     const [modelsLoading, setModelsLoading] = useState(false);
+    /** Whether component has been initialized */
     const [initialized, setInitialized] = useState(false);
+    /** Whether this is the initial setup */
     const [isInitialSetup, setIsInitialSetup] = useState(true);
 
+    /**
+     * State for filter values
+     * @type {AdvancedSearchParams}
+     */
     const [filters, setFilters] = useState<AdvancedSearchParams>({
       phrase: '',
       brand: '',
@@ -82,30 +118,52 @@ const AdvancedFilter = forwardRef<any, AdvancedFilterProps>(
       ledLights: null,
     });
 
-    // Exposing methods for parent component via ref
+    /**
+     * Expose methods for parent component via ref
+     */
     useImperativeHandle(ref, () => ({
+      /**
+       * Gets the current filter values
+       * @returns {AdvancedSearchParams} Current filter state
+       */
       getCurrentFilters: () => filters,
 
+      /**
+       * Initiates a search with current filters
+       */
       searchOffers: () => {
         searchOffersWithFilters(filters);
       },
 
+      /**
+       * Resets all filters to their default values
+       */
       resetFilters: () => {
         resetFilters();
       },
 
+      /**
+       * Sets filter values from outside the component
+       * @param {AdvancedSearchParams} newFilters - New filter values to apply
+       */
       setFilters: (newFilters: AdvancedSearchParams) => {
         console.log('Setting filters from outside:', newFilters);
         setFilters(prev => ({ ...prev, ...newFilters }));
       },
     }));
 
+    /**
+     * Option lists for dropdowns
+     */
     const fuelTypeOptions = enumToOptions(FuelType, 'fuelType');
     const transmissionOptions = enumToOptions(TransmissionType, 'transmissionType');
     const bodyTypeOptions = enumToOptions(BodyType, 'bodyType');
     const driveTypeOptions = enumToOptions(DriveType, 'driveType');
     const conditionOptions = enumToOptions(VehicleCondition, 'vehicleCondition');
 
+    /**
+     * Default car brands to show if API call fails
+     */
     const defaultBrands = [
       'Audi',
       'BMW',
@@ -122,6 +180,9 @@ const AdvancedFilter = forwardRef<any, AdvancedFilterProps>(
       'Volvo',
     ].sort();
 
+    /**
+     * Set initial filters on first render
+     */
     useEffect(() => {
       if (isInitialSetup && Object.keys(initialFilters).length > 0) {
         console.log('Setting initial filters:', initialFilters);
@@ -147,6 +208,9 @@ const AdvancedFilter = forwardRef<any, AdvancedFilterProps>(
       }
     }, [initialFilters, isInitialSetup, disableAutoSearch]);
 
+    /**
+     * Perform initial search if needed
+     */
     useEffect(() => {
       if (!initialized) {
         // If automatic search is not disabled and we don't have initial filters,
@@ -160,6 +224,9 @@ const AdvancedFilter = forwardRef<any, AdvancedFilterProps>(
       }
     }, [initialized, disableAutoSearch, initialFilters]);
 
+    /**
+     * Fetch car brands on component mount
+     */
     useEffect(() => {
       const fetchBrands = async () => {
         offerApiService
@@ -180,6 +247,9 @@ const AdvancedFilter = forwardRef<any, AdvancedFilterProps>(
       fetchBrands();
     }, []);
 
+    /**
+     * Fetch car models when brand changes
+     */
     useEffect(() => {
       const fetchModels = async () => {
         if (!filters.brand) {
@@ -207,12 +277,19 @@ const AdvancedFilter = forwardRef<any, AdvancedFilterProps>(
       fetchModels();
     }, [filters.brand]);
 
+    /**
+     * Reset model when brand changes
+     */
     useEffect(() => {
       if (filters.brand) {
         setFilters(prev => ({ ...prev, model: '' }));
       }
     }, [filters.brand]);
 
+    /**
+     * Fetches all offers without filtering
+     * @function fetchAllOffers
+     */
     const fetchAllOffers = () => {
       console.log('Fetching all offers...');
       onLoading(true);
@@ -231,6 +308,11 @@ const AdvancedFilter = forwardRef<any, AdvancedFilterProps>(
         });
     };
 
+    /**
+     * Handles input field changes
+     * @function handleInputChange
+     * @param {React.ChangeEvent<HTMLInputElement | HTMLSelectElement>} e - Change event
+     */
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       const { name, value, type } = e.target;
 
@@ -249,11 +331,21 @@ const AdvancedFilter = forwardRef<any, AdvancedFilterProps>(
       }
     };
 
+    /**
+     * Handles checkbox changes
+     * @function handleCheckboxChange
+     * @param {React.ChangeEvent<HTMLInputElement>} e - Change event
+     */
     const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const { name, checked } = e.target;
       setFilters(prev => ({ ...prev, [name]: checked ? true : null }));
     };
 
+    /**
+     * Executes a search with the given filters
+     * @function searchOffersWithFilters
+     * @param {AdvancedSearchParams} searchFilters - Filters to search with
+     */
     const searchOffersWithFilters = (searchFilters: AdvancedSearchParams) => {
       console.log('Searching with filters:', searchFilters);
       onLoading(true);
@@ -272,11 +364,20 @@ const AdvancedFilter = forwardRef<any, AdvancedFilterProps>(
         });
     };
 
+    /**
+     * Handles form submission
+     * @function searchOffers
+     * @param {React.FormEvent} e - Form event
+     */
     const searchOffers = (e: React.FormEvent) => {
       e.preventDefault();
       searchOffersWithFilters(filters);
     };
 
+    /**
+     * Resets all filters to default values
+     * @function resetFilters
+     */
     const resetFilters = () => {
       setFilters({
         phrase: '',
@@ -315,12 +416,24 @@ const AdvancedFilter = forwardRef<any, AdvancedFilterProps>(
       fetchAllOffers();
     };
 
+    /**
+     * Toggles visibility of advanced filters section
+     * @function toggleAdvancedFilters
+     */
     const toggleAdvancedFilters = () => {
       setShowAdvanced(!showAdvanced);
     };
 
+    /**
+     * Checks if any filters are active
+     * @type {boolean}
+     */
     const hasActiveFilters = Object.values(filters).some(value => value !== null && value !== '');
 
+    /**
+     * Current year for year input validation
+     * @type {number}
+     */
     const currentYear = new Date().getFullYear();
 
     return (

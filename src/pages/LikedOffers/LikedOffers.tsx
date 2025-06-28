@@ -16,6 +16,13 @@ import { DEFAULT_CAR_IMAGE } from '../../util/constants.tsx';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+/**
+ * Component for displaying and managing user's liked offers.
+ * Provides functionality to view, remove, and compare liked offers.
+ * Requires user authentication to access.
+ *
+ * @returns {JSX.Element} The rendered LikedOffersList component
+ */
 const LikedOffersList: React.FC = () => {
   useTitle('Ulubione');
 
@@ -32,10 +39,23 @@ const LikedOffersList: React.FC = () => {
     canAddMoreOffers,
   } = useComparison();
 
+  /**
+   * Gets translated text for car equipment based on category and key.
+   *
+   * @param {keyof typeof translations} category - The translation category
+   * @param {string} key - The translation key
+   * @returns {string} The translated text or the original key if translation not found
+   */
   const getTranslation = (category: keyof typeof translations, key: string) => {
     return (translations[category] as Record<string, string>)?.[key] || key;
   };
 
+  /**
+   * Handles image loading errors by setting a default fallback image.
+   * Prevents multiple error handling attempts on the same image element.
+   *
+   * @param {React.SyntheticEvent<HTMLImageElement>} event - The image error event
+   */
   const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
     const target = event.target as HTMLImageElement;
     if (!target.dataset.errorHandled) {
@@ -45,6 +65,10 @@ const LikedOffersList: React.FC = () => {
     }
   };
 
+  /**
+   * Effect hook to fetch liked offers when user authentication status changes.
+   * Only fetches data if user is authenticated, otherwise sets loading to false.
+   */
   useEffect(() => {
     if (isAuthenticated) {
       fetchLikedOffers();
@@ -53,6 +77,13 @@ const LikedOffersList: React.FC = () => {
     }
   }, [isAuthenticated]);
 
+  /**
+   * Maps raw offer data from the API to MiniOffer format.
+   * Handles missing or invalid data gracefully by returning null.
+   *
+   * @param {RawOfferData} rawData - The raw offer data from the API
+   * @returns {MiniOffer | null} The mapped MiniOffer object or null if mapping fails
+   */
   const mapToMiniOffer = (rawData: RawOfferData): MiniOffer | null => {
     try {
       if (!rawData.id || !rawData.title || rawData.price === undefined) {
@@ -84,6 +115,11 @@ const LikedOffersList: React.FC = () => {
     }
   };
 
+  /**
+   * Fetches liked offers from the API and updates component state.
+   * Maps raw API data to MiniOffer format and filters out invalid entries.
+   * Sets loading state and handles errors gracefully.
+   */
   const fetchLikedOffers = async () => {
     setIsLoading(true);
     try {
@@ -107,16 +143,35 @@ const LikedOffersList: React.FC = () => {
     }
   };
 
+  /**
+   * Handles click events on offer cards to navigate to offer details.
+   *
+   * @param {string} id - The ID of the offer to navigate to
+   */
   const handleOfferClick = (id: string) => {
     navigate(`/offer/${id}`);
   };
 
+  /**
+   * Handles like toggle events from the LikeButton component.
+   * Removes the offer from the liked offers list when unliked.
+   *
+   * @param {string} offerId - The ID of the offer being toggled
+   * @param {boolean} isLiked - The new like status of the offer
+   */
   const handleLikeToggle = (offerId: string, isLiked: boolean) => {
     if (!isLiked) {
       setLikedOffers(prev => prev.filter(offer => offer.id !== offerId));
     }
   };
 
+  /**
+   * Handles comparison checkbox toggle events.
+   * Adds or removes offers from the comparison list based on checkbox state.
+   *
+   * @param {string} id - The ID of the offer to toggle in comparison
+   * @param {boolean} checked - The new checked state of the comparison checkbox
+   */
   const handleToggleComparison = (id: string, checked: boolean) => {
     const offer = likedOffers.find(o => o.id === id);
     if (!offer) return;
@@ -128,10 +183,23 @@ const LikedOffersList: React.FC = () => {
     }
   };
 
+  /**
+   * Truncates text to a specified maximum length and adds ellipsis if needed.
+   *
+   * @param {string} text - The text to truncate
+   * @param {number} maxLength - The maximum length of the text
+   * @returns {string} The truncated text with ellipsis if applicable
+   */
   const truncateText = (text: string, maxLength: number) => {
     return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
   };
 
+  /**
+   * Renders the main content for authenticated users.
+   * Displays loading state, empty state, or the list of liked offers.
+   *
+   * @returns {JSX.Element} The rendered content for authenticated users
+   */
   const renderAuthenticatedContent = () => {
     if (isLoading) {
       return <p className="loading-message">Ładowanie ofert...</p>;

@@ -1,21 +1,37 @@
+import { useState, useEffect } from 'react';
 import SimpleSearch from '../../components/SimpleSearch/SimpleSearch';
 import useTitle from '../../hooks/useTitle';
 import WhyChooseUs from '../../components/WhyChooseUs/WhyChooseUs';
 import OfferSlider from '../../components/OfferSlider/OfferSlider';
 import carImage from '../../assets/images/car_home.png';
 import './HomePage.scss';
-import { useState, useEffect } from 'react';
 
+/**
+ * Renders the landing page with dynamic content based on screen size.
+ * Includes hero text, an image, a search component, a feature section,
+ * and a slider for featured offers.
+ *
+ * @component
+ */
 const HomePage = () => {
   useTitle('Home');
+
+  /**
+   * Determines if the current screen size is considered mobile.
+   */
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
+  /**
+   * Sets up a resize listener to update the isMobile state.
+   */
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
     };
 
     window.addEventListener('resize', handleResize);
+
+    // Cleanup event listener on component unmount
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
@@ -34,8 +50,13 @@ const HomePage = () => {
         </div>
       </div>
 
+      {/* Search bar component */}
       <SimpleSearch />
+
+      {/* Section explaining service advantages */}
       <WhyChooseUs />
+
+      {/* Featured offer slider */}
       <OfferSlider />
     </div>
   );
