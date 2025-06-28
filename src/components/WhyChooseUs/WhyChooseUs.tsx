@@ -31,7 +31,7 @@ const WhyChooseUs: React.FC = () => {
               </p>
             </div>
           </div>
-          
+
           {/* Direct chat communication feature */}
           <div className="feature-item">
             <FaComments className="icon" />
@@ -43,7 +43,7 @@ const WhyChooseUs: React.FC = () => {
               </p>
             </div>
           </div>
-          
+
           {/* Rating system and listing verification feature */}
           <div className="feature-item">
             <FaShieldAlt className="icon" />
@@ -55,7 +55,7 @@ const WhyChooseUs: React.FC = () => {
               </p>
             </div>
           </div>
-          
+
           {/* Data protection and encrypted communication feature */}
           <div className="feature-item">
             <FaLock className="icon" />
@@ -67,7 +67,7 @@ const WhyChooseUs: React.FC = () => {
               </p>
             </div>
           </div>
-          
+
           {/* Speed and responsiveness feature */}
           <div className="feature-item">
             <FaMobile className="icon" />
@@ -79,7 +79,7 @@ const WhyChooseUs: React.FC = () => {
               </p>
             </div>
           </div>
-          
+
           {/* Lowest price and full transparency feature */}
           <div className="feature-item">
             <FaInfoCircle className="icon" />
@@ -92,7 +92,7 @@ const WhyChooseUs: React.FC = () => {
             </div>
           </div>
         </div>
-        
+
         {/* Company mission statement */}
         <div className="mission-statement">
           <h3>Nasza misja</h3>

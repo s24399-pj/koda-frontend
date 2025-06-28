@@ -29,7 +29,7 @@ interface ComparisonBarProps {
 const ComparisonBar: React.FC<ComparisonBarProps> = ({ selectedOffers, removeFromComparison }) => {
   /** Navigation hook for redirecting to comparison page */
   const navigate = useNavigate();
-  
+
   /**
    * Handles the compare button click
    * Stores selected offers in sessionStorage and navigates to comparison page
@@ -41,12 +41,12 @@ const ComparisonBar: React.FC<ComparisonBarProps> = ({ selectedOffers, removeFro
       navigate('/comparison');
     }
   };
-  
+
   // Don't render the component if no offers are selected
   if (selectedOffers.length === 0) {
     return null;
   }
-  
+
   return (
     <div className="comparison-bar">
       <div className="comparison-bar-content">

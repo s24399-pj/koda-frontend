@@ -4,7 +4,7 @@ import './AuthRequired.scss';
 
 /**
  * Props for the AuthRequired component.
- * 
+ *
  * @property {string} [pageTitle] - Optional title displayed at the top of the page.
  * @property {string} [message] - Optional custom message explaining the login requirement.
  */

@@ -14,14 +14,29 @@ import { translations } from '../../translations/carEquipmentTranslations.ts';
 import { DEFAULT_CAR_IMAGE } from '../../util/constants.tsx';
 import offerApi from '../../api/offerApi';
 
+/**
+ * Props interface for the Lightbox component.
+ */
 interface LightboxProps {
+  /** Array of image URLs to display in the lightbox */
   images: string[];
+  /** Index of the currently displayed image */
   currentIndex: number;
+  /** Callback function to close the lightbox */
   onClose: () => void;
+  /** Callback function to change the displayed image */
   onImageChange: (index: number) => void;
+  /** Base API URL for constructing full image URLs */
   apiUrl: string;
 }
 
+/**
+ * Lightbox component for displaying images in full-screen overlay.
+ * Supports keyboard navigation, thumbnail navigation, and image zooming.
+ *
+ * @param {LightboxProps} props - The props for the Lightbox component
+ * @returns {JSX.Element} The rendered Lightbox component
+ */
 const Lightbox: React.FC<LightboxProps> = ({
   images,
   currentIndex,
@@ -31,6 +46,10 @@ const Lightbox: React.FC<LightboxProps> = ({
 }) => {
   const lightboxThumbnailsRef = useRef<HTMLDivElement | null>(null);
 
+  /**
+   * Effect hook to handle thumbnail scrolling when current image changes.
+   * Centers the active thumbnail in the thumbnails container.
+   */
   useEffect(() => {
     if (lightboxThumbnailsRef.current && currentIndex >= 0) {
       const container = lightboxThumbnailsRef.current;
@@ -50,6 +69,10 @@ const Lightbox: React.FC<LightboxProps> = ({
     }
   }, [currentIndex]);
 
+  /**
+   * Effect hook to handle keyboard navigation and body scroll prevention.
+   * Sets up event listeners for Escape, Arrow Left, and Arrow Right keys.
+   */
   useEffect(() => {
     document.body.style.overflow = 'hidden';
 
@@ -71,20 +94,37 @@ const Lightbox: React.FC<LightboxProps> = ({
     };
   }, [onClose, onImageChange, currentIndex, images.length]);
 
+  /**
+   * Handles click events on the lightbox backdrop to close the lightbox.
+   * Only closes if the clicked element is the backdrop itself.
+   *
+   * @param {React.MouseEvent} e - The mouse event object
+   */
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose();
     }
   };
 
+  /**
+   * Navigates to the previous image in the lightbox.
+   */
   const handlePrevImage = () => {
     onImageChange((currentIndex - 1 + images.length) % images.length);
   };
 
+  /**
+   * Navigates to the next image in the lightbox.
+   */
   const handleNextImage = () => {
     onImageChange((currentIndex + 1) % images.length);
   };
 
+  /**
+   * Handles image loading errors by setting a default fallback image.
+   *
+   * @param {React.SyntheticEvent<HTMLImageElement>} event - The image error event
+   */
   const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
     const target = event.target as HTMLImageElement;
     if (!target.dataset.errorHandled) {
@@ -151,6 +191,12 @@ const Lightbox: React.FC<LightboxProps> = ({
   );
 };
 
+/**
+ * Main Offer component that displays detailed information about a single car offer.
+ * Includes image gallery, technical specifications, seller information, and interactive map.
+ *
+ * @returns {JSX.Element} The rendered Offer component
+ */
 const Offer: React.FC = () => {
   useTitle('Oferta');
   const navigate = useNavigate();
@@ -171,10 +217,20 @@ const Offer: React.FC = () => {
   const thumbnailsContainerRef = useRef<HTMLDivElement | null>(null);
   const [lightboxOpen, setLightboxOpen] = useState<boolean>(false);
 
+  /**
+   * Gets translated text for car equipment based on category and key.
+   *
+   * @param {keyof typeof translations} category - The translation category
+   * @param {string} key - The translation key
+   * @returns {string} The translated text or the original key if translation not found
+   */
   const getTranslation = (category: keyof typeof translations, key: string) => {
     return (translations[category] as Record<string, string>)?.[key] || key;
   };
 
+  /**
+   * Effect hook to handle window resize events for mobile detection.
+   */
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -184,6 +240,10 @@ const Offer: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  /**
+   * Effect hook to fetch offer data when component mounts or ID changes.
+   * Also handles image collection, seller profile picture, and location geocoding.
+   */
   useEffect(() => {
     const fetchOffer = async () => {
       if (!id) {
@@ -240,6 +300,10 @@ const Offer: React.FC = () => {
     fetchOffer();
   }, [id]);
 
+  /**
+   * Effect hook to initialize and configure the Leaflet map when coordinates are available.
+   * Creates a map with a circle overlay indicating the offer location area.
+   */
   useEffect(() => {
     if (mapLat && mapLng && mapRef.current) {
       const map = L.map(mapRef.current).setView([mapLat, mapLng], 13);
@@ -267,6 +331,10 @@ const Offer: React.FC = () => {
     }
   }, [mapLat, mapLng, isMobile]);
 
+  /**
+   * Effect hook to handle thumbnail scrolling when image index changes.
+   * Centers the active thumbnail in the thumbnails container.
+   */
   useEffect(() => {
     if (thumbnailsContainerRef.current && imageIndex >= 0) {
       const container = thumbnailsContainerRef.current;
@@ -286,26 +354,45 @@ const Offer: React.FC = () => {
     }
   }, [imageIndex]);
 
+  /**
+   * Handles thumbnail click events to change the selected image.
+   *
+   * @param {number} index - The index of the clicked thumbnail
+   */
   const handleThumbnailClick = (index: number) => {
     setImageIndex(index);
     setSelectedImage(allImages[index]);
   };
 
+  /**
+   * Navigates to the previous image in the gallery.
+   */
   const handlePrevImage = () => {
     const newIndex = (imageIndex - 1 + allImages.length) % allImages.length;
     handleThumbnailClick(newIndex);
   };
 
+  /**
+   * Navigates to the next image in the gallery.
+   */
   const handleNextImage = () => {
     const newIndex = (imageIndex + 1) % allImages.length;
     handleThumbnailClick(newIndex);
   };
 
+  /**
+   * Handles profile image loading errors by setting a default profile image.
+   */
   const handleProfileImageError = () => {
     console.log('Profile image loading error occurred');
     setProfileImage(DEFAULT_PROFILE_IMAGE);
   };
 
+  /**
+   * Handles image loading errors by setting a default car image.
+   *
+   * @param {React.SyntheticEvent<HTMLImageElement>} event - The image error event
+   */
   const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
     const target = event.target as HTMLImageElement;
     if (!target.dataset.errorHandled) {
@@ -315,19 +402,34 @@ const Offer: React.FC = () => {
     }
   };
 
+  /**
+   * Opens the lightbox for image viewing.
+   */
   const openLightbox = () => {
     setLightboxOpen(true);
   };
 
+  /**
+   * Closes the lightbox.
+   */
   const closeLightbox = () => {
     setLightboxOpen(false);
   };
 
+  /**
+   * Handles image change events from the lightbox component.
+   *
+   * @param {number} index - The new image index
+   */
   const handleLightboxImageChange = (index: number) => {
     setImageIndex(index);
     setSelectedImage(allImages[index]);
   };
 
+  /**
+   * Handles the start chat functionality.
+   * Redirects to login if user is not authenticated, otherwise navigates to chat.
+   */
   const handleStartChat = () => {
     if (!isAuthenticated) {
       navigate('/user/login', { state: { returnUrl: `/offer/${id}` } });
@@ -350,6 +452,10 @@ const Offer: React.FC = () => {
     }
   };
 
+  /**
+   * Handles contact button click.
+   * Starts chat if seller ID is available, otherwise opens email client.
+   */
   const handleContactButton = () => {
     if (offer?.seller?.id) {
       handleStartChat();
@@ -358,6 +464,9 @@ const Offer: React.FC = () => {
     }
   };
 
+  /**
+   * Navigates to the seller's other offers page.
+   */
   const handleViewSellerOffers = () => {
     if (offer?.seller?.id) {
       navigate(`/seller/${offer.seller.id}/offers`);
@@ -366,6 +475,12 @@ const Offer: React.FC = () => {
     }
   };
 
+  /**
+   * Renders the car equipment section based on available equipment data.
+   *
+   * @param {CarEquipment} [equipment] - The car equipment data
+   * @returns {JSX.Element | null} The rendered equipment section or null if no equipment
+   */
   const renderEquipmentSection = (equipment?: CarEquipment) => {
     if (!equipment) return null;
 
@@ -398,6 +513,10 @@ const Offer: React.FC = () => {
     );
   };
 
+  /**
+   * Effect hook to handle keyboard navigation for image gallery.
+   * Only active when lightbox is not open to avoid conflicts.
+   */
   useEffect(() => {
     if (lightboxOpen) return;
 

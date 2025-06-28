@@ -6,16 +6,36 @@ import useTitle from '../../hooks/useTitle';
 import { register } from '../../api/authApi';
 import './RegisterPage.scss';
 
+/**
+ * Interface defining the structure of registration form values.
+ */
 interface RegisterFormValues {
+  /** User's first name */
   firstName: string;
+  /** User's last name */
   lastName: string;
+  /** User's email address */
   email: string;
+  /** User's password */
   password: string;
+  /** Password confirmation for validation */
   confirmPassword: string;
+  /** User's phone number */
   phoneNumber: string;
+  /** Checkbox indicating acceptance of terms and privacy policy */
   terms: boolean;
 }
 
+/**
+ * Yup validation schema for the registration form.
+ * Defines validation rules for all form fields including:
+ * - Required field validation
+ * - Email format validation
+ * - Phone number format validation (9 digits)
+ * - Password length validation (minimum 8 characters)
+ * - Password confirmation matching
+ * - Terms acceptance requirement
+ */
 const RegisterSchema = Yup.object().shape({
   firstName: Yup.string().required('Imię jest wymagane'),
   lastName: Yup.string().required('Nazwisko jest wymagane'),
@@ -32,6 +52,20 @@ const RegisterSchema = Yup.object().shape({
   terms: Yup.boolean().oneOf([true], 'Musisz zaakceptować regulamin i politykę prywatności'),
 });
 
+/**
+ * Registration page component that provides user registration functionality.
+ * Features a comprehensive form with validation for creating new user accounts.
+ *
+ * Key features:
+ * - Form validation using Yup schema
+ * - Password visibility toggles
+ * - Error handling and display
+ * - Responsive two-column layout for some fields
+ * - Terms and conditions acceptance
+ * - Automatic navigation to login page on success
+ *
+ * @returns {JSX.Element} The rendered RegisterPage component
+ */
 const RegisterPage: React.FC = () => {
   useTitle('Rejestracja');
 
@@ -40,6 +74,10 @@ const RegisterPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  /**
+   * Initial values for the registration form.
+   * All fields start as empty strings or false for the terms checkbox.
+   */
   const initialValues: RegisterFormValues = {
     firstName: '',
     lastName: '',
@@ -50,6 +88,15 @@ const RegisterPage: React.FC = () => {
     terms: false,
   };
 
+  /**
+   * Handles form submission for user registration.
+   * Sends registration data to the API and handles success/error responses.
+   * On success, navigates to login page with success message.
+   * On error, displays appropriate error message to the user.
+   *
+   * @param {RegisterFormValues} values - The form values from Formik
+   * @param {FormikHelpers<RegisterFormValues>} helpers - Formik helper methods including setSubmitting
+   */
   const handleSubmit = async (
     values: RegisterFormValues,
     { setSubmitting }: FormikHelpers<RegisterFormValues>
@@ -79,10 +126,18 @@ const RegisterPage: React.FC = () => {
     }
   };
 
+  /**
+   * Toggles the visibility of the main password field.
+   * Switches between password and text input types for better user experience.
+   */
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
+  /**
+   * Toggles the visibility of the password confirmation field.
+   * Switches between password and text input types for better user experience.
+   */
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };

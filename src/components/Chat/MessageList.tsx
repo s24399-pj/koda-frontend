@@ -53,7 +53,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages, currentUser }) => {
          * @type {boolean}
          */
         const isCurrentUser = currentUser?.id === message.senderId;
-        
+
         return (
           <div key={message.id} className={`message ${isCurrentUser ? 'sent' : 'received'}`}>
             <div className="message-content">

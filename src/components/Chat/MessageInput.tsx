@@ -15,13 +15,13 @@ import { MessageInputProps } from '../../types/chat/MessageInputProps.ts';
 const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, isConnected }) => {
   /** Current message text */
   const [message, setMessage] = useState<string>('');
-  
+
   /** Whether a message is currently being sent */
   const [isSending, setIsSending] = useState<boolean>(false);
-  
+
   /** Reference to the input element for focus management */
   const inputRef = useRef<HTMLInputElement>(null);
-  
+
   /**
    * Focus the input field when connection is established
    */
@@ -30,7 +30,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, isConnected 
       inputRef.current?.focus({ preventScroll: true });
     }
   }, [isConnected]);
-  
+
   /**
    * Handles form submission to send a message
    * @async
@@ -43,7 +43,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, isConnected 
     if (!trimmedMessage || !isConnected || isSending) {
       return;
     }
-    
+
     setIsSending(true);
     try {
       await onSendMessage(trimmedMessage);
@@ -57,7 +57,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, isConnected 
       setIsSending(false);
     }
   };
-  
+
   /**
    * Handles keyboard events to submit on Enter
    * @function handleKeyPress
@@ -69,7 +69,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, isConnected 
       handleSubmit(e as any);
     }
   };
-  
+
   /**
    * Updates message state on input change
    * @function handleInputChange
@@ -78,13 +78,13 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, isConnected 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);
   };
-  
+
   /**
    * Whether the send button should be disabled
    * @type {boolean}
    */
   const isDisabled = !isConnected || isSending || !message.trim();
-  
+
   return (
     <form className="message-form" onSubmit={handleSubmit}>
       <input

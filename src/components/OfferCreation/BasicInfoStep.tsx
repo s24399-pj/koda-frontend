@@ -64,7 +64,7 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ formik, onNext }) => {
    * @returns {number} Number of characters in the title
    */
   const calculateTitleChars = () => formik.values.title?.length || 0;
-  
+
   /**
    * Calculates the number of characters in the description
    * @function calculateDescriptionChars

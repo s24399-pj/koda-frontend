@@ -230,9 +230,7 @@ const OfferComparison: React.FC = () => {
     if (offer.imageUrls?.length) return `${API_URL}${offer.imageUrls[0]}`;
     if (offer.mainImage) return `${API_URL}${offer.mainImage}`;
     const imagesField = (offer as any)['images'];
-    return Array.isArray(imagesField) && imagesField.length
-      ? `${API_URL}${imagesField[0]}`
-      : null;
+    return Array.isArray(imagesField) && imagesField.length ? `${API_URL}${imagesField[0]}` : null;
   };
 
   /**
@@ -267,7 +265,10 @@ const OfferComparison: React.FC = () => {
           {suggestionsA.length > 0 && focusA && (
             <ul className="suggestions">
               {suggestionsA.map(offer => (
-                <li key={offer.id} onClick={() => selectOffer(offer, setOfferA, setInputA, setSuggestionsA)}>
+                <li
+                  key={offer.id}
+                  onClick={() => selectOffer(offer, setOfferA, setInputA, setSuggestionsA)}
+                >
                   <div className="suggestion-item">
                     <img
                       src={getMainImageUrl(offer) || DEFAULT_CAR_IMAGE}
@@ -300,7 +301,10 @@ const OfferComparison: React.FC = () => {
           {suggestionsB.length > 0 && focusB && (
             <ul className="suggestions">
               {suggestionsB.map(offer => (
-                <li key={offer.id} onClick={() => selectOffer(offer, setOfferB, setInputB, setSuggestionsB)}>
+                <li
+                  key={offer.id}
+                  onClick={() => selectOffer(offer, setOfferB, setInputB, setSuggestionsB)}
+                >
                   <div className="suggestion-item">
                     <img
                       src={getMainImageUrl(offer) || DEFAULT_CAR_IMAGE}

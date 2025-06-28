@@ -36,13 +36,13 @@ const isTokenValid = (): boolean => {
 class ChatService {
   /** STOMP client for WebSocket communication */
   client: Client | null = null;
-  
+
   /** Array of message handler callbacks */
   private messageHandlers: ((message: ChatMessage) => void)[] = [];
-  
+
   /** Flag indicating if a connection attempt is in progress */
   private isConnecting: boolean = false;
-  
+
   /** Number of connection attempts made */
   private connectionAttempts: number = 0;
 
