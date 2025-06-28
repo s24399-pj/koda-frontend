@@ -38,13 +38,31 @@ self.addEventListener('fetch', event => {
     event.respondWith(handleGeocodingRequest(event.request));
   } else if (isApiRequest(url)) {
     event.respondWith(handleApiRequest(event.request));
-  } else if (isStaticAsset(event.request)) {
+  } else if (isStaticAsset(event.request) || isCdnAsset(url)) {
     event.respondWith(handleStaticAsset(event.request));
   }
 });
 
 function isApiRequest(url) {
   return url.pathname.includes('/api/v1/') || (url.hostname === 'localhost' && url.port === '8137');
+}
+
+function isCdnAsset(url) {
+  return (
+    url.hostname.includes('cdnjs.cloudflare.com') ||
+    url.hostname.includes('fonts.googleapis.com') ||
+    url.hostname.includes('fonts.gstatic.com') ||
+    url.hostname.includes('fontawesome.com') ||
+    url.hostname.includes('use.fontawesome.com') ||
+    url.hostname.includes('kit.fontawesome.com') ||
+    url.hostname.includes('pro.fontawesome.com') ||
+    url.pathname.includes('fontawesome') ||
+    url.pathname.includes('font-awesome') ||
+    url.pathname.includes('.woff') ||
+    url.pathname.includes('.woff2') ||
+    url.pathname.includes('.ttf') ||
+    url.pathname.includes('.eot')
+  );
 }
 
 function isStaticAsset(request) {
@@ -56,6 +74,7 @@ function isStaticAsset(request) {
       request.destination === 'script' ||
       request.destination === 'style' ||
       request.destination === 'image' ||
+      request.destination === 'font' ||
       request.url.includes('/manifest.json'))
   );
 }
