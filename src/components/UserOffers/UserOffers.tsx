@@ -1,3 +1,8 @@
+/**
+ * Component for displaying and managing a user's vehicle offers
+ * @module components/user/UserOffers
+ */
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './UserOffers.scss';
@@ -6,16 +11,36 @@ import { ApiOffer, OfferData } from '../../types/offerTypes.ts';
 import { translations } from '../../translations/carEquipmentTranslations';
 import { DEFAULT_CAR_IMAGE } from '../../util/constants.tsx';
 
+/** Base API URL from environment variables */
 const API_URL = import.meta.env.VITE_API_URL;
 
+/**
+ * Formats a price value with proper locale and currency
+ * @function formatPrice
+ * @param {number} price - The price value to format
+ * @param {string} [currency='zł'] - The currency symbol
+ * @returns {string} Formatted price string
+ */
 const formatPrice = (price: number, currency: string = 'zł'): string => {
   return price.toLocaleString('pl-PL') + ' ' + currency;
 };
 
+/**
+ * Formats a mileage value with proper locale and unit
+ * @function formatMileage
+ * @param {number} mileage - The mileage value to format
+ * @returns {string} Formatted mileage string
+ */
 const formatMileage = (mileage: number): string => {
   return mileage.toLocaleString('pl-PL') + ' km';
 };
 
+/**
+ * Maps API response data to the component's expected format
+ * @function mapApiResponseToComponentFormat
+ * @param {ApiOffer[]} apiOffers - Array of offers from API
+ * @returns {OfferData[]} Transformed offer data
+ */
 const mapApiResponseToComponentFormat = (apiOffers: ApiOffer[]): OfferData[] => {
   if (!apiOffers || !Array.isArray(apiOffers)) {
     console.log('No data or wrong format');
@@ -58,13 +83,28 @@ const mapApiResponseToComponentFormat = (apiOffers: ApiOffer[]): OfferData[] => 
   });
 };
 
+/**
+ * Component for displaying and managing offers created by the current user
+ * @component
+ * @returns {JSX.Element} The UserOffers component
+ */
 const UserOffers: React.FC = () => {
+  /** State for storing user's offers */
   const [offers, setOffers] = useState<OfferData[]>([]);
+  /** Loading state for data fetching */
   const [loading, setLoading] = useState<boolean>(true);
+  /** Error state for data fetching */
   const [error, setError] = useState<string | null>(null);
+  /** Special error state for missing user ID */
   const [noUserIdError, setNoUserIdError] = useState<boolean>(false);
+  /** Navigation hook for redirecting */
   const navigate = useNavigate();
 
+  /**
+   * Handles image loading errors by replacing with default image
+   * @function handleImageError
+   * @param {React.SyntheticEvent<HTMLImageElement>} event - Image error event
+   */
   const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
     const target = event.target as HTMLImageElement;
     if (!target.dataset.errorHandled) {
@@ -74,10 +114,18 @@ const UserOffers: React.FC = () => {
     }
   };
 
+  /**
+   * Navigates to the offer details page
+   * @function handleOfferClick
+   * @param {string} offerId - ID of the offer to view
+   */
   const handleOfferClick = (offerId: string) => {
     navigate(`/offer/${offerId}`);
   };
 
+  /**
+   * Fetches user's offers on component mount
+   */
   useEffect(() => {
     const fetchUserOffers = async () => {
       try {
@@ -115,6 +163,12 @@ const UserOffers: React.FC = () => {
     fetchUserOffers();
   }, []);
 
+  /**
+   * Handles offer deletion after confirmation
+   * @function handleDeleteOffer
+   * @param {string} offerId - ID of the offer to delete
+   * @param {React.MouseEvent} event - Click event
+   */
   const handleDeleteOffer = async (offerId: string, event: React.MouseEvent) => {
     event.stopPropagation();
 
@@ -134,19 +188,40 @@ const UserOffers: React.FC = () => {
     }
   };
 
+  /**
+   * Redirects to user profile page
+   * @function redirectToProfile
+   */
   const redirectToProfile = () => {
     window.location.href = '/user/panel';
   };
 
+  /**
+   * Sub-component for rendering individual offer cards
+   * @component OfferCard
+   * @param {Object} props - Component props
+   * @param {OfferData} props.offer - Offer data to display
+   * @returns {JSX.Element|null} Offer card or null if data is invalid
+   */
   const OfferCard: React.FC<{ offer: OfferData }> = ({ offer }) => {
     if (!offer || !offer.CarDetailsDto) {
       return null;
     }
 
+    /**
+     * Gets the translated fuel type from the translation dictionary
+     * @type {string}
+     */
     const translatedFuelType =
       translations.fuelType[offer.CarDetailsDto.fuelType as keyof typeof translations.fuelType] ||
       offer.CarDetailsDto.fuelType;
 
+    /**
+     * Gets the translated transmission type from the translation dictionary
+     * @function getTranslatedTransmission
+     * @param {string} transmission - Transmission type key
+     * @returns {string} Translated transmission type
+     */
     const getTranslatedTransmission = (transmission: string) => {
       return (
         translations.transmissionType[transmission as keyof typeof translations.transmissionType] ||
@@ -154,10 +229,22 @@ const UserOffers: React.FC = () => {
       );
     };
 
+    /**
+     * Gets the translated body type from the translation dictionary
+     * @function getTranslatedBodyType
+     * @param {string} bodyType - Body type key
+     * @returns {string} Translated body type
+     */
     const getTranslatedBodyType = (bodyType: string) => {
       return translations.bodyType[bodyType as keyof typeof translations.bodyType] || bodyType;
     };
 
+    /**
+     * Gets the translated drive type from the translation dictionary
+     * @function getTranslatedDriveType
+     * @param {string} driveType - Drive type key
+     * @returns {string} Translated drive type
+     */
     const getTranslatedDriveType = (driveType: string) => {
       return translations.driveType[driveType as keyof typeof translations.driveType] || driveType;
     };
@@ -207,10 +294,19 @@ const UserOffers: React.FC = () => {
     );
   };
 
+  /**
+   * Navigates to offer creation page
+   * @function navigateToCreateOffer
+   */
   const navigateToCreateOffer = () => {
     window.location.href = '/offer/create';
   };
 
+  /**
+   * Renders the appropriate content based on loading/error states
+   * @function renderOffers
+   * @returns {JSX.Element} Content to render
+   */
   const renderOffers = () => {
     if (loading) {
       return <div className="offers-loading">Ładowanie ogłoszeń...</div>;

@@ -1,15 +1,26 @@
+/**
+ * Component for displaying the "Why Choose Us" section highlighting platform benefits
+ * @module components/home/WhyChooseUs
+ */
+
 import React from 'react';
 import './WhyChooseUs.scss';
 import { FaLock, FaInfoCircle, FaSearch, FaComments, FaShieldAlt, FaMobile } from 'react-icons/fa';
 
+/**
+ * Component that showcases the key features and benefits of the platform
+ * Each feature is presented with an icon, title, and description
+ * @component
+ * @returns {JSX.Element} The WhyChooseUs component
+ */
 const WhyChooseUs: React.FC = () => {
   return (
     <section className="why-choose-us">
       <div className="content">
         <div className="cta-button">DLACZEGO WARTO WYBRAĆ NAS</div>
         <h2>Nowoczesna platforma z pełną transparentością i bezpieczeństwem</h2>
-
         <div className="features">
+          {/* Advanced car comparison feature */}
           <div className="feature-item">
             <FaSearch className="icon" />
             <div>
@@ -20,7 +31,8 @@ const WhyChooseUs: React.FC = () => {
               </p>
             </div>
           </div>
-
+          
+          {/* Direct chat communication feature */}
           <div className="feature-item">
             <FaComments className="icon" />
             <div>
@@ -31,7 +43,8 @@ const WhyChooseUs: React.FC = () => {
               </p>
             </div>
           </div>
-
+          
+          {/* Rating system and listing verification feature */}
           <div className="feature-item">
             <FaShieldAlt className="icon" />
             <div>
@@ -42,7 +55,8 @@ const WhyChooseUs: React.FC = () => {
               </p>
             </div>
           </div>
-
+          
+          {/* Data protection and encrypted communication feature */}
           <div className="feature-item">
             <FaLock className="icon" />
             <div>
@@ -53,7 +67,8 @@ const WhyChooseUs: React.FC = () => {
               </p>
             </div>
           </div>
-
+          
+          {/* Speed and responsiveness feature */}
           <div className="feature-item">
             <FaMobile className="icon" />
             <div>
@@ -64,7 +79,8 @@ const WhyChooseUs: React.FC = () => {
               </p>
             </div>
           </div>
-
+          
+          {/* Lowest price and full transparency feature */}
           <div className="feature-item">
             <FaInfoCircle className="icon" />
             <div>
@@ -76,7 +92,8 @@ const WhyChooseUs: React.FC = () => {
             </div>
           </div>
         </div>
-
+        
+        {/* Company mission statement */}
         <div className="mission-statement">
           <h3>Nasza misja</h3>
           <p>

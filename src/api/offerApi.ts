@@ -1,12 +1,24 @@
+/**
+ * Module for handling offer-related API operations
+ * @module api/offerApi
+ */
+
 import axiosAuthClient from './axiosAuthClient';
 import axios from 'axios';
 import { CreateOfferCommand, OfferResponse } from '../types/offer/OfferTypes';
 import { MiniOffer } from '../types/miniOfferTypes';
 import { OfferData } from '../types/offerTypes';
 
+/** Base API URL */
 const API_URL = import.meta.env.VITE_API_URL;
+
+/** Endpoint for offers API */
 const OFFERS_ENDPOINT = '/api/v1/offers';
 
+/**
+ * Axios client for making requests without authentication
+ * @type {import('axios').AxiosInstance}
+ */
 const apiClient = axios.create({
   baseURL: API_URL,
   headers: {
@@ -14,6 +26,10 @@ const apiClient = axios.create({
   },
 });
 
+/**
+ * Interface for paginated offer response
+ * @interface OffersResponse
+ */
 export interface OffersResponse {
   content: any[];
   pageable: {
@@ -35,6 +51,11 @@ export interface OffersResponse {
   size?: number;
 }
 
+/**
+ * Interface for search response with pagination
+ * @interface SearchResponse
+ * @template T - The type of content in the response
+ */
 export interface SearchResponse<T> {
   content: T[];
   totalElements: number;
@@ -44,6 +65,10 @@ export interface SearchResponse<T> {
   empty: boolean;
 }
 
+/**
+ * Interface for advanced search parameters
+ * @interface AdvancedSearchParams
+ */
 export interface AdvancedSearchParams {
   phrase?: string;
   brand?: string;
@@ -78,12 +103,20 @@ export interface AdvancedSearchParams {
   [key: string]: any;
 }
 
+/**
+ * Interface for pagination parameters
+ * @interface PaginationParams
+ */
 export interface PaginationParams {
   page: number;
   size: number;
   sort?: string;
 }
 
+/**
+ * Interface for geocoding result
+ * @interface GeocodeResult
+ */
 export interface GeocodeResult {
   lat: string;
   lon: string;
@@ -95,11 +128,21 @@ export interface GeocodeResult {
   };
 }
 
+/**
+ * Interface for location coordinates
+ * @interface LocationCoordinates
+ */
 export interface LocationCoordinates {
   lat: number;
   lng: number;
 }
 
+/**
+ * Cleans search parameters by removing null, undefined and empty values
+ * @function cleanSearchParams
+ * @param {AdvancedSearchParams} params - Parameters to clean
+ * @returns {Record<string, any>} Cleaned parameters
+ */
 const cleanSearchParams = (params: AdvancedSearchParams): Record<string, any> => {
   const cleanedParams: Record<string, any> = {};
 
@@ -112,6 +155,12 @@ const cleanSearchParams = (params: AdvancedSearchParams): Record<string, any> =>
   return cleanedParams;
 };
 
+/**
+ * Adapts any offer object to MiniOffer format
+ * @function adaptToMiniOffer
+ * @param {any} item - The offer data to adapt
+ * @returns {MiniOffer} Adapted mini offer
+ */
 export const adaptToMiniOffer = (item: any): MiniOffer => {
   const carDetails = item.carDetailsDto || item.carDetails || {};
 
@@ -138,6 +187,10 @@ export const adaptToMiniOffer = (item: any): MiniOffer => {
   };
 };
 
+/**
+ * Empty search response template
+ * @type {SearchResponse<any>}
+ */
 const emptyResponse: SearchResponse<any> = {
   content: [],
   totalElements: 0,
@@ -147,6 +200,14 @@ const emptyResponse: SearchResponse<any> = {
   empty: true,
 };
 
+/**
+ * Creates a new offer
+ * @async
+ * @function createOffer
+ * @param {CreateOfferCommand} offerData - Data for the new offer
+ * @returns {Promise<OfferResponse>} Created offer response
+ * @throws {Error} Error creating offer
+ */
 export const createOffer = (offerData: CreateOfferCommand) => {
   console.log('Creating new offer with data:', offerData);
 
@@ -162,6 +223,13 @@ export const createOffer = (offerData: CreateOfferCommand) => {
     });
 };
 
+/**
+ * Gets offers for a specific user
+ * @async
+ * @function getUserOffers
+ * @param {string} userId - ID of the user to get offers for
+ * @returns {Promise<OffersResponse>} User's offers
+ */
 export const getUserOffers = (userId: string) => {
   console.log(`Fetching offers for user ${userId}`);
 
@@ -190,8 +258,22 @@ export const getUserOffers = (userId: string) => {
     });
 };
 
+/**
+ * Alias for getUserOffers
+ * @async
+ * @function getOffersBySeller
+ * @param {string} userId - ID of the seller
+ * @returns {Promise<OffersResponse>} Seller's offers
+ */
 export const getOffersBySeller = getUserOffers;
 
+/**
+ * Deletes an offer
+ * @async
+ * @function deleteOffer
+ * @param {string} offerId - ID of the offer to delete
+ * @returns {Promise<boolean>} Success status
+ */
 export const deleteOffer = (offerId: string) => {
   console.log(`Deleting offer with ID: ${offerId}`);
 
@@ -215,6 +297,15 @@ export const deleteOffer = (offerId: string) => {
     });
 };
 
+/**
+ * Updates an existing offer
+ * @async
+ * @function updateOffer
+ * @param {string} offerId - ID of the offer to update
+ * @param {CreateOfferCommand} offerData - New offer data
+ * @returns {Promise<OfferResponse>} Updated offer
+ * @throws {Error} Error updating offer
+ */
 export const updateOffer = (offerId: string, offerData: CreateOfferCommand) => {
   console.log(`Updating offer with ID: ${offerId}`);
 
@@ -230,6 +321,14 @@ export const updateOffer = (offerId: string, offerData: CreateOfferCommand) => {
     });
 };
 
+/**
+ * Searches offers with advanced filtering
+ * @async
+ * @function searchOffers
+ * @param {AdvancedSearchParams} searchParams - Search criteria
+ * @param {PaginationParams} paginationParams - Pagination options
+ * @returns {Promise<SearchResponse<MiniOffer>>} Search results
+ */
 export const searchOffers = (
   searchParams: AdvancedSearchParams = {},
   paginationParams: PaginationParams = { page: 0, size: 10 }
@@ -263,6 +362,12 @@ export const searchOffers = (
     });
 };
 
+/**
+ * Gets all available car brands
+ * @async
+ * @function getBrands
+ * @returns {Promise<string[]>} List of car brands
+ */
 export const getBrands = () => {
   return apiClient
     .get<{ content: string[] }>('/api/v1/offers/search/brands')
@@ -273,6 +378,13 @@ export const getBrands = () => {
     });
 };
 
+/**
+ * Searches car brands by phrase
+ * @async
+ * @function searchBrands
+ * @param {string} phrase - Search phrase
+ * @returns {Promise<string[]>} Matching brands
+ */
 export const searchBrands = (phrase: string) => {
   return apiClient
     .get<{ content: string[] }>('/api/v1/offers/search/brands/search', {
@@ -285,6 +397,13 @@ export const searchBrands = (phrase: string) => {
     });
 };
 
+/**
+ * Gets car models for a specific brand
+ * @async
+ * @function getModelsByBrand
+ * @param {string} brand - Car brand
+ * @returns {Promise<string[]>} List of models
+ */
 export const getModelsByBrand = (brand: string) => {
   return apiClient
     .get<{ content: string[] }>('/api/v1/offers/search/models', {
@@ -297,6 +416,14 @@ export const getModelsByBrand = (brand: string) => {
     });
 };
 
+/**
+ * Gets detailed offer data by ID
+ * @async
+ * @function getOfferById
+ * @param {string} id - Offer ID
+ * @returns {Promise<OfferData>} Detailed offer data
+ * @throws {Error} Error fetching offer
+ */
 export const getOfferById = (id: string): Promise<OfferData> => {
   console.log(`Fetching offer with ID: ${id}`);
 
@@ -312,6 +439,14 @@ export const getOfferById = (id: string): Promise<OfferData> => {
     });
 };
 
+/**
+ * Geocodes a location string to coordinates
+ * @async
+ * @function geocodeLocation
+ * @param {string} location - Location to geocode
+ * @returns {Promise<LocationCoordinates|null>} Location coordinates
+ * @throws {Error} Error geocoding location
+ */
 export const geocodeLocation = async (location: string): Promise<LocationCoordinates | null> => {
   console.log(`Geocoding location: ${location}`);
 
@@ -354,6 +489,14 @@ export const geocodeLocation = async (location: string): Promise<LocationCoordin
   }
 };
 
+/**
+ * Searches offers by text phrase
+ * @async
+ * @function searchOffersByPhrase
+ * @param {string} phrase - Search phrase
+ * @param {number} [size=5] - Number of results to return
+ * @returns {Promise<OfferData[]>} Matching offers
+ */
 export const searchOffersByPhrase = (phrase: string, size: number = 5): Promise<OfferData[]> => {
   console.log(`Searching offers by phrase: ${phrase}`);
 
@@ -374,6 +517,12 @@ export const searchOffersByPhrase = (phrase: string, size: number = 5): Promise<
     });
 };
 
+/**
+ * Gets all offers
+ * @async
+ * @function getAllOffers
+ * @returns {Promise<MiniOffer[]>} All offers
+ */
 export const getAllOffers = (): Promise<MiniOffer[]> => {
   console.log('Fetching all offers');
 
@@ -389,6 +538,12 @@ export const getAllOffers = (): Promise<MiniOffer[]> => {
     });
 };
 
+/**
+ * Gets the maximum price from all offers
+ * @async
+ * @function getMaxPrice
+ * @returns {Promise<number>} Maximum price
+ */
 export const getMaxPrice = async (): Promise<number> => {
   console.log('Fetching max price from offers');
 
@@ -414,6 +569,12 @@ export const getMaxPrice = async (): Promise<number> => {
   }
 };
 
+/**
+ * Gets all car brands
+ * @async
+ * @function getAllBrands
+ * @returns {Promise<string[]>} All car brands
+ */
 export const getAllBrands = (): Promise<string[]> => {
   console.log('Fetching all brands');
 
@@ -429,6 +590,13 @@ export const getAllBrands = (): Promise<string[]> => {
     });
 };
 
+/**
+ * Searches brands by phrase
+ * @async
+ * @function searchBrandsByPhrase
+ * @param {string} phrase - Search phrase
+ * @returns {Promise<string[]>} Matching brands
+ */
 export const searchBrandsByPhrase = (phrase: string): Promise<string[]> => {
   console.log(`Searching brands by phrase: ${phrase}`);
 
@@ -446,6 +614,10 @@ export const searchBrandsByPhrase = (phrase: string): Promise<string[]> => {
     });
 };
 
+/**
+ * Offer API object with all exported functions
+ * @const offerApi
+ */
 const offerApi = {
   createOffer,
   getUserOffers,

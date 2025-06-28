@@ -1,3 +1,8 @@
+/**
+ * Component for displaying a carousel of vehicle offers
+ * @module components/home/OfferSlider
+ */
+
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Slider from 'react-slick';
@@ -9,18 +14,36 @@ import 'slick-carousel/slick/slick-theme.css';
 import './offerslider.scss';
 import { DEFAULT_CAR_IMAGE } from '../../util/constants.tsx';
 
+/** Base API URL from environment variables */
 const API_URL = import.meta.env.VITE_API_URL;
 
+/**
+ * Responsive carousel component for displaying vehicle offers on the homepage
+ * @component
+ * @returns {JSX.Element} The OfferSlider component
+ */
 const OfferSlider: React.FC = () => {
+  /** Array of offers to display in the slider */
   const [offers, setOffers] = useState<MiniOffer[]>([]);
+  /** Loading state for data fetching */
   const [loading, setLoading] = useState(true);
+  /** Error state for data fetching */
   const [error, setError] = useState<string | null>(null);
+  /** Navigation hook for redirecting to offer details */
   const navigate = useNavigate();
 
+  /** Flag to track if user is dragging (to prevent navigation on drag) */
   const isDragging = useRef(false);
+  /** Starting X coordinate for drag detection */
   const startX = useRef(0);
+  /** Starting Y coordinate for drag detection */
   const startY = useRef(0);
 
+  /**
+   * Handles image loading errors by replacing with default image
+   * @function handleImageError
+   * @param {React.SyntheticEvent<HTMLImageElement>} event - Image error event
+   */
   const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
     const target = event.target as HTMLImageElement;
     if (!target.dataset.errorHandled) {
@@ -30,6 +53,9 @@ const OfferSlider: React.FC = () => {
     }
   };
 
+  /**
+   * Fetches all offers on component mount
+   */
   useEffect(() => {
     const fetchOffers = async () => {
       try {
@@ -48,6 +74,10 @@ const OfferSlider: React.FC = () => {
     fetchOffers();
   }, []);
 
+  /**
+   * Configuration for the react-slick carousel
+   * @type {Object}
+   */
   const settings = {
     dots: true,
     infinite: true,
@@ -81,24 +111,44 @@ const OfferSlider: React.FC = () => {
     ],
   };
 
+  /**
+   * Initializes drag tracking on mouse down
+   * @function handleMouseDown
+   * @param {React.MouseEvent} e - Mouse down event
+   */
   const handleMouseDown = (e: React.MouseEvent) => {
     isDragging.current = false;
     startX.current = e.clientX;
     startY.current = e.clientY;
   };
 
+  /**
+   * Initializes drag tracking on touch start
+   * @function handleTouchStart
+   * @param {React.TouchEvent} e - Touch start event
+   */
   const handleTouchStart = (e: React.TouchEvent) => {
     isDragging.current = false;
     startX.current = e.touches[0].clientX;
     startY.current = e.touches[0].clientY;
   };
 
+  /**
+   * Updates drag state on mouse move
+   * @function handleMouseMove
+   * @param {React.MouseEvent} e - Mouse move event
+   */
   const handleMouseMove = (e: React.MouseEvent) => {
     if (Math.abs(e.clientX - startX.current) > 5 || Math.abs(e.clientY - startY.current) > 5) {
       isDragging.current = true;
     }
   };
 
+  /**
+   * Updates drag state on touch move
+   * @function handleTouchMove
+   * @param {React.TouchEvent} e - Touch move event
+   */
   const handleTouchMove = (e: React.TouchEvent) => {
     if (
       Math.abs(e.touches[0].clientX - startX.current) > 5 ||
@@ -108,6 +158,11 @@ const OfferSlider: React.FC = () => {
     }
   };
 
+  /**
+   * Navigates to offer details if not dragging
+   * @function handleClickEnd
+   * @param {string} id - Offer ID to navigate to
+   */
   const handleClickEnd = (id: string) => {
     if (!isDragging.current) {
       navigate(`/offer/${id}`);

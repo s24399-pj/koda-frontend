@@ -1,28 +1,58 @@
+/**
+ * Component for basic vehicle search functionality
+ * @module components/home/SimpleSearch
+ */
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './SimpleSearch.scss';
 import { getMaxPrice, getAllBrands, searchBrandsByPhrase } from '../../api/offerApi';
 
+/**
+ * Simple search form for the homepage with brand search and price range selection
+ * @component
+ * @returns {JSX.Element} The SimpleSearch component
+ */
 const SimpleSearch: React.FC = () => {
+  /** Navigation hook for redirecting to search results */
   const navigate = useNavigate();
+  /** Search phrase for brand/model */
   const [phrase, setPhrase] = useState('');
+  /** Minimum price formatted with thousand separators */
   const [minPrice, setMinPrice] = useState<string>('');
+  /** Maximum price formatted with thousand separators */
   const [maxPrice, setMaxPrice] = useState<string>('');
+  /** Maximum price value in the system */
   const [maxPriceValue, setMaxPriceValue] = useState<number>(1000000);
+  /** Controls visibility of minimum price suggestions */
   const [showMinPriceSuggestions, setShowMinPriceSuggestions] = useState(false);
+  /** Controls visibility of maximum price suggestions */
   const [showMaxPriceSuggestions, setShowMaxPriceSuggestions] = useState(false);
+  /** Controls visibility of brand suggestions */
   const [showBrandSuggestions, setShowBrandSuggestions] = useState(false);
+  /** Loading state for price data */
   const [isLoading, setIsLoading] = useState(false);
+  /** Loading state for brand data */
   const [isLoadingBrands, setIsLoadingBrands] = useState(false);
+  /** Error message for price validation */
   const [priceError, setPriceError] = useState<string | null>(null);
+  /** Controls visibility of error notification */
   const [showNotification, setShowNotification] = useState(false);
+  /** List of all available brands */
   const [availableBrands, setAvailableBrands] = useState<string[]>([]);
+  /** Filtered brands based on search phrase */
   const [filteredBrands, setFilteredBrands] = useState<string[]>([]);
+  /** Flag indicating no brand results found */
   const [noResults, setNoResults] = useState(false);
 
+  /** Predefined minimum price options */
   const MIN_PRICE_POINTS = [1000, 5000, 10000, 25000, 50000, 100000, 250000];
+  /** Predefined maximum price options */
   const MAX_PRICE_POINTS = [10000, 25000, 50000, 100000, 250000, 500000, 1000000];
 
+  /**
+   * Shows and automatically hides error notifications
+   */
   useEffect(() => {
     if (priceError) {
       setShowNotification(true);
@@ -34,14 +64,29 @@ const SimpleSearch: React.FC = () => {
     }
   }, [priceError]);
 
+  /**
+   * Formats a number string with thousand separators
+   * @function formatNumber
+   * @param {string} value - Number string to format
+   * @returns {string} Formatted number string
+   */
   const formatNumber = (value: string) => {
     return value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   };
 
+  /**
+   * Removes thousand separators from a formatted number string
+   * @function cleanNumber
+   * @param {string} value - Formatted number string
+   * @returns {string} Clean number string
+   */
   const cleanNumber = (value: string) => {
     return value.replace(/\s/g, '');
   };
 
+  /**
+   * Fetches maximum price from API on component mount
+   */
   useEffect(() => {
     const fetchMaxPrice = async () => {
       try {
@@ -58,6 +103,9 @@ const SimpleSearch: React.FC = () => {
     fetchMaxPrice();
   }, []);
 
+  /**
+   * Fetches all available brands on component mount
+   */
   useEffect(() => {
     const fetchBrands = async () => {
       try {
@@ -76,6 +124,12 @@ const SimpleSearch: React.FC = () => {
     fetchBrands();
   }, []);
 
+  /**
+   * Fetches brand suggestions based on search phrase
+   * @async
+   * @function fetchBrandSuggestions
+   * @param {string} searchPhrase - Search phrase for filtering brands
+   */
   const fetchBrandSuggestions = async (searchPhrase: string) => {
     setNoResults(false);
 
@@ -122,6 +176,9 @@ const SimpleSearch: React.FC = () => {
     }
   };
 
+  /**
+   * Debounces brand suggestion fetching when search phrase changes
+   */
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       fetchBrandSuggestions(phrase);
@@ -130,6 +187,11 @@ const SimpleSearch: React.FC = () => {
     return () => clearTimeout(delayDebounceFn);
   }, [phrase, availableBrands]);
 
+  /**
+   * Handles search phrase input changes
+   * @function handleInputChange
+   * @param {React.ChangeEvent<HTMLInputElement>} e - Input change event
+   */
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setPhrase(newValue);
@@ -137,12 +199,22 @@ const SimpleSearch: React.FC = () => {
     setShowBrandSuggestions(true);
   };
 
+  /**
+   * Handles minimum price input changes
+   * @function handleMinPriceChange
+   * @param {React.ChangeEvent<HTMLInputElement>} e - Input change event
+   */
   const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formattedValue = formatNumber(e.target.value);
     setMinPrice(formattedValue);
     validatePrices(formattedValue, maxPrice);
   };
 
+  /**
+   * Handles maximum price input changes
+   * @function handleMaxPriceChange
+   * @param {React.ChangeEvent<HTMLInputElement>} e - Input change event
+   */
   const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formattedValue = formatNumber(e.target.value);
 
@@ -157,6 +229,13 @@ const SimpleSearch: React.FC = () => {
     }
   };
 
+  /**
+   * Validates price range inputs
+   * @function validatePrices
+   * @param {string} minPriceStr - Minimum price string
+   * @param {string} maxPriceStr - Maximum price string
+   * @returns {boolean} Whether the price range is valid
+   */
   const validatePrices = (minPriceStr: string, maxPriceStr: string) => {
     const minPriceNum = parseInt(cleanNumber(minPriceStr) || '0', 10);
     const maxPriceNum = parseInt(cleanNumber(maxPriceStr) || '0', 10);
@@ -170,6 +249,11 @@ const SimpleSearch: React.FC = () => {
     }
   };
 
+  /**
+   * Handles clicking on a minimum price suggestion
+   * @function handleMinPriceClick
+   * @param {number} price - Selected minimum price
+   */
   const handleMinPriceClick = (price: number) => {
     const formattedPrice = formatNumber(price.toString());
     setMinPrice(formattedPrice);
@@ -177,6 +261,11 @@ const SimpleSearch: React.FC = () => {
     validatePrices(formattedPrice, maxPrice);
   };
 
+  /**
+   * Handles clicking on a maximum price suggestion
+   * @function handleMaxPriceClick
+   * @param {number} price - Selected maximum price
+   */
   const handleMaxPriceClick = (price: number) => {
     const minPriceNum = parseInt(cleanNumber(minPrice) || '0', 10);
 
@@ -190,12 +279,22 @@ const SimpleSearch: React.FC = () => {
     setShowMaxPriceSuggestions(false);
   };
 
+  /**
+   * Handles clicking on a brand suggestion
+   * @function handleBrandClick
+   * @param {string} brand - Selected brand
+   */
   const handleBrandClick = (brand: string) => {
     console.log(`Selected brand: ${brand}`);
     setPhrase(brand);
     setShowBrandSuggestions(false);
   };
 
+  /**
+   * Handles search form submission
+   * @function handleSubmit
+   * @param {React.FormEvent} e - Form submit event
+   */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -225,6 +324,12 @@ const SimpleSearch: React.FC = () => {
     navigate('/offers');
   };
 
+  /**
+   * Filters price points based on maximum price value
+   * @function getFilteredPrices
+   * @param {number[]} pricePoints - Array of price points to filter
+   * @returns {number[]} Filtered price points
+   */
   const getFilteredPrices = (pricePoints: number[]): number[] => {
     return pricePoints.filter(price => price <= maxPriceValue);
   };

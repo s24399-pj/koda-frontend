@@ -1,27 +1,58 @@
+/**
+ * Final step component in the offer creation process focusing on location, expiration date and summary
+ * @module components/OfferCreation/ContactAndSummaryStep
+ */
+
 import React from 'react';
 import { FormikProps, Field, ErrorMessage, FieldInputProps } from 'formik';
 import { CreateOfferCommand, OfferFormValues } from '../../types/offer/OfferTypes';
 
+/**
+ * Props for ContactAndSummaryStep component
+ * @interface ContactAndSummaryStepProps
+ */
 interface ContactAndSummaryStepProps {
+  /** Formik props object for form handling */
   formik: FormikProps<OfferFormValues>;
+  /** Function to go back to the previous step */
   onPrevious: () => void;
+  /** Whether the form is currently being submitted */
   isSubmitting: boolean;
 }
 
+/**
+ * Props for the terms acceptance field
+ * @interface TermsFieldProps
+ */
 interface TermsFieldProps {
+  /** Formik field input props */
   field: FieldInputProps<boolean>;
+  /** Formik form object */
   form: FormikProps<CreateOfferCommand & { termsAccepted: boolean }>;
 }
 
+/**
+ * Component for entering location information and finalizing the offer creation
+ * This is the final step in the multi-step form process
+ * @component
+ * @param {ContactAndSummaryStepProps} props - Component props
+ * @returns {JSX.Element} The ContactAndSummaryStep component
+ */
 const ContactAndSummaryStep: React.FC<ContactAndSummaryStepProps> = ({
   formik,
   onPrevious,
   isSubmitting,
 }) => {
+  /**
+   * Prepares and submits the form
+   * Sets the expiration date time to end of day if provided
+   * @function handleSubmit
+   */
   const handleSubmit = () => {
     if (formik.values.expirationDate) {
       const expirationDate = new Date(formik.values.expirationDate);
 
+      // Set expiration to end of day (23:59:59.999)
       expirationDate.setHours(23, 59, 59, 999);
 
       formik.setFieldValue('expirationDate', expirationDate.toISOString());
@@ -63,6 +94,7 @@ const ContactAndSummaryStep: React.FC<ContactAndSummaryStepProps> = ({
         </small>
       </div>
 
+      {/* Summary section displaying key offer details */}
       <div className="form-summary">
         <h3>Podsumowanie ogłoszenia</h3>
         <div className="summary-details">
@@ -120,6 +152,7 @@ const ContactAndSummaryStep: React.FC<ContactAndSummaryStepProps> = ({
         </div>
       </div>
 
+      {/* Terms acceptance section */}
       <div className="offer-terms">
         <div className="checkbox-group">
           <Field name="termsAccepted">
@@ -144,6 +177,7 @@ const ContactAndSummaryStep: React.FC<ContactAndSummaryStepProps> = ({
         </div>
       </div>
 
+      {/* Navigation buttons */}
       <div className="form-navigation">
         <button type="button" className="previous-step-btn" onClick={onPrevious}>
           Wstecz

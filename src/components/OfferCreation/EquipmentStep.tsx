@@ -1,19 +1,49 @@
+/**
+ * Component for selecting vehicle equipment options in the offer creation process
+ * @module components/OfferCreation/EquipmentStep
+ */
+
 import React from 'react';
 import { FormikProps, Field, FieldInputProps } from 'formik';
 import { OfferFormValues } from '../../types/offer/OfferTypes';
 
+/**
+ * Props for EquipmentStep component
+ * @interface EquipmentStepProps
+ */
 interface EquipmentStepProps {
+  /** Formik props object for form handling */
   formik: FormikProps<OfferFormValues>;
+  /** Function to proceed to the next step */
   onNext: () => void;
+  /** Function to go back to the previous step */
   onPrevious: () => void;
 }
 
+/**
+ * Props for Formik field render functions
+ * @interface FieldRenderProps
+ */
 interface FieldRenderProps {
+  /** Formik field input props */
   field: FieldInputProps<any>;
+  /** Formik form object */
   form: FormikProps<OfferFormValues>;
 }
 
+/**
+ * Component for selecting vehicle equipment options grouped by categories
+ * This is an optional step in the multi-step form process
+ * @component
+ * @param {EquipmentStepProps} props - Component props
+ * @returns {JSX.Element} The EquipmentStep component
+ */
 const EquipmentStep: React.FC<EquipmentStepProps> = ({ formik, onNext, onPrevious }) => {
+  /**
+   * Checks if any equipment options have been selected
+   * @function hasSelectedEquipment
+   * @returns {boolean} True if at least one equipment option is selected
+   */
   const hasSelectedEquipment = () => {
     const equipment = formik.values.equipment || {};
     return Object.values(equipment).some(value => value === true);
