@@ -12,6 +12,9 @@ import EquipmentStep from '../../components/OfferCreation/EquipmentStep';
 import ContactAndSummaryStep from '../../components/OfferCreation/ContactAndSummaryStep';
 import './OfferCreation.scss';
 
+/**
+ * Validation schemas for each step of the form.
+ */
 const validationSchemas = [
   Yup.object({
     title: Yup.string()
@@ -106,6 +109,10 @@ const validationSchemas = [
   }),
 ];
 
+/**
+ * Functional component for creating a new offer.
+ * It guides the user through multiple steps to fill in the details of the offer.
+ */
 const OfferCreation: React.FC = () => {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState<number>(0);
@@ -113,6 +120,9 @@ const OfferCreation: React.FC = () => {
   const [serverError, setServerError] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
 
+  /**
+   * Initial form values for the offer creation form.
+   */
   const initialValues: OfferFormValues = {
     title: '',
     description: '',
@@ -149,16 +159,27 @@ const OfferCreation: React.FC = () => {
     expirationDate: undefined,
   };
 
+  /**
+   * Moves to the next step in the form.
+   */
   const handleNextStep = () => {
     setActiveStep(activeStep + 1);
     window.scrollTo(0, 0);
   };
 
+  /**
+   * Returns to the previous step in the form.
+   */
   const handlePreviousStep = () => {
     setActiveStep(activeStep - 1);
     window.scrollTo(0, 0);
   };
 
+  /**
+   * Normalizes form values before submission.
+   * @param {OfferFormValues} values - The form values to normalize.
+   * @returns {Promise<CreateOfferCommand>} The normalized offer data.
+   */
   const normalizeFormValues = async (values: OfferFormValues): Promise<CreateOfferCommand> => {
     const { termsAccepted, imageFiles, ...offerData } = values;
 
@@ -188,6 +209,10 @@ const OfferCreation: React.FC = () => {
     return offerData;
   };
 
+  /**
+   * Handles form submission.
+   * @param {OfferFormValues} values - The form values to submit.
+   */
   const handleSubmit = async (values: OfferFormValues) => {
     try {
       if (!values.termsAccepted) {
