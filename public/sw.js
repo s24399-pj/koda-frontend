@@ -17,56 +17,40 @@ self.addEventListener('activate', event => {
   event.waitUntil(
     caches
       .keys()
-      .then(cacheNames => {
-        return Promise.all(
+      .then(cacheNames =>
+        Promise.all(
           cacheNames.map(cacheName => {
             if (!['koda-v1', 'koda-api-v1', 'koda-geo-v1'].includes(cacheName)) {
               return caches.delete(cacheName);
             }
+            return Promise.resolve();
           })
-        );
-      })
+        )
+      )
       .then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('fetch', event => {
-  const { request } = event;
-  const url = new URL(request.url);
+  const url = new URL(event.request.url);
 
-  if (isGeocodingRequest(url)) {
-    event.respondWith(handleGeocodingRequest(request));
+  if (url.hostname === 'nominatim.openstreetmap.org') {
+    event.respondWith(handleGeocodingRequest(event.request));
   } else if (isApiRequest(url)) {
-    event.respondWith(handleApiRequest(request));
-  } else if (isStaticAsset(request)) {
-    event.respondWith(handleStaticAsset(request));
+    event.respondWith(handleApiRequest(event.request));
+  } else if (isStaticAsset(event.request)) {
+    event.respondWith(handleStaticAsset(event.request));
   }
 });
 
-function isGeocodingRequest(url) {
-  return url.hostname === 'nominatim.openstreetmap.org';
-}
-
 function isApiRequest(url) {
-  console.log('SW checking URL:', url.href, 'pathname:', url.pathname);
-
-  const isApi =
-    url.pathname.includes('/api/v1/') ||
-    (url.hostname === 'localhost' && url.port === '8137') ||
-    url.hostname.includes('localhost:8137');
-
-  console.log('SW isApiRequest result:', isApi);
-  return isApi;
+  return url.pathname.includes('/api/v1/') || (url.hostname === 'localhost' && url.port === '8137');
 }
 
 function isStaticAsset(request) {
   const url = new URL(request.url);
-
-  if (url.origin !== self.location.origin) {
-    return false;
-  }
-
   return (
+    url.origin === self.location.origin &&
     request.method === 'GET' &&
     (request.destination === 'document' ||
       request.destination === 'script' ||
@@ -77,34 +61,20 @@ function isStaticAsset(request) {
 }
 
 async function handleGeocodingRequest(request) {
-  console.log('SW handling geocoding request:', request.url);
-
-  if (request.method !== 'GET') {
-    return fetch(request);
-  }
+  if (request.method !== 'GET') return fetch(request);
 
   try {
-    console.log('SW trying network for geocoding:', request.url);
     const networkResponse = await fetch(request);
-
     if (networkResponse.ok) {
-      console.log('SW geocoding network success, caching response');
       const cache = await caches.open(GEO_CACHE);
-      cache.put(request, networkResponse.clone());
+      await cache.put(request, networkResponse.clone());
     }
-
     return networkResponse;
   } catch (error) {
-    console.log('SW geocoding network failed, checking cache:', request.url);
     const cachedResponse = await caches.match(request);
+    if (cachedResponse) return cachedResponse;
 
-    if (cachedResponse) {
-      console.log('SW found cached geocoding response');
-      return cachedResponse;
-    }
-
-    console.log('SW no cached geocoding response found');
-    return new Response(JSON.stringify([]), {
+    return new Response('[]', {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -112,8 +82,6 @@ async function handleGeocodingRequest(request) {
 }
 
 async function handleApiRequest(request) {
-  console.log('SW handling API request:', request.url, 'method:', request.method);
-
   if (request.method !== 'GET') {
     try {
       return await fetch(request);
@@ -122,10 +90,15 @@ async function handleApiRequest(request) {
         JSON.stringify({
           error: 'Brak połączenia z internetem',
           offline: true,
-          queued: true,
+          content: [],
+          totalElements: 0,
+          totalPages: 0,
+          number: 0,
+          size: 10,
+          empty: true,
         }),
         {
-          status: 503,
+          status: 200,
           headers: { 'Content-Type': 'application/json' },
         }
       );
@@ -133,29 +106,15 @@ async function handleApiRequest(request) {
   }
 
   try {
-    console.log('SW trying network for:', request.url);
     const networkResponse = await fetch(request);
-
-    if (networkResponse.ok && networkResponse.status === 200) {
-      console.log('SW network success, caching response for:', request.url);
+    if (networkResponse.ok) {
       const cache = await caches.open(API_CACHE);
-      cache.put(request, networkResponse.clone());
-    } else {
-      console.log('SW network response not OK:', networkResponse.status);
+      await cache.put(request, networkResponse.clone());
     }
-
     return networkResponse;
   } catch (error) {
-    console.log('SW network failed, checking cache for:', request.url);
     const cachedResponse = await caches.match(request);
-
-    if (cachedResponse) {
-      console.log('SW found in cache, returning:', request.url);
-      return cachedResponse;
-    }
-
-    console.log('SW no cache found for:', request.url);
-    console.log('SW creating offline response');
+    if (cachedResponse) return cachedResponse;
 
     return new Response(
       JSON.stringify({
@@ -177,66 +136,23 @@ async function handleApiRequest(request) {
 }
 
 async function handleStaticAsset(request) {
-  console.log('SW handling static asset:', request.url, 'destination:', request.destination);
-
   try {
     const cachedResponse = await caches.match(request);
-    if (cachedResponse) {
-      console.log('SW found cached static asset:', request.url);
-      return cachedResponse;
-    }
+    if (cachedResponse) return cachedResponse;
 
-    console.log('SW trying network for static asset:', request.url);
     const networkResponse = await fetch(request);
     if (networkResponse.ok) {
-      console.log('SW caching static asset:', request.url);
       const cache = await caches.open(CACHE_NAME);
-      cache.put(request, networkResponse.clone());
+      await cache.put(request, networkResponse.clone());
     }
-
     return networkResponse;
   } catch (error) {
-    console.log('SW static asset failed:', request.url, 'error:', error.message);
-
     if (request.destination === 'document') {
-      console.log('SW document request failed, trying homepage fallback');
       const fallback = await caches.match('/');
-      if (fallback) {
-        console.log('SW serving homepage as fallback');
-        return fallback;
-      }
-
-      console.log('SW no homepage in cache, serving app shell');
-      return new Response(
-        `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>Koda - Offline</title>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1">
-        </head>
-        <body>
-          <div id="root">
-            <div style="text-align: center; padding: 50px; font-family: Arial;">
-              <h1>Koda</h1>
-              <p>Aplikacja działa offline</p>
-              <p><a href="/">Wróć do strony głównej</a></p>
-            </div>
-          </div>
-          <script>window.location.href = '/';</script>
-        </body>
-        </html>
-      `,
-        {
-          status: 200,
-          headers: { 'Content-Type': 'text/html' },
-        }
-      );
+      if (fallback) return fallback;
     }
 
-    console.log('SW no fallback for:', request.url);
-    return new Response('Offline - resource not available', {
+    return new Response('Offline', {
       status: 503,
       statusText: 'Service Unavailable',
     });
