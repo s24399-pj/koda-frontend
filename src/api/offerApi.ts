@@ -450,6 +450,11 @@ export const getOfferById = (id: string): Promise<OfferData> => {
 export const geocodeLocation = async (location: string): Promise<LocationCoordinates | null> => {
   console.log(`Geocoding location: ${location}`);
 
+  if (!navigator.onLine) {
+    console.log('Offline - skipping geocoding');
+    return null;
+  }
+
   try {
     const response = await axios.get<GeocodeResult[]>(
       'https://nominatim.openstreetmap.org/search',
@@ -460,6 +465,7 @@ export const geocodeLocation = async (location: string): Promise<LocationCoordin
           limit: 5,
           addressdetails: 1,
         },
+        timeout: 5000,
       }
     );
 
@@ -477,15 +483,15 @@ export const geocodeLocation = async (location: string): Promise<LocationCoordin
         };
       } else {
         console.error('Exact location not found');
-        throw new Error('Failed to find exact location.');
+        return null;
       }
     } else {
       console.error('No results for this location');
-      throw new Error('Failed to find location.');
+      return null;
     }
   } catch (error) {
     console.error('Error geocoding location:', error);
-    throw error;
+    return null;
   }
 };
 
