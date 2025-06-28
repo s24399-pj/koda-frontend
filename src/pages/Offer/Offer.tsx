@@ -278,15 +278,18 @@ const Offer: React.FC = () => {
         }
 
         if (offerData.location) {
-          try {
-            const coordinates = await offerApi.geocodeLocation(offerData.location);
-            if (coordinates) {
-              setMapLat(coordinates.lat);
-              setMapLng(coordinates.lng);
+          if (!navigator.onLine) {
+            console.log('Offline - skipping geocoding');
+          } else {
+            try {
+              const coordinates = await offerApi.geocodeLocation(offerData.location);
+              if (coordinates) {
+                setMapLat(coordinates.lat);
+                setMapLng(coordinates.lng);
+              }
+            } catch (geocodeError) {
+              console.error('Geocoding error:', geocodeError);
             }
-          } catch (geocodeError) {
-            console.error('Geocoding error:', geocodeError);
-            setError('Failed to find location.');
           }
         }
       } catch (error) {
@@ -304,6 +307,29 @@ const Offer: React.FC = () => {
    * Effect hook to initialize and configure the Leaflet map when coordinates are available.
    * Creates a map with a circle overlay indicating the offer location area.
    */
+  useEffect(() => {
+    const handleOnlineStatusChange = async () => {
+      if (navigator.onLine && offer?.location && !mapLat && !mapLng) {
+        console.log('Network is back - trying to load map');
+        try {
+          const coordinates = await offerApi.geocodeLocation(offer.location);
+          if (coordinates) {
+            setMapLat(coordinates.lat);
+            setMapLng(coordinates.lng);
+          }
+        } catch (geocodeError) {
+          console.error('Geocoding error after coming online:', geocodeError);
+        }
+      }
+    };
+
+    window.addEventListener('online', handleOnlineStatusChange);
+
+    return () => {
+      window.removeEventListener('online', handleOnlineStatusChange);
+    };
+  }, [offer?.location, mapLat, mapLng]);
+
   useEffect(() => {
     if (mapLat && mapLng && mapRef.current) {
       const map = L.map(mapRef.current).setView([mapLat, mapLng], 13);
@@ -814,17 +840,42 @@ const Offer: React.FC = () => {
         </div>
       )}
 
-      {mapLat && mapLng && (
+      {offer.location && (
         <div className="offer-map">
           <div className="section">
             <h2>Lokalizacja</h2>
-            <div
-              ref={mapRef}
-              style={{
-                height: isMobile ? '250px' : '300px',
-                width: '100%',
-              }}
-            ></div>
+            {mapLat && mapLng ? (
+              <div
+                ref={mapRef}
+                style={{
+                  height: isMobile ? '250px' : '300px',
+                  width: '100%',
+                }}
+              ></div>
+            ) : (
+              <div
+                style={{
+                  height: isMobile ? '250px' : '300px',
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: '#f5f5f5',
+                  border: '1px solid #ddd',
+                  borderRadius: '8px',
+                  flexDirection: 'column',
+                  gap: '10px',
+                }}
+              >
+                <div style={{ fontSize: '48px' }}>📍</div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>{offer.location}</div>
+                  <div style={{ color: '#666', fontSize: '14px' }}>
+                    {!navigator.onLine ? 'Mapa niedostępna w trybie offline' : 'Ładowanie mapy...'}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
