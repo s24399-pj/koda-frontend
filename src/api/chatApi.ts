@@ -96,7 +96,7 @@ class ChatService {
           },
           onDisconnect: () => {
             console.log('WebSocket disconnected');
-          }
+          },
         });
 
         this.client.activate();
@@ -177,7 +177,7 @@ class ChatService {
       }
 
       const response = await axiosAuthClient.get<ChatMessage[]>(
-          `/api/v1/chat/messages?recipientId=${recipientId}`
+        `/api/v1/chat/messages?recipientId=${recipientId}`
       );
       return response.data;
     } catch (error) {

@@ -19,6 +19,7 @@ export const translations = {
     SEDAN: 'Sedan',
     HATCHBACK: 'Hatchback',
     STATION_WAGON: 'Kombi',
+    ESTATE: 'Kombi',
     SUV: 'SUV',
     COUPE: 'Coupe',
     CONVERTIBLE: 'Kabriolet',
