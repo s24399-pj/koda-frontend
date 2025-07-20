@@ -6,6 +6,7 @@
 import React from 'react';
 import { FormikProps, Field, ErrorMessage, FieldInputProps } from 'formik';
 import { CreateOfferCommand, OfferFormValues } from '../../types/offer/OfferTypes';
+import { translations } from '../../translations/carEquipmentTranslations';
 
 /**
  * Props for ContactAndSummaryStep component
@@ -43,6 +44,17 @@ const ContactAndSummaryStep: React.FC<ContactAndSummaryStepProps> = ({
   onPrevious,
   isSubmitting,
 }) => {
+  /**
+   * Gets translated text for car equipment based on category and key.
+   *
+   * @param {keyof typeof translations} category - The translation category
+   * @param {string} key - The translation key
+   * @returns {string} The translated text or the original key if translation not found
+   */
+  const getTranslation = (category: keyof typeof translations, key: string) => {
+    return (translations[category] as Record<string, string>)?.[key] || key;
+  };
+
   /**
    * Prepares and submits the form
    * Sets the expiration date time to end of day if provided
@@ -128,19 +140,25 @@ const ContactAndSummaryStep: React.FC<ContactAndSummaryStepProps> = ({
           {formik.values.fuelType && (
             <div className="summary-row">
               <span className="summary-label">Rodzaj paliwa:</span>
-              <span className="summary-value">{formik.values.fuelType}</span>
+              <span className="summary-value">
+                {getTranslation('fuelType', formik.values.fuelType)}
+              </span>
             </div>
           )}
           {formik.values.bodyType && (
             <div className="summary-row">
               <span className="summary-label">Typ nadwozia:</span>
-              <span className="summary-value">{formik.values.bodyType}</span>
+              <span className="summary-value">
+                {getTranslation('bodyType', formik.values.bodyType)}
+              </span>
             </div>
           )}
           {formik.values.transmission && (
             <div className="summary-row">
               <span className="summary-label">Skrzynia biegów:</span>
-              <span className="summary-value">{formik.values.transmission}</span>
+              <span className="summary-value">
+                {getTranslation('transmissionType', formik.values.transmission)}
+              </span>
             </div>
           )}
           {formik.values.location && (
