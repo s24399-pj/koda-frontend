@@ -13,6 +13,8 @@ import ChatPage from '../pages/Chat/ChatPage.tsx';
 import LikedOffers from '../pages/LikedOffers/LikedOffers.tsx';
 import SellerOffers from '../pages/SellerOffers/SellerOffers.tsx';
 import RequireAuth from '../components/RequireAuth/RequireAuth.tsx';
+import TermsPage from '../pages/LegalPages/TermsPage';
+import PrivacyPolicyPage from '../pages/LegalPages/PrivacyPolicyPage';
 
 const AppRouter = () => {
   return (
@@ -28,6 +30,8 @@ const AppRouter = () => {
       <Route path="/user/login" element={<LoginPage />} />
       <Route path="/user/register" element={<RegisterPage />} />
       <Route path="/liked" element={<LikedOffers />} />
+      <Route path="/terms" element={<TermsPage />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
       {/* Protected */}
       <Route
         path="/user/panel"
