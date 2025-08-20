@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import './Footer.scss';
 
 const Footer = () => {
@@ -74,8 +75,8 @@ const Footer = () => {
             <p>Copyright © {currentYear} ・ Koda, All Rights Reserved</p>
           </div>
           <div className="footer-links">
-            <a href="#">Polityka prywatności</a>
-            <a href="#">Warunki korzystania</a>
+            <Link to="/privacy-policy">Polityka prywatności</Link>
+            <Link to="/terms">Warunki korzystania</Link>
           </div>
         </div>
       </div>

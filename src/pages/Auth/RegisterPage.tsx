@@ -258,7 +258,8 @@ const RegisterPage: React.FC = () => {
               <div className="form-terms">
                 <Field type="checkbox" id="terms" name="terms" />
                 <label htmlFor="terms">
-                  Akceptuję <a href="#">regulamin</a> oraz <a href="#">politykę prywatności</a>
+                  Akceptuję <Link to="/terms">regulamin</Link> oraz{' '}
+                  <Link to="/privacy-policy">politykę prywatności</Link>
                 </label>
               </div>
               <ErrorMessage name="terms" component="div" className="form-error" />
